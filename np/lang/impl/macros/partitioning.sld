@@ -4,7 +4,7 @@
   ;;; various classes based on their structural features.
   ;;;
   (export $partition-toplevel-clauses
-    )
+          $filter-standalone-terminal-descriptions)
 
   (import (scheme base)
           (sr ck)
@@ -54,5 +54,25 @@
       (syntax-rules (quote)
         ((_ s 'terminals)
          ($ s ($concatenate ($map '$cdr 'terminals)))) ) )
+
+    ;;;
+    ;;; Terminal descriptions
+    ;;;
+
+    (define-syntax $filter-standalone-terminal-descriptions
+      (syntax-rules (quote)
+        ((_ s 'lang 'descriptions)
+         ($ s ($cleanup-partitioned-standalone-terminal-descriptions 'lang
+                ($partition '$can-be:standalone-terminal-description?
+                            'descriptions ) )))  ) )
+
+    (define-syntax $cleanup-partitioned-standalone-terminal-descriptions
+      (syntax-rules (quote)
+        ((_ s 'lang '(possible-descriptions ()))
+         ($ s ($map '($must-be:standalone-terminal-description 'lang)
+                    'possible-descriptions )))
+
+        ((_ s 'lang '(_ (x xs ...)))
+         (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
 
 ) )

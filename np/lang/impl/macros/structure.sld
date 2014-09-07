@@ -18,10 +18,15 @@
           $can-be:parser-clause?
           $can-be:unparser-clause?
           $can-be:terminals-clause?
-          $can-be:nonterminal-clause?)
+          $can-be:nonterminal-clause?
+
+          $can-be:standalone-terminal-description?
+          $must-be:standalone-terminal-description)
 
   (import (scheme base)
-          (sr ck))
+          (sr ck)
+          (sr ck lists)
+          (sr ck maps))
 
   (begin
     ;;;
@@ -57,5 +62,53 @@
       (syntax-rules (quote)
         ((_ s '(something . _)) ($ s '#t))
         ((_ s        _        ) ($ s '#f)) ) )
+
+    ;;;
+    ;;; Terminal descriptions
+    ;;;
+
+    (define-syntax $can-be:standalone-terminal-description?
+      (syntax-rules (quote)
+        ((_ s '(name predicate (vars ...))) ($ s '#t))
+        ((_ s '(predicate (vars ...)))      ($ s '#t))
+        ((_ s 'anything-other-than-that)    ($ s '#f)) ) )
+
+    (define-syntax $must-be:standalone-terminal-description
+      (syntax-rules (quote)
+        ((_ s 'lang '(name predicate ()))
+         (syntax-error "Meta-var list cannot be empty"
+                       lang (name predicate ())))
+
+        ((_ s 'lang '(predicate ()))
+         (syntax-error "Meta-var list cannot be empty"
+                       lang (predicate ())))
+
+        ((_ s 'lang '(name predicate (meta-vars ...)))
+         ($ s ($list 'name 'predicate
+                ($map '($must-be:standalone-meta-var 'lang 'name)
+                      '(meta-vars ...) ) )))
+
+        ((_ s 'lang '(predicate (meta-vars ...)))
+         ($ s ($list 'predicate
+                ($map '($must-be:standalone-meta-var 'lang 'predicate)
+                      '(meta-vars ...) ) )))
+
+        ((_ s 'lang 'invalid-description)
+         (syntax-error "Invalid terminal description syntax"
+                       lang invalid-description)) ) )
+
+    ;;;
+    ;;; Meta-variables
+    ;;;
+
+    (define-syntax $must-be:standalone-meta-var
+      (syntax-rules (quote)
+        ((_ s 'lang 'clause '(x ...))
+         (syntax-error "Meta-var name cannot be a list" lang clause (x ...)))
+
+        ((_ s 'lang 'clause '#(x ...))
+         (syntax-error "Meta-var name cannot be a vector" lang clause #(x ...)))
+
+        ((_ s _ _ 'var) ($ s 'var)) ) )
 
 ) )
