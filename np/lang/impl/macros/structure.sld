@@ -21,7 +21,15 @@
           $can-be:nonterminal-clause?
 
           $can-be:standalone-terminal-description?
-          $must-be:standalone-terminal-description)
+          $must-be:standalone-terminal-description
+
+          $can-be:terminal-explicit-addition?
+          $can-be:terminal-implicit-addition?
+          $can-be:terminal-removal?
+          $can-be:terminal-modification?
+          $must-be:terminal-description-addition
+          $must-be:terminal-description-removal
+          $must-be:terminal-description-modification)
 
   (import (scheme base)
           (sr ck)
@@ -29,6 +37,16 @@
           (sr ck maps))
 
   (begin
+    ;;;
+    ;;; Utilities
+    ;;;
+
+    (define-syntax $not-vector-or-list?
+      (syntax-rules (quote)
+        ((_ s '(things ...)) ($ s '#f))
+        ((_ s '#(stuff ...)) ($ s '#f))
+        ((_ s 'atom)         ($ s '#t)) ) )
+
     ;;;
     ;;; Toplevel clauses
     ;;;
@@ -64,14 +82,16 @@
         ((_ s        _        ) ($ s '#f)) ) )
 
     ;;;
-    ;;; Terminal descriptions
+    ;;; Terminal descriptions (standalone)
     ;;;
 
     (define-syntax $can-be:standalone-terminal-description?
       (syntax-rules (quote)
-        ((_ s '(name predicate (vars ...))) ($ s '#t))
-        ((_ s '(predicate (vars ...)))      ($ s '#t))
-        ((_ s 'anything-other-than-that)    ($ s '#f)) ) )
+        ((_ s '(name predicate (vars ...)))
+         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
+        ((_ s '(predicate (vars ...)))
+         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
+        ((_ s _) ($ s '#f)) ) )
 
     (define-syntax $must-be:standalone-terminal-description
       (syntax-rules (quote)
@@ -98,8 +118,62 @@
                        lang invalid-description)) ) )
 
     ;;;
+    ;;; Terminal descriptions (extension, predicates)
+    ;;;
+
+    (define-syntax $can-be:terminal-explicit-addition?
+      (syntax-rules (quote +)
+        ((_ s '(+ clauses ...))
+         ($ s ($every? '$can-be:standalone-terminal-description?
+                       '(clauses ...) )))
+        ((_ s _) ($ s '#f)) ) )
+
+    (define-syntax $can-be:terminal-implicit-addition?
+      (syntax-rules (quote + -)
+        ((_ s 'expr) ($ s ($can-be:standalone-terminal-description? 'expr))) ) )
+
+    (define-syntax $can-be:terminal-removal?
+      (syntax-rules (quote -)
+        ((_ s '(- clauses ...))
+         ($ s ($every? '$standalone-desciption-or-name? '(clauses ...))))
+        ((_ s _) ($ s '#f)) ) )
+
+    (define-syntax $standalone-desciption-or-name?
+      (syntax-rules (quote)
+        ((_ s 'expr) ($ s ($or '($can-be:standalone-terminal-description? 'expr)
+                               '($not-vector-or-list? 'expr) ))) ) )
+
+    (define-syntax $can-be:terminal-modification?
+      (syntax-rules (quote)
+        ((_ s '(name predicate (vars ...)))
+         ($ s ($every? '$can-be:extension-meta-var? '(vars ...))))
+        ((_ s '(name (vars ...)))
+         ($ s ($every? '$can-be:extension-meta-var? '(vars ...))))
+        ((_ s _) ($ s '#f)) ) )
+
+    ;;;
+    ;;; Terminal descriptions (extension, assertions)
+    ;;;
+
+    (define-syntax $must-be:terminal-description-addition
+      (syntax-rules (quote)
+        ((_ s 'lang 'expr) ($ s 'expr)) ) )
+
+    (define-syntax $must-be:terminal-description-removal
+      (syntax-rules (quote)
+        ((_ s 'lang 'expr) ($ s 'expr)) ) )
+
+    (define-syntax $must-be:terminal-description-modification
+      (syntax-rules (quote)
+        ((_ s 'lang 'expr) ($ s 'expr)) ) )
+
+    ;;;
     ;;; Meta-variables
     ;;;
+
+    (define-syntax $can-be:standalone-meta-var?
+      (syntax-rules (quote)
+        ((_ s 'expr) ($ s ($not-vector-or-list? 'expr))) ) )
 
     (define-syntax $must-be:standalone-meta-var
       (syntax-rules (quote)
@@ -110,5 +184,13 @@
          (syntax-error "Meta-var name cannot be a vector" lang clause #(x ...)))
 
         ((_ s _ _ 'var) ($ s 'var)) ) )
+
+    (define-syntax $can-be:extension-meta-var?
+      (syntax-rules (quote + -)
+        ((_ s '(+ vars ...))
+         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
+        ((_ s '(- vars ...))
+         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
+        ((_ s _) ($ s '#f)) ) )
 
 ) )

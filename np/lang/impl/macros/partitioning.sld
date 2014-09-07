@@ -4,7 +4,8 @@
   ;;; various classes based on their structural features.
   ;;;
   (export $partition-toplevel-clauses
-          $filter-standalone-terminal-descriptions)
+          $filter-standalone-terminal-descriptions
+          $partition-extension-terminal-descriptions)
 
   (import (scheme base)
           (sr ck)
@@ -14,6 +15,15 @@
           (np lang impl macros structure))
 
   (begin
+    ;;;
+    ;;; Utilities
+    ;;;
+
+    (define-syntax $drop-head-and-squash
+      (syntax-rules (quote)
+        ((_ s 'list)
+         ($ s ($concatenate ($map '$cdr 'list)))) ) )
+
     ;;;
     ;;; Preliminary partitioning
     ;;;
@@ -40,7 +50,7 @@
                 ($at-most-one 'r '(lang "Only one 'predicate' clause allowed"))
                 ($at-most-one 'p '(lang "Only one 'parser' clause allowed"))
                 ($at-most-one 'u '(lang "Only one 'unparser' clause allowed"))
-                ($squash-terminals 't)
+                ($drop-head-and-squash 't)
                 'n ))) ) )
 
     (define-syntax $at-most-one
@@ -50,13 +60,8 @@
         ((_ s '(x xs ...) '(lang msg))
          (syntax-error msg lang)) ) )
 
-    (define-syntax $squash-terminals
-      (syntax-rules (quote)
-        ((_ s 'terminals)
-         ($ s ($concatenate ($map '$cdr 'terminals)))) ) )
-
     ;;;
-    ;;; Terminal descriptions
+    ;;; Terminal descriptions (standalone)
     ;;;
 
     (define-syntax $filter-standalone-terminal-descriptions
@@ -73,6 +78,36 @@
                     'possible-descriptions )))
 
         ((_ s 'lang '(_ (x xs ...)))
+         (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
+
+    ;;;
+    ;;; Terminal descriptions (extension)
+    ;;;
+
+    ;; Implicit addition is checked at the end to avoid false positives from it
+    (define-syntax $partition-extension-terminal-descriptions
+      (syntax-rules (quote)
+        ((_ s 'lang 'descriptions)
+         ($ s ($cleanup-partitioned-extension-terminal-descriptions 'lang
+                ($multi-partition '($can-be:terminal-modification?
+                                    $can-be:terminal-removal?
+                                    $can-be:terminal-explicit-addition?
+                                    $can-be:terminal-implicit-addition?)
+                  'descriptions ) ))) ) )
+
+    (define-syntax $cleanup-partitioned-extension-terminal-descriptions
+      (syntax-rules (quote)
+        ((_ s 'lang '(edits minuses explicit-pluses implicit-pluses ()))
+         ($ s ($list
+                ($map '($must-be:terminal-description-addition 'lang)
+                      ($append ($drop-head-and-squash 'explicit-pluses)
+                               'implicit-pluses ) )
+                ($map '($must-be:terminal-description-removal 'lang)
+                      ($drop-head-and-squash 'minuses) )
+                ($map '($must-be:terminal-description-modification 'lang)
+                      'edits ) )))
+
+        ((_ s 'lang '(_ _ _ _ (x xs ...)))
          (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
 
 ) )
