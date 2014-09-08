@@ -29,12 +29,15 @@
           $can-be:terminal-modification?
           $must-be:terminal-description-addition
           $must-be:terminal-description-removal
-          $must-be:terminal-description-modification)
+          $must-be:terminal-description-modification
+          $partition-terminal-description-modification-meta-vars)
 
   (import (scheme base)
           (sr ck)
+          (sr ck filters)
           (sr ck lists)
-          (sr ck maps))
+          (sr ck maps)
+          (sr ck predicates))
 
   (begin
     ;;;
@@ -157,15 +160,78 @@
 
     (define-syntax $must-be:terminal-description-addition
       (syntax-rules (quote)
-        ((_ s 'lang 'expr) ($ s 'expr)) ) )
+        ((_ s 'lang '(name predicate ()))
+         (syntax-error "Meta-var list cannot be empty"
+                       lang (name predicate ())))
+
+        ((_ s 'lang '(predicate ()))
+         (syntax-error "Meta-var list cannot be empty"
+                       lang (predicate ())))
+
+        ((_ s 'lang '(name predicate (meta-vars ...)))
+         ($ s ($list 'name 'predicate
+                ($map '($must-be:standalone-meta-var 'lang 'name)
+                      '(meta-vars ...) ) )))
+
+        ((_ s 'lang '(predicate (meta-vars ...)))
+         ($ s ($list 'predicate
+                ($map '($must-be:standalone-meta-var 'lang 'predicate)
+                      '(meta-vars ...) ) )))
+
+        ((_ s 'lang 'invalid-description)
+         (syntax-error "Invalid added terminal description syntax"
+                       lang invalid-description)) ) )
 
     (define-syntax $must-be:terminal-description-removal
       (syntax-rules (quote)
-        ((_ s 'lang 'expr) ($ s 'expr)) ) )
+        ((_ s 'lang '(name predicate ()))
+         (syntax-error "Meta-var list cannot be empty"
+                       lang (name predicate ())))
+
+        ((_ s 'lang '(predicate ()))
+         (syntax-error "Meta-var list cannot be empty"
+                       lang (predicate ())))
+
+        ((_ s 'lang '(name predicate (meta-vars ...)))
+         ($ s ($list 'name 'predicate
+                ($map '($must-be:standalone-meta-var 'lang 'name)
+                      '(meta-vars ...) ) )))
+
+        ((_ s 'lang '(predicate (meta-vars ...)))
+         ($ s ($list 'predicate
+                ($map '($must-be:standalone-meta-var 'lang 'predicate)
+                      '(meta-vars ...) ) )))
+
+        ((_ s 'lang '(some-other-list ...))
+         (syntax-error "Invalid removed terminal description syntax"
+                       lang (some-other-list ...)))
+
+        ((_ s 'lang '#(some-vector ...))
+         (syntax-error "Invalid removed terminal description syntax"
+                       lang #(some-vector ...)))
+
+        ((_ s _ 'otherwise-structurally-valid-terminal-name)
+         ($ s 'otherwise-structurally-valid-terminal-name)) ) )
 
     (define-syntax $must-be:terminal-description-modification
       (syntax-rules (quote)
-        ((_ s 'lang 'expr) ($ s 'expr)) ) )
+        ((_ s 'lang '(name predicate ((added-vars ...) (removed-vars ...))))
+         ($ s ($list 'name 'predicate
+                ($list ($map '($must-be:standalone-meta-var 'lang 'name)
+                             '(added-vars ...) )
+                       ($map '($must-be:standalone-meta-var 'lang 'name)
+                             '(removed-vars ...) ) ) )))
+
+        ((_ s 'lang '(name ((added-vars ...) (removed-vars ...))))
+         ($ s ($list 'name
+                ($list ($map '($must-be:standalone-meta-var 'lang 'name)
+                             '(added-vars ...) )
+                       ($map '($must-be:standalone-meta-var 'lang 'name)
+                             '(removed-vars ...) ) ) )))
+
+        ((_ s 'lang 'invalid-description)
+         (syntax-error "Invalid modified terminal description syntax"
+                       lang invalid-description)) ) )
 
     ;;;
     ;;; Meta-variables
@@ -189,6 +255,85 @@
       (syntax-rules (quote + -)
         ((_ s '(+ vars ...))
          ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
+        ((_ s '(- vars ...))
+         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
+        ((_ s _) ($ s '#f)) ) )
+
+    (define-syntax $must-be:extension-meta-var
+      (syntax-rules (quote + -)
+        ((_ s 'lang 'clause '(+))
+         (syntax-error "List of added meta-vars cannot be empty" lang clause))
+
+        ((_ s 'lang 'clause '(-))
+         (syntax-error "List of removed meta-vars cannot be empty" lang clause))
+
+        ((_ s 'lang 'clause '(+ vars ...))
+         ($ s ($list '+
+                ($map '($must-be:standalone-meta-var 'lang 'clause)
+                      '(vars ...) ) )))
+
+        ((_ s 'lang 'clause '(- vars ...))
+         ($ s ($list '-
+                ($map '($must-be:standalone-meta-var 'lang 'clause)
+                      '(vars ...) ) )))
+
+        ((_ s 'lang 'clause 'invalid-expr)
+         (syntax-error "Invalid meta-var description"
+                       lang clause invalid-expr)) ) )
+
+    (define-syntax $partition-terminal-description-modification-meta-vars
+      (syntax-rules (quote)
+        ((_ s 'lang '(name predicate (vars ...)))
+         ($ s ($cleanup-terminal-description-modification-meta-vars
+                'lang 'name 'predicate
+                ($multi-partition '($can-be:meta-var-addition?
+                                    $can-be:meta-var-removal?)
+                  '(vars ...) ) )))
+
+        ((_ s 'lang '(name (vars ...)))
+         ($ s ($cleanup-terminal-description-modification-meta-vars
+                'lang 'name
+                ($multi-partition '($can-be:meta-var-addition?
+                                    $can-be:meta-var-removal?)
+                  '(vars ...) ) )))
+
+        ((_ s 'lang 'invalid-expr)
+         (syntax-error "Invalid modified terminal description syntax"
+                       lang invalid-expr)) ) )
+
+    (define-syntax $drop-head-and-squash
+      (syntax-rules (quote)
+        ((_ s 'list)
+         ($ s ($concatenate ($map '$cdr 'list)))) ) )
+
+    (define-syntax $cleanup-terminal-description-modification-meta-vars
+      (syntax-rules (quote)
+        ((_ s 'lang 'name 'predicate '(added removed ()))
+         ($ s ($list 'name 'predicate
+                ($list ($drop-head-and-squash 'added)
+                       ($drop-head-and-squash 'removed) ) )))
+
+        ((_ s 'lang 'name '(added removed ()))
+         ($ s ($list 'name
+                ($list ($drop-head-and-squash 'added)
+                       ($drop-head-and-squash 'removed) ) )))
+
+        ((_ s 'lang 'name _ '(_ _ (x xs ...)))
+         (syntax-error "Invalid meta-var descriptions"
+                       lang name (x xs ...)))
+
+        ((_ s 'lang 'name '(_ _ (x xs ...)))
+         (syntax-error "Invalid meta-var descriptions"
+                       lang name (x xs ...))) ) )
+
+    (define-syntax $can-be:meta-var-addition?
+      (syntax-rules (quote +)
+        ((_ s '(+ vars ...))
+         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
+        ((_ s _) ($ s '#f)) ) )
+
+    (define-syntax $can-be:meta-var-removal?
+      (syntax-rules (quote -)
         ((_ s '(- vars ...))
          ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
         ((_ s _) ($ s '#f)) ) )

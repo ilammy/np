@@ -102,10 +102,14 @@
                 ($map '($must-be:terminal-description-addition 'lang)
                       ($append ($drop-head-and-squash 'explicit-pluses)
                                'implicit-pluses ) )
+
                 ($map '($must-be:terminal-description-removal 'lang)
                       ($drop-head-and-squash 'minuses) )
+
                 ($map '($must-be:terminal-description-modification 'lang)
-                      'edits ) )))
+                  ($map '($partition-terminal-description-modification-meta-vars
+                          'lang)
+                        'edits ) ) )))
 
         ((_ s 'lang '(_ _ _ _ (x xs ...)))
          (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
