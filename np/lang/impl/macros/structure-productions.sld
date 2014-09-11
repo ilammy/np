@@ -3,7 +3,10 @@
   ;;; Structural analysis of nonterminal productions (standalone and extension)
   ;;;
   (export $can-be:standalone-production?
-          $must-be:standalone-production)
+          $must-be:standalone-production
+
+          $can-be:production-addition?
+          $can-be:production-removal?)
 
   (import (scheme base)
           (sr ck)
@@ -42,5 +45,20 @@
          ($ s ($map '($must-be:standalone-production* 'lang 'clause 'production) '(x ...))))
 
         ((_ s _ _ _ 'atom) ($ s 'atom)) ) )
+
+    ;;;
+    ;;; Extension form
+    ;;;
+
+    (define-syntax $can-be:production-addition?
+      (syntax-rules (quote +)
+        ((_ s '(+ clauses ...))
+         ($ s ($every? '$can-be:standalone-production? '(clauses ...)))) ) )
+
+    (define-syntax $can-be:production-removal?
+      (syntax-rules (quote -)
+        ((_ s '(- clauses ...))
+         ($ s ($every? '$can-be:standalone-production? '(clauses ...)))) ) )
+
 
 ) )
