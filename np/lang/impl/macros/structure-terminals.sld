@@ -33,11 +33,8 @@
 
     (define-syntax $can-be:standalone-terminal-description?
       (syntax-rules (quote)
-        ((_ s '(name predicate (vars ...)))
-         ($ s ($and '($not-vector-or-list? 'name)
-                    '($every? '$can-be:standalone-meta-var? '(vars ...)) )))
-        ((_ s '(predicate (vars ...)))
-         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
+        ((_ s '(name predicate (vars ...))) ($ s '#t))
+        ((_ s '(predicate (vars ...)))      ($ s '#t))
         ((_ s _) ($ s '#f)) ) )
 
     (define-syntax $must-be:standalone-terminal-description
@@ -47,6 +44,25 @@
 
         ((_ s 'lang '(predicate ()))
          (syntax-error "Meta-var list cannot be empty" lang (predicate ())))
+
+        ((_ s 'lang '(() predicate (meta-vars ...)))
+         (syntax-error "Terminal name must be a symbol" lang (() predicate (meta-vars ...)) ()))
+
+        ((_ s 'lang '((x . xs) predicate (meta-vars ...)))
+         (syntax-error "Terminal name must be a symbol" lang
+                     ((x . xs) predicate (meta-vars ...)) (x . xs)))
+
+        ((_ s 'lang '(#(x ...) predicate (meta-vars ...)))
+         (syntax-error "Terminal name must be a symbol" lang
+                     (#(x ...) predicate (meta-vars ...)) #(x ...)))
+
+        ((_ s 'lang '((x . xs) (meta-vars ...)))
+         (syntax-error "Predicate must be a symbol in short form" lang
+                     ((x . xs) (meta-vars ...)) (x . xs)))
+
+        ((_ s 'lang '(#(x ...) (meta-vars ...)))
+         (syntax-error "Invalid terminal description syntax" lang
+                     (#(x ...) (meta-vars ...))))
 
         ((_ s 'lang '(name predicate (meta-vars ...)))
          ($ s ($list 'name 'predicate
