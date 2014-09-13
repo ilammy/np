@@ -61,11 +61,15 @@
         ((_ s 'lang '(edits minuses explicit-pluses implicit-pluses ()))
          ($ s ($list
                 ($map '($must-be:terminal-description-addition 'lang)
-                      ($append ($drop-head-and-squash 'explicit-pluses)
+                      ($append ($drop-head-and-squash
+                                 ($map '($must-be:proper-list 'lang)
+                                       'explicit-pluses ) )
                                'implicit-pluses ) )
 
                 ($map '($must-be:terminal-description-removal 'lang)
-                      ($drop-head-and-squash 'minuses) )
+                      ($drop-head-and-squash
+                        ($map '($must-be:proper-list 'lang)
+                              'minuses ) ) )
 
                 ($map '($must-be:terminal-description-modification 'lang)
                   ($map '($partition-terminal-modification-meta-vars 'lang)
@@ -73,6 +77,13 @@
 
         ((_ s 'lang '(_ _ _ _ (x xs ...)))
          (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
+
+    (define-syntax $must-be:proper-list
+      (syntax-rules (quote)
+        ((_ s 'lang '(list ...)) ($ s '(list ...)))
+        ((_ s 'lang '(list ... . stray-atom))
+         (syntax-error "Unexpected dotted list in terminal description" lang
+                       (list ... . stray-atom) stray-atom)) ) )
 
     ;;;
     ;;; Partitioning of meta-vars of the modification extension form
