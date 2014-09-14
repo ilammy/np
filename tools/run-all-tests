@@ -1,0 +1,75 @@
+#!/bin/bash
+
+cd /tmp/build
+
+count() { echo $#; }
+
+output-with-indent() { sed "s/^/    /" <<< "$1"; }
+
+actual-error-message() {
+    sed -e '/^\s*called from/d' \
+        -e 's/^ERROR [^:]*://'  \
+        -e 's/: /\n/'
+}
+
+expected-error-message() {
+    grep '^; ' | sed 's/^;//'
+}
+
+error-message-diff() {
+    diff --unified --ignore-all-space       \
+        <(actual-error-message <<< "$1")    \
+        <(expected-error-message < "$2")
+}
+
+echo
+echo Running success tests...
+
+TEST_FILES=$(find -L np -type f -name 'test-*.ss')
+TEST_TOTAL=$(count $TEST_FILES)
+TEST_PASSED=0
+
+for test in $TEST_FILES
+do
+    if output=$(chibi-scheme $test 2>&1)
+    then
+        echo "- $test"
+        TEST_PASSED=$(expr $TEST_PASSED + 1)
+    else
+        echo "X $test"
+        output-with-indent "$output"
+    fi
+done
+
+echo
+echo Running failure tests...
+
+FAIL_FILES=$(find -L np -type f -name 'fail-*.ss')
+FAIL_TOTAL=$(count $FAIL_FILES)
+FAIL_PASSED=0
+
+for test in $FAIL_FILES
+do
+    if output=$(chibi-scheme $test 2>&1)
+    then
+        echo "X $test"
+        echo "  Program exited successfully"
+    else
+        if diff=$(error-message-diff "$output" "$test")
+        then
+            echo "- $test"
+            FAIL_PASSED=$(expr $FAIL_PASSED + 1)
+        else
+            echo "X $test"
+            echo "  Program output differs from expected"
+            output-with-indent "$diff"
+        fi
+    fi
+done
+
+echo
+echo Done
+echo Success: [ $TEST_PASSED / $TEST_TOTAL ]
+echo Failure: [ $FAIL_PASSED / $FAIL_TOTAL ]
+
+[ "$(expr $TEST_PASSED + $FAIL_PASSED)" == "$(expr $TEST_TOTAL + $FAIL_TOTAL)" ]

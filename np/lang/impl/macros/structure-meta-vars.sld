@@ -26,8 +26,11 @@
 
     (define-syntax $must-be:standalone-meta-var
       (syntax-rules (quote)
-        ((_ s 'lang 'clause '(x ...))
-         (syntax-error "Meta-var name cannot be a list" lang clause (x ...)))
+        ((_ s 'lang 'clause '())
+         (syntax-error "Meta-var name cannot be a list" lang clause ()))
+
+        ((_ s 'lang 'clause '(x . xs))
+         (syntax-error "Meta-var name cannot be a list" lang clause (x . xs)))
 
         ((_ s 'lang 'clause '#(x ...))
          (syntax-error "Meta-var name cannot be a vector" lang clause #(x ...)))

@@ -16,7 +16,8 @@
 
     (define-syntax $not-vector-or-list?
       (syntax-rules (quote)
-        ((_ s '(things ...)) ($ s '#f))
+        ((_ s '())           ($ s '#f))
+        ((_ s '(car . cdr))  ($ s '#f))
         ((_ s '#(stuff ...)) ($ s '#f))
         ((_ s 'atom)         ($ s '#t)) ) )
 
