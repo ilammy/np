@@ -1,0 +1,5 @@
+# A dummy file to keep Travis busy building other branches
+# without breaking master that does not have any code yet.
+language: c
+
+script: true
