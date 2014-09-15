@@ -3,6 +3,7 @@
   ;;; Structural analysis of terminal descriptions (standalone and extension)
   ;;;
   (export $can-be:standalone-terminal-description?
+          $is-a:standalone-terminal-description?
           $must-be:standalone-terminal-description
 
           $can-be:terminal-explicit-addition?
@@ -28,54 +29,84 @@
   (begin
 
     ;;;
-    ;;; Terminal descriptions (standalone)
+    ;;; Terminal descriptions (standalone) - interface
     ;;;
 
     (define-syntax $can-be:standalone-terminal-description?
       (syntax-rules (quote)
-        ((_ s '(name predicate (vars ...))) ($ s '#t))
-        ((_ s '(predicate (vars ...)))      ($ s '#t))
-        ((_ s _) ($ s '#f)) ) )
+        ((_ s '(name predicate (meta . vars))) ($ s '#t))
+        ((_ s '(predicate      (meta . vars))) ($ s '#t))
+        ((_ s _)                               ($ s '#f)) ) )
+
+    (define-syntax $is-a:standalone-terminal-description?
+      (syntax-rules (quote)
+        ((_ s 'term)
+         ($ s ($verify-result:as-boolean
+                ($verify:standalone-terminal-description 'term) ))) ) )
 
     (define-syntax $must-be:standalone-terminal-description
       (syntax-rules (quote)
-        ((_ s 'lang '(name predicate ()))
-         (syntax-error "Meta-var list cannot be empty" lang (name predicate ())))
+        ((_ s 'lang 'term)
+         ($ s ($verify-result:syntax-error
+                ($verify:standalone-terminal-description 'lang 'term) ))) ) )
 
-        ((_ s 'lang '(predicate ()))
-         (syntax-error "Meta-var list cannot be empty" lang (predicate ())))
+    ;;;
+    ;;; Terminal descriptions (standalone) - implementation
+    ;;;
 
-        ((_ s 'lang '(() predicate (meta-vars ...)))
-         (syntax-error "Terminal name must be a symbol" lang (() predicate (meta-vars ...)) ()))
+    (define-syntax $verify:standalone-terminal-description
+      (syntax-rules (quote)
+        ((_ s 'term)       ($ s (%verify:standalone-terminal-description '(s ())     'term)))
+        ((_ s 'lang 'term) ($ s (%verify:standalone-terminal-description '(s (lang)) 'term))) ) )
 
-        ((_ s 'lang '((x . xs) predicate (meta-vars ...)))
-         (syntax-error "Terminal name must be a symbol" lang
-                     ((x . xs) predicate (meta-vars ...)) (x . xs)))
+    (define-syntax %verify:standalone-terminal-description
+      (syntax-rules (quote)
+        ((_ s '(k t) '(name predicate ()))
+         ($ s ($and '(%verify:terminal-name '(k ((name predicate ()) . t)) 'name)
+                    '(%verify:terminal-meta-var-list '(k (name . t)) '()) )))
 
-        ((_ s 'lang '(#(x ...) predicate (meta-vars ...)))
-         (syntax-error "Terminal name must be a symbol" lang
-                     (#(x ...) predicate (meta-vars ...)) #(x ...)))
+        ((_ s '(k t) '(name predicate (meta . vars)))
+         ($ s ($and '(%verify:terminal-name '(k ((name predicate (meta . vars)) . t)) 'name)
+                    '(%verify:terminal-meta-var-list '(k (name . t)) '(meta . vars))
+                    '($every? '(%verify:meta-var-name '(k (name . t))) '(meta . vars)) )))
 
-        ((_ s 'lang '((x . xs) (meta-vars ...)))
-         (syntax-error "Predicate must be a symbol in short form" lang
-                     ((x . xs) (meta-vars ...)) (x . xs)))
+        ((_ s '(k t) '(predicate-name ()))
+         ($ s ($and '(%verify:short-predicate-name '(k ((predicate-name ()) . t)) 'predicate-name)
+                    '(%verify:terminal-meta-var-list '(k (predicate-name . t)) '()) )))
 
-        ((_ s 'lang '(#(x ...) (meta-vars ...)))
-         (syntax-error "Invalid terminal description syntax" lang
-                     (#(x ...) (meta-vars ...))))
+        ((_ s '(k t) '(predicate-name (meta . vars)))
+         ($ s ($and '(%verify:short-predicate-name '(k ((predicate-name (meta . vars)) . t)) 'predicate-name)
+                    '(%verify:terminal-meta-var-list '(k (predicate-name . t)) '(meta . vars))
+                    '($every? '(%verify:meta-var-name '(k (predicate-name . t))) '(meta . vars)) )))
 
-        ((_ s 'lang '(name predicate (meta-vars ...)))
-         ($ s ($list 'name 'predicate
-                ($map '($must-be:standalone-meta-var 'lang 'name)
-                      '(meta-vars ...) ) )))
+        ((_ s '(k t) 'invalid-syntax)
+         ($ k '("Invalid terminal description syntax" (invalid-syntax . t)))) ) )
 
-        ((_ s 'lang '(predicate (meta-vars ...)))
-         ($ s ($list 'predicate
-                ($map '($must-be:standalone-meta-var 'lang 'predicate)
-                      '(meta-vars ...) ) )))
+    (define-syntax %verify:terminal-name
+      (syntax-rules (quote)
+        ((_ s '(k t) 'x) ($ s (%verify:expr-is-atom '(k t) 'x '"Terminal name must be a symbol"))) ) )
 
-        ((_ s 'lang 'invalid-description)
-         (syntax-error "Invalid terminal description syntax" lang invalid-description)) ) )
+    (define-syntax %verify:meta-var-name
+      (syntax-rules (quote)
+        ((_ s '(k t) 'x) ($ s (%verify:expr-is-atom '(k t) 'x '"Meta-variable name must be a symbol"))) ) )
+
+    (define-syntax %verify:short-predicate-name
+      (syntax-rules (quote)
+        ((_ s '(k t) 'x) ($ s (%verify:expr-is-atom '(k t) 'x '"Predicate must be a symbol in short form"))) ) )
+
+    (define-syntax %verify:expr-is-atom
+      (syntax-rules (quote)
+        ((_ s '(k t) '()       'msg) ($ k '(msg (()       . t))))
+        ((_ s '(k t) '(a . d)  'msg) ($ k '(msg ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...) 'msg) ($ k '(msg (#(x ...) . t))))
+        ((_ s '(k t) 'an-atom  'msg) ($ s '#t)) ) )
+
+    (define-syntax %verify:terminal-meta-var-list
+      (syntax-rules (quote)
+        ((_ s '(k t) '())          ($ k '("Terminal must have at least one meta-variable" t)))
+        ((_ s '(k t) '(x ...))     ($ s '#t))
+        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in terminal description" (a (x ... . a) . t))))
+        ((_ s '(k t) 'unexpected)  ($ k '("Expected meta-variable list" (unexpected . t)))) ) )
 
     ;;;
     ;;; Terminal descriptions (extension, predicates)

@@ -22,18 +22,17 @@
     (define-syntax $filter-standalone-terminal-descriptions
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
-         ($ s ($cleanup-partitioned-standalone-terminal-descriptions 'lang
-                ($partition '$can-be:standalone-terminal-description?
+         ($ s ($check-for-invalid-terminal-descriptions 'lang
+                ($partition '$is-a:standalone-terminal-description?
                             'descriptions ) )))  ) )
 
-    (define-syntax $cleanup-partitioned-standalone-terminal-descriptions
+    (define-syntax $check-for-invalid-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(possible-descriptions ()))
-         ($ s ($map '($must-be:standalone-terminal-description 'lang)
-                    'possible-descriptions )))
+        ((_ s 'lang '(valid-descriptions ())) ($ s 'valid-descriptions))
 
-        ((_ s 'lang '(_ (x xs ...)))
-         (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
+        ((_ s 'lang '(_ (invalid-descriptions ...)))
+         ($ s ($map '($must-be:standalone-terminal-description 'lang)
+                    '(invalid-descriptions ...) ))) ) )
 
     ;;;
     ;;; Extension form
