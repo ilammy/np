@@ -137,7 +137,8 @@
           (zog ((- var))) (+ (x (x)) (y y (y)))) ))) ) )
 
   (define-test ("does not mess up in hard-to-tell cases")
-    (assert-equal '(((+ (some-var) (x y))
+    (assert-equal '(((- (some meta vars))
+                     (+ (some-var) (x y))
                      (- predicate? (var))
                      (+ (num? (x)) (var x)))
                     ()
@@ -145,7 +146,8 @@
                      (+ ((remove) (add)))
                      (- (() (-)))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((+ (some-var) (x y))
+        '((- (some meta vars))
+          (+ (some-var) (x y))
           (- predicate? (var))
           (+ (num? (x)) (var x))
           (- ((+ add) (- remove)))

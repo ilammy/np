@@ -1,6 +1,6 @@
 ; Terminal must have at least one meta-variable
 ;   lang
-;   number?
+;   (number? ())
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)

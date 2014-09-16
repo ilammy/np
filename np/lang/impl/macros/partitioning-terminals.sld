@@ -5,7 +5,7 @@
   (export $filter-standalone-terminal-descriptions
           $partition-extension-terminal-descriptions)
 
-  (import (scheme base)
+  (import (scheme base)                   (sr ck predicates)
           (sr ck)
           (sr ck filters)
           (sr ck lists)
@@ -38,51 +38,44 @@
     ;;; Extension form
     ;;;
 
-    ;; Modification is checked first, because some valid modification clauses
-    ;; are also considered valid by $can-be:terminal-removal?, but obviously
-    ;; fail the $must-be:terminal-description-removal verification. A valid
-    ;; removal clause is never a valid modification one, so it's okay to do so.
-    ;;
-    ;; Implicit addition is checked last to avoid false positives from it.
-    ;;
     (define-syntax $partition-extension-terminal-descriptions
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
          ($ s ($cleanup-partitioned-extension-terminal-descriptions 'lang
-                ($multi-partition '($can-be:terminal-modification?
-                                    $can-be:terminal-removal?
-                                    $can-be:terminal-explicit-addition?
-                                    $can-be:terminal-implicit-addition?)
+                ($multi-partition '($is-a:terminal-explicit-addition?
+                                    $is-a:terminal-implicit-addition?
+                                    $is-a:terminal-removal?
+                                    $is-a:terminal-modification?)
                   'descriptions ) ))) ) )
 
     (define-syntax $cleanup-partitioned-extension-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(edits minuses explicit-pluses implicit-pluses ()))
-         ($ s ($list
-                ($map '($must-be:terminal-description-addition 'lang)
-                      ($append ($drop-head-and-squash
-                                 ($map '($must-be:proper-list 'lang)
-                                       'explicit-pluses ) )
-                               'implicit-pluses ) )
+        ((_ s 'lang '(explicit-pluses implicit-pluses minuses edits ()))
+         ($ s ($list 'explicit-pluses 'implicit-pluses 'minuses 'edits)))       ; incorrect, needs postprocessing
 
-                ($map '($must-be:terminal-description-removal 'lang)
-                      ($drop-head-and-squash
-                        ($map '($must-be:proper-list 'lang)
-                              'minuses ) ) )
+        ((_ s 'lang '(_ _ _ _ (invalid-descriptions ...)))
+         ($ s ($report-invalid-extension-terminal-descriptions 'lang
+                ($multi-partition '($can-be:terminal-explicit-addition?
+                                    $can-be:terminal-removal?
+                                    $can-be:terminal-modification?
+                                    $can-be:terminal-implicit-addition?)
+                  '(invalid-descriptions ...) ) ))) ) )
 
-                ($map '($must-be:terminal-description-modification 'lang)
-                  ($map '($partition-terminal-modification-meta-vars 'lang)
-                        'edits ) ) )))
+    ;; $can-be checks go in such order because they are used to heuristically
+    ;; guess an implied class for a structurally invalid clauses. The $multi-
+    ;; partition picks the first predicate that returns #t, therefore at first
+    ;; we check for the clauses with distinct features: explicit additions,
+    ;; removals, and modifications have (+ ...) / (- ...) clauses that identify
+    ;; them pretty well. Anything else is considered a failed implicit addition
 
-        ((_ s 'lang '(_ _ _ _ (x xs ...)))
-         (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
-
-    (define-syntax $must-be:proper-list
+    (define-syntax $report-invalid-extension-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(list ...)) ($ s '(list ...)))
-        ((_ s 'lang '(list ... . stray-atom))
-         (syntax-error "Unexpected dotted list in terminal description" lang
-                       (list ... . stray-atom) stray-atom)) ) )
+        ((_ s 'lang '(explicit-pluses minuses edits implicit-pluses incomprehensible))
+         ($ s ($and '($every? '($must-be:terminal-explicit-addition 'lang) 'explicit-pluses)
+                    '($every? '($must-be:terminal-removal           'lang) 'minuses)
+                    '($every? '($must-be:terminal-modification      'lang) 'edits)
+                    '($every? '($must-be:terminal-implicit-addition 'lang) 'implicit-pluses)
+                    '($every? '($must-be:terminal-implicit-addition 'lang) 'incomprehensible) ))) ) )
 
     ;;;
     ;;; Partitioning of meta-vars of the modification extension form
