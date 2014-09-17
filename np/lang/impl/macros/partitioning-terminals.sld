@@ -5,11 +5,12 @@
   (export $filter-standalone-terminal-descriptions
           $partition-extension-terminal-descriptions)
 
-  (import (scheme base)                   (sr ck predicates)
+  (import (scheme base)
           (sr ck)
           (sr ck filters)
           (sr ck lists)
           (sr ck maps)
+          (sr ck predicates)
           (np lang impl macros structure-terminals)
           (np lang impl macros structure-meta-vars)
           (np lang impl macros utils))
@@ -41,17 +42,20 @@
     (define-syntax $partition-extension-terminal-descriptions
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
-         ($ s ($cleanup-partitioned-extension-terminal-descriptions 'lang
+         ($ s ($postprocess-partitioned-extension-terminal-descriptions 'lang
                 ($multi-partition '($is-a:terminal-explicit-addition?
                                     $is-a:terminal-implicit-addition?
                                     $is-a:terminal-removal?
                                     $is-a:terminal-modification?)
                   'descriptions ) ))) ) )
 
-    (define-syntax $cleanup-partitioned-extension-terminal-descriptions
+    (define-syntax $postprocess-partitioned-extension-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(explicit-pluses implicit-pluses minuses edits ()))
-         ($ s ($list 'explicit-pluses 'implicit-pluses 'minuses 'edits)))       ; incorrect, needs postprocessing
+        ((_ s 'lang '(explicit-additions implicit-additions removals modifications ()))
+         ($ s ($list
+                ($squash-terminal-additions 'explicit-additions 'implicit-additions)
+                ($squash-terminal-removals 'removals)
+                ($map '($partition-terminal-modification-meta-vars 'lang) 'modifications) )))
 
         ((_ s 'lang '(_ _ _ _ (invalid-descriptions ...)))
          ($ s ($report-invalid-extension-terminal-descriptions 'lang
@@ -70,11 +74,11 @@
 
     (define-syntax $report-invalid-extension-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(explicit-pluses minuses edits implicit-pluses incomprehensible))
-         ($ s ($and '($every? '($must-be:terminal-explicit-addition 'lang) 'explicit-pluses)
-                    '($every? '($must-be:terminal-removal           'lang) 'minuses)
-                    '($every? '($must-be:terminal-modification      'lang) 'edits)
-                    '($every? '($must-be:terminal-implicit-addition 'lang) 'implicit-pluses)
+        ((_ s 'lang '(explicit-additions removals modifications implicit-additions incomprehensible))
+         ($ s ($and '($every? '($must-be:terminal-explicit-addition 'lang) 'explicit-additions)
+                    '($every? '($must-be:terminal-removal           'lang) 'removals)
+                    '($every? '($must-be:terminal-modification      'lang) 'modifications)
+                    '($every? '($must-be:terminal-implicit-addition 'lang) 'implicit-additions)
                     '($every? '($must-be:terminal-implicit-addition 'lang) 'incomprehensible) ))) ) )
 
     ;;;
@@ -85,18 +89,15 @@
       (syntax-rules (quote)
         ((_ s 'lang 'terminal-modification)
          ($ s ($set-terminal-modification-meta-vars 'lang 'terminal-modification
-                ($cleanup-terminal-modification-meta-vars 'lang 'terminal-modification
-                  ($multi-partition '($can-be:meta-var-addition?
-                                      $can-be:meta-var-removal?)
+                ($squash-terminal-modification-meta-vars
+                  ($multi-partition '($is-a:meta-var-addition? $is-a:meta-var-removal?)
                     ($get-terminal-modification-meta-vars 'lang 'terminal-modification) ) ) ))) ) )
 
-    (define-syntax $cleanup-terminal-modification-meta-vars
+    ;; Validity of meta-variables has been already checked by $is-a:terminal-modification?
+    (define-syntax $squash-terminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s _ _ '(added removed ()))
-         ($ s ($list ($drop-head-and-squash 'added)
-                     ($drop-head-and-squash 'removed) )))
-
-        ((_ s 'lang 'clause '(_ _ (x xs ...)))
-         (syntax-error "Invalid meta-var descriptions" lang clause (x xs ...))) ) )
+        ((_ s '(added removed ()))
+         ($ s ($list ($squash-extension-meta-variables 'added)
+                     ($squash-extension-meta-variables 'removed) ))) ) )
 
 ) )

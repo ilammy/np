@@ -16,14 +16,35 @@ These files contain functions that match and check the structure of clauses.
 They only check the structure of forms--count and positions of their elements,
 but not types of the elements or their semantics.
 
-Functions there are generally called **$can-be:_something_?** or
-**$must-be:_something_**.
+Functions there can be divided into several classes:
 
-_Can-be_-functions are _necessity_ predicates. I.e., getting `#t` as a result
-is necessary for the thing in question to be _something_, and getting `#f`
-means that the thing is definitely not _something_.
+  - `$can-be:<something>?` functions are **necessity** predicates. I.e.,
+    getting `#t` as a result is necessary—but not sufficient!—for the
+    thing in question to be `<something>`; and getting `#f` means that
+    the thing is definitely not `<something>`.
 
-_Must-be_-functions are _sufficiency_ assertions. I.e., passing such assertion
-is sufficient for the thing in question to be considered _something_ (however,
-only _structurally_). These functions return their original argument intact
-if the assertion holds, and fail with syntax error if it is not true.
+  - `$is-a:<something>?` functions are **sufficiency** predicates. I.e.,
+    getting `#t` means that the thing is an absolutely structurally
+    valid `<something>`, while `#f` still means that the thing cannot
+    be `<something>`.
+
+  - `$must-be:<something>` functions are essentially the same as `$is-a`
+    ones, but they are **assetions**. I.e., they fail with a helpful
+    syntax error if the thing is not `<something>`. They are used for
+    reporting errors, and they are _meant_ to fail, not return values.
+
+  - Other self-explanatory functions.
+
+
+##### A note on `$is-a` and `$must-be` implementation
+
+They are generally implemented in terms of `$verify` functions, which
+return `#t` is the verification is successful, and non-`#t` exception value
+in the other case. The exception values is a list of human-readable message
+that describes the error and a stack of subexpressions which have caused it.
+The exception is either turned into `#f` by `$is-a` or printed out as
+a `syntax-error` by `$must-be` functions.
+
+Such exception-like behavior is implemented via `%verify` functions that
+exploit the built-in call/cc ability of CK functions. Hence the `%` prefix:
+it mirrors the fact that these functions have _two_ possible continuations.

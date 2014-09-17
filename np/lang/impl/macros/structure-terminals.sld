@@ -2,32 +2,36 @@
   ;;;
   ;;; Structural analysis of terminal descriptions (standalone and extension)
   ;;;
-  (export $can-be:standalone-terminal-description?
-          $is-a:standalone-terminal-description?
+  (export  $can-be:standalone-terminal-description?
+             $is-a:standalone-terminal-description?
           $must-be:standalone-terminal-description
 
-          $can-be:terminal-explicit-addition?
-          $is-a:terminal-explicit-addition?
+           $can-be:terminal-explicit-addition?
+             $is-a:terminal-explicit-addition?
           $must-be:terminal-explicit-addition
 
-          $can-be:terminal-implicit-addition?
-          $is-a:terminal-implicit-addition?
+           $can-be:terminal-implicit-addition?
+             $is-a:terminal-implicit-addition?
           $must-be:terminal-implicit-addition
 
-          $can-be:terminal-removal?
-          $is-a:terminal-removal?
+           $can-be:terminal-removal?
+             $is-a:terminal-removal?
           $must-be:terminal-removal
 
-          $can-be:terminal-modification?
-          $is-a:terminal-modification?
+           $can-be:terminal-modification?
+             $is-a:terminal-modification?
           $must-be:terminal-modification
+
+          $squash-terminal-additions
+          $squash-terminal-removals
 
           $get-terminal-modification-meta-vars
           $set-terminal-modification-meta-vars)
 
-  (import (scheme base)         (sr ck kernel)
+  (import (scheme base)
           (sr ck)
           (sr ck filters)
+          (sr ck kernel)
           (sr ck lists)
           (sr ck maps)
           (sr ck predicates)
@@ -44,19 +48,17 @@
       (syntax-rules (quote)
         ((_ s '(name predicate (meta . vars))) ($ s '#t))
         ((_ s '(predicate      (meta . vars))) ($ s '#t))
-        ((_ s _)                               ($ s '#f)) ) )
+        ((_ s  _)                              ($ s '#f)) ) )
 
     (define-syntax $is-a:standalone-terminal-description?
       (syntax-rules (quote)
-        ((_ s 'term)
-         ($ s ($verify-result:as-boolean
-                ($verify:standalone-terminal-description 'term) ))) ) )
+        ((_ s 'term) ($ s ($verify-result:as-boolean
+                            ($verify:standalone-terminal-description 'term) ))) ) )
 
     (define-syntax $must-be:standalone-terminal-description
       (syntax-rules (quote)
-        ((_ s 'lang 'term)
-         ($ s ($verify-result:syntax-error
-                ($verify:standalone-terminal-description 'lang 'term) ))) ) )
+        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
+                                  ($verify:standalone-terminal-description 'lang 'term) ))) ) )
 
     ;;;
     ;;; Terminal descriptions (standalone) - implementation
@@ -90,50 +92,21 @@
         ((_ s '(k t) 'invalid-syntax)
          ($ k '("Invalid terminal description syntax" (invalid-syntax . t)))) ) )
 
-    (define-syntax %verify:terminal-name
-      (syntax-rules (quote)
-        ((_ s '(k t) 'x) ($ s (%verify:expr-is-atom '(k t) 'x '"Terminal name must be a symbol"))) ) )
-
-    (define-syntax %verify:meta-var-name
-      (syntax-rules (quote)
-        ((_ s '(k t) 'x) ($ s (%verify:expr-is-atom '(k t) 'x '"Meta-variable name must be a symbol"))) ) )
-
-    (define-syntax %verify:short-predicate-name
-      (syntax-rules (quote)
-        ((_ s '(k t) 'x) ($ s (%verify:expr-is-atom '(k t) 'x '"Predicate must be a symbol in short form"))) ) )
-
-    (define-syntax %verify:expr-is-atom
-      (syntax-rules (quote)
-        ((_ s '(k t) '()       'msg) ($ k '(msg (()       . t))))
-        ((_ s '(k t) '(a . d)  'msg) ($ k '(msg ((a . d)  . t))))
-        ((_ s '(k t) '#(x ...) 'msg) ($ k '(msg (#(x ...) . t))))
-        ((_ s '(k t) 'an-atom  'msg) ($ s '#t)) ) )
-
-    (define-syntax %verify:terminal-meta-var-list
-      (syntax-rules (quote)
-        ((_ s '(k t) '())          ($ k '("Terminal must have at least one meta-variable" t)))
-        ((_ s '(k t) '(x ...))     ($ s '#t))
-        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in terminal description" (a (x ... . a) . t))))
-        ((_ s '(k t) 'unexpected)  ($ k '("Expected meta-variable list" (unexpected . t)))) ) )
-
     ;;;
     ;;; Terminal descriptions (extension, implicit addition)
     ;;;
 
     (define-syntax $can-be:terminal-implicit-addition?
       (syntax-rules (quote)
-        ((_ s 'expr)
-         ($ s ($can-be:standalone-terminal-description? 'expr))) ) )
+        ((_ s 'term) ($ s ($can-be:standalone-terminal-description? 'term))) ) )
 
     (define-syntax $is-a:terminal-implicit-addition?
       (syntax-rules (quote)
-        ((_ s 'expr)
-         ($ s ($is-a:standalone-terminal-description? 'expr))) ) )
+        ((_ s 'term) ($ s ($is-a:standalone-terminal-description? 'term))) ) )
 
     (define-syntax $must-be:terminal-implicit-addition
       (syntax-rules (quote)
-        ((_ s 'lang 'expr)
-         ($ s ($must-be:standalone-terminal-description 'lang 'expr))) ) )
+        ((_ s 'lang 'term) ($ s ($must-be:standalone-terminal-description 'lang 'term))) ) )
 
     ;;;
     ;;; Terminal descriptions (extension, explicit addition) - interface
@@ -142,17 +115,17 @@
     (define-syntax $can-be:terminal-explicit-addition?
       (syntax-rules (quote +)
         ((_ s '(+ . rest)) ($ s '#t))
-        ((_ s 'else)       ($ s '#f)) ) )
+        ((_ s  _)          ($ s '#f)) ) )
 
     (define-syntax $is-a:terminal-explicit-addition?
       (syntax-rules (quote)
-        ((_ s 'term)
-         ($ s ($verify-result:as-boolean ($verify:terminal-explicit-addition 'term)))) ) )
+        ((_ s 'term) ($ s ($verify-result:as-boolean
+                            ($verify:terminal-explicit-addition 'term) ))) ) )
 
     (define-syntax $must-be:terminal-explicit-addition
       (syntax-rules (quote)
-        ((_ s 'lang 'term)
-         ($ s ($verify-result:syntax-error ($verify:terminal-explicit-addition 'lang 'term)))) ) )
+        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
+                                  ($verify:terminal-explicit-addition 'lang 'term) ))) ) )
 
     ;;;
     ;;; Terminal descriptions (extension, implicit addition) - implementation
@@ -173,12 +146,6 @@
         ((_ s '(k t) 'invalid-syntax)
          ($ k '("Invalid terminal description syntax" (invalid-syntax . t)))) ) )
 
-    (define-syntax %verify:terminal-description-list
-      (syntax-rules (quote)
-        ((_ s '(k t) '(x ...))     ($ s '#t))
-        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in terminal description" (a . t))))
-        ((_ s '(k t) 'unexpected)  ($ k '("Expected terminal description list" (unexpected . t)))) ) )
-
     ;; The 2nd and 3rd arguments are actually the same. This trick is necessary
     ;; to get the (+) form from the original source, because writing just `(+)`
     ;; in the expansion yields a list that contains another plus--that free one
@@ -187,7 +154,7 @@
       (syntax-rules (quote +)
         ((_ s '(k t) '(+)         'x) ($ k '("At least one terminal should be specified for addition" (x . t))))
         ((_ s '(k t) '(+ . other) 'x) ($ s '#t))
-        ((_ s '(k t) 'else        'x) ($ k '("Invalid terminal description syntax" (else . t)))) ) )
+        ((_ s '(k t)  _           'x) ($ k '("Invalid terminal description syntax" (x . t)))) ) )
 
     ;;;
     ;;; Terminal descriptions (extension, removal) - interface
@@ -196,17 +163,17 @@
     (define-syntax $can-be:terminal-removal?
       (syntax-rules (quote -)
         ((_ s '(- . rest)) ($ s '#t))
-        ((_ s 'else)       ($ s '#f)) ) )
+        ((_ s  _)          ($ s '#f)) ) )
 
     (define-syntax $is-a:terminal-removal?
       (syntax-rules (quote)
-        ((_ s 'term)
-         ($ s ($verify-result:as-boolean ($verify:terminal-removal 'term)))) ) )
+        ((_ s 'term) ($ s ($verify-result:as-boolean
+                            ($verify:terminal-removal 'term) ))) ) )
 
     (define-syntax $must-be:terminal-removal
       (syntax-rules (quote)
-        ((_ s 'lang 'term)
-         ($ s ($verify-result:syntax-error ($verify:terminal-removal 'lang 'term)))) ) )
+        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
+                                  ($verify:terminal-removal 'lang 'term) ))) ) )
 
     ;;;
     ;;; Terminal descriptions (extension, removal) - implementation
@@ -239,34 +206,19 @@
       (syntax-rules (quote -)
         ((_ s '(k t) '(-)         'x) ($ k '("At least one terminal should be specified for removal" (x . t))))
         ((_ s '(k t) '(- . other) 'x) ($ s '#t))
-        ((_ s '(k t) 'else        'x) ($ k '("Invalid terminal description syntax" (else . t)))) ) )
+        ((_ s '(k t)  _           'x) ($ k '("Invalid terminal description syntax" (x . t)))) ) )
 
     ;;;
     ;;; Terminal descriptions (extension, modification) - interface
     ;;;
 
-          ;; To library (SR):
-          (define-syntax $any?
-            (syntax-rules (quote)
-              ((_ s 'pred '())       ($ s '#f))
-              ((_ s 'pred '(x . xs)) ($ s ($if ($call 'pred 'x)
-                                              ''#t
-                                              '($any? 'pred 'xs) ))) ) )
-
     ;; A form with predicate is also allowed here as extension meta-variable syntax
     ;; implies a misplaced predicate rather than invalid (standalone) meta-vars
     (define-syntax $can-be:terminal-modification?
       (syntax-rules (quote)
-        ((_ s '(name (vars ...))) ($ s ($any? '$can-be:extension-meta-var?** '(vars ...))))
-        ((_ s '(name predicate (vars ...))) ($ s ($any? '$can-be:extension-meta-var?** '(vars ...))))
-        ((_ s _)                  ($ s '#f)) ) )
-
-          ;; To structure-meta-vars
-          (define-syntax $can-be:extension-meta-var?**
-            (syntax-rules (quote + -)
-              ((_ s '(+ . _)) ($ s '#t))
-              ((_ s '(- . _)) ($ s '#t))
-              ((_ s 'other)   ($ s '#f)) ) )
+        ((_ s '(name           (vars ...))) ($ s ($any? '$can-be:extension-meta-var? '(vars ...))))
+        ((_ s '(name predicate (vars ...))) ($ s ($any? '$can-be:extension-meta-var? '(vars ...))))
+        ((_ s _)                            ($ s '#f)) ) )
 
     (define-syntax $is-a:terminal-modification?
       (syntax-rules (quote)
@@ -320,8 +272,7 @@
          ($ s ($and '(%verify:terminal-meta-var-list '(k t) 'x)
                     '($every? '(%verify:meta-var-name '(k (x . t))) 'list) )))
 
-        ((_ s '(k t) 'other      _)
-         ($ k '("Invalid extension meta-variable syntax" (other . t)))) ) )
+        ((_ s '(k t) _ 'x) ($ k '("Invalid extension meta-variable syntax" (x . t)))) ) )
 
     ;;;
     ;;; Getter/setter for meta-vars in terminal modification descriptions
@@ -329,24 +280,55 @@
 
     (define-syntax $get-terminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s 'lang '(name predicate meta-vars))
-         ($ s 'meta-vars))
-
-        ((_ s 'lang '(name meta-vars))
-         ($ s 'meta-vars))
-
-        ((_ s 'lang 'invalid-description)
-         (syntax-error "Invalid modified terminal description syntax" lang invalid-description)) ) )
+        ((_ s 'lang '(name predicate meta-vars)) ($ s 'meta-vars))
+        ((_ s 'lang '(predicate-name meta-vars)) ($ s 'meta-vars)) ) )
 
     (define-syntax $set-terminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s 'lang '(name predicate old-meta-vars) 'new-meta-vars)
-         ($ s '(name predicate new-meta-vars)))
+        ((_ s 'lang '(name predicate meta-vars) 'meta-vars*) ($ s '(name predicate meta-vars*)))
+        ((_ s 'lang '(predicate-name meta-vars) 'meta-vars*) ($ s '(predicate-name meta-vars*))) ) )
 
-        ((_ s 'lang '(name old-meta-vars) 'new-meta-vars)
-         ($ s '(name new-meta-vars)))
+    ;;;
+    ;;; Explicit clause squashers (to be applied only to valid clauses)
+    ;;;
 
-        ((_ s 'lang 'invalid-description)
-         (syntax-error "Invalid modified terminal description syntax" lang invalid-description)) ) )
+    (define-syntax $squash-terminal-additions
+      (syntax-rules (quote)
+        ((_ s 'explicit 'implicit) ($ s ($append ($concatenate ($map '$cdr 'explicit))
+                                                 'implicit ))) ) )
 
+    (define-syntax $squash-terminal-removals
+      (syntax-rules (quote)
+        ((_ s 'removals) ($ s ($concatenate ($map '$cdr 'removals)))) ) )
+
+    ;;;
+    ;;; Common matching utilities
+    ;;;
+
+    (define-syntax %verify:terminal-name
+      (syntax-rules (quote)
+        ((_ s '(k t) '())       ($ k '("Terminal name must be a symbol" (()       . t))))
+        ((_ s '(k t) '(a . d))  ($ k '("Terminal name must be a symbol" ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...)) ($ k '("Terminal name must be a symbol" (#(x ...) . t))))
+        ((_ s '(k t) 'an-atom)  ($ s '#t)) ) )
+
+    (define-syntax %verify:short-predicate-name
+      (syntax-rules (quote)
+        ((_ s '(k t) '())       ($ k '("Predicate must be a symbol in short form" (()       . t))))
+        ((_ s '(k t) '(a . d))  ($ k '("Predicate must be a symbol in short form" ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...)) ($ k '("Predicate must be a symbol in short form" (#(x ...) . t))))
+        ((_ s '(k t) 'an-atom)  ($ s '#t)) ) )
+
+    (define-syntax %verify:terminal-description-list
+      (syntax-rules (quote)
+        ((_ s '(k t) '(x ...))     ($ s '#t))
+        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in terminal description" (a . t))))
+        ((_ s '(k t) 'unexpected)  ($ k '("Expected terminal description list" (unexpected . t)))) ) )
+
+    (define-syntax %verify:terminal-meta-var-list
+      (syntax-rules (quote)
+        ((_ s '(k t) '())          ($ k '("Terminal must have at least one meta-variable" t)))
+        ((_ s '(k t) '(x ...))     ($ s '#t))
+        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in terminal description" (a (x ... . a) . t))))
+        ((_ s '(k t) 'unexpected)  ($ k '("Expected meta-variable list" (unexpected . t)))) ) )
 ) )

@@ -2,80 +2,62 @@
   ;;;
   ;;; Structural analysis of meta-variable specifier lists
   ;;;
-  (export $can-be:standalone-meta-var?
-          $must-be:standalone-meta-var
+  (export %verify:meta-var-name
 
           $can-be:extension-meta-var?
-          $must-be:extension-meta-var
 
-          $can-be:meta-var-addition?
-          $can-be:meta-var-removal?)
+          $is-a:meta-var-addition?
+          $is-a:meta-var-removal?
+
+          $squash-extension-meta-variables)
 
   (import (scheme base)
           (sr ck)
           (sr ck lists)
           (sr ck maps)
-          (sr ck predicates)
-          (np lang impl macros utils))
+          (sr ck predicates))
 
   (begin
 
-    (define-syntax $can-be:standalone-meta-var?
+    ;;;
+    ;;; Standalone meta-vars
+    ;;;
+
+    (define-syntax %verify:meta-var-name
       (syntax-rules (quote)
-        ((_ s 'expr) ($ s ($not-vector-or-list? 'expr))) ) )
+        ((_ s '(k t) '())       ($ k '("Meta-variable name must be a symbol" (()       . t))))
+        ((_ s '(k t) '(a . d))  ($ k '("Meta-variable name must be a symbol" ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...)) ($ k '("Meta-variable name must be a symbol" (#(x ...) . t))))
+        ((_ s '(k t)  _)        ($ s '#t)) ) )
 
-    (define-syntax $must-be:standalone-meta-var
-      (syntax-rules (quote)
-        ((_ s 'lang 'clause '())
-         (syntax-error "Meta-var name cannot be a list" lang clause ()))
-
-        ((_ s 'lang 'clause '(x . xs))
-         (syntax-error "Meta-var name cannot be a list" lang clause (x . xs)))
-
-        ((_ s 'lang 'clause '#(x ...))
-         (syntax-error "Meta-var name cannot be a vector" lang clause #(x ...)))
-
-        ((_ s _ _ 'var) ($ s 'var)) ) )
+    ;;;
+    ;;; Extension meta-vars clauses
+    ;;;
 
     (define-syntax $can-be:extension-meta-var?
       (syntax-rules (quote + -)
-        ((_ s '(+ vars ...))
-         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
-        ((_ s '(- vars ...))
-         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
-        ((_ s _) ($ s '#f)) ) )
+        ((_ s '(+ . _)) ($ s '#t))
+        ((_ s '(- . _)) ($ s '#t))
+        ((_ s  _)       ($ s '#f)) ) )
 
-    (define-syntax $must-be:extension-meta-var
-      (syntax-rules (quote + -)
-        ((_ s 'lang 'clause '(+))
-         (syntax-error "List of added meta-vars cannot be empty" lang clause))
-
-        ((_ s 'lang 'clause '(-))
-         (syntax-error "List of removed meta-vars cannot be empty" lang clause))
-
-        ((_ s 'lang 'clause '(+ vars ...))
-         ($ s ($list '+
-                ($map '($must-be:standalone-meta-var 'lang 'clause)
-                      '(vars ...) ) )))
-
-        ((_ s 'lang 'clause '(- vars ...))
-         ($ s ($list '-
-                ($map '($must-be:standalone-meta-var 'lang 'clause)
-                      '(vars ...) ) )))
-
-        ((_ s 'lang 'clause 'invalid-expr)
-         (syntax-error "Invalid meta-var description" lang clause invalid-expr)) ) )
-
-    (define-syntax $can-be:meta-var-addition?
+    (define-syntax $is-a:meta-var-addition?
       (syntax-rules (quote +)
-        ((_ s '(+ vars ...))
-         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
-        ((_ s _) ($ s '#f)) ) )
+        ((_ s '(+ vars ...)) ($ s ($every? '$is-a:meta-var-name? '(vars ...))))
+        ((_ s  _)            ($ s '#f)) ) )
 
-    (define-syntax $can-be:meta-var-removal?
+    (define-syntax $is-a:meta-var-removal?
       (syntax-rules (quote -)
-        ((_ s '(- vars ...))
-         ($ s ($every? '$can-be:standalone-meta-var? '(vars ...))))
-        ((_ s _) ($ s '#f)) ) )
+        ((_ s '(- vars ...)) ($ s ($every? '$is-a:meta-var-name? '(vars ...))))
+        ((_ s  _)            ($ s '#f)) ) )
 
+    (define-syntax $is-a:meta-var-name?
+      (syntax-rules (quote)
+        ((_ s '())       ($ s '#f))
+        ((_ s '(a . d))  ($ s '#f))
+        ((_ s '#(x ...)) ($ s '#f))
+        ((_ s  _)        ($ s '#t)) ) )
+
+    (define-syntax $squash-extension-meta-variables
+      (syntax-rules (quote)
+        ((_ s 'vars) ($ s ($concatenate ($map '$cdr 'vars)))) ) )
 ) )
