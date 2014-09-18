@@ -10,6 +10,7 @@
           (sr ck filters)
           (sr ck lists)
           (sr ck maps)
+          (sr ck predicates)
           (np lang impl macros structure-terminals)
           (np lang impl macros structure-meta-vars)
           (np lang impl macros utils))
@@ -22,68 +23,63 @@
     (define-syntax $filter-standalone-terminal-descriptions
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
-         ($ s ($cleanup-partitioned-standalone-terminal-descriptions 'lang
-                ($partition '$can-be:standalone-terminal-description?
+         ($ s ($check-for-invalid-terminal-descriptions 'lang
+                ($partition '$is-a:standalone-terminal-description?
                             'descriptions ) )))  ) )
 
-    (define-syntax $cleanup-partitioned-standalone-terminal-descriptions
+    (define-syntax $check-for-invalid-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(possible-descriptions ()))
-         ($ s ($map '($must-be:standalone-terminal-description 'lang)
-                    'possible-descriptions )))
+        ((_ s 'lang '(valid-descriptions ())) ($ s 'valid-descriptions))
 
-        ((_ s 'lang '(_ (x xs ...)))
-         (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
+        ((_ s 'lang '(_ (invalid-descriptions ...)))
+         ($ s ($map '($must-be:standalone-terminal-description 'lang)
+                    '(invalid-descriptions ...) ))) ) )
 
     ;;;
     ;;; Extension form
     ;;;
 
-    ;; Modification is checked first, because some valid modification clauses
-    ;; are also considered valid by $can-be:terminal-removal?, but obviously
-    ;; fail the $must-be:terminal-description-removal verification. A valid
-    ;; removal clause is never a valid modification one, so it's okay to do so.
-    ;;
-    ;; Implicit addition is checked last to avoid false positives from it.
-    ;;
     (define-syntax $partition-extension-terminal-descriptions
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
-         ($ s ($cleanup-partitioned-extension-terminal-descriptions 'lang
-                ($multi-partition '($can-be:terminal-modification?
-                                    $can-be:terminal-removal?
-                                    $can-be:terminal-explicit-addition?
-                                    $can-be:terminal-implicit-addition?)
+         ($ s ($postprocess-partitioned-extension-terminal-descriptions 'lang
+                ($multi-partition '($is-a:terminal-explicit-addition?
+                                    $is-a:terminal-implicit-addition?
+                                    $is-a:terminal-removal?
+                                    $is-a:terminal-modification?)
                   'descriptions ) ))) ) )
 
-    (define-syntax $cleanup-partitioned-extension-terminal-descriptions
+    (define-syntax $postprocess-partitioned-extension-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(edits minuses explicit-pluses implicit-pluses ()))
+        ((_ s 'lang '(explicit-additions implicit-additions removals modifications ()))
          ($ s ($list
-                ($map '($must-be:terminal-description-addition 'lang)
-                      ($append ($drop-head-and-squash
-                                 ($map '($must-be:proper-list 'lang)
-                                       'explicit-pluses ) )
-                               'implicit-pluses ) )
+                ($squash-terminal-additions 'explicit-additions 'implicit-additions)
+                ($squash-terminal-removals 'removals)
+                ($map '($partition-terminal-modification-meta-vars 'lang) 'modifications) )))
 
-                ($map '($must-be:terminal-description-removal 'lang)
-                      ($drop-head-and-squash
-                        ($map '($must-be:proper-list 'lang)
-                              'minuses ) ) )
+        ((_ s 'lang '(_ _ _ _ (invalid-descriptions ...)))
+         ($ s ($report-invalid-extension-terminal-descriptions 'lang
+                ($multi-partition '($can-be:terminal-explicit-addition?
+                                    $can-be:terminal-removal?
+                                    $can-be:terminal-modification?
+                                    $can-be:terminal-implicit-addition?)
+                  '(invalid-descriptions ...) ) ))) ) )
 
-                ($map '($must-be:terminal-description-modification 'lang)
-                  ($map '($partition-terminal-modification-meta-vars 'lang)
-                        'edits ) ) )))
+    ;; $can-be checks go in such order because they are used to heuristically
+    ;; guess an implied class for a structurally invalid clauses. The $multi-
+    ;; partition picks the first predicate that returns #t, therefore at first
+    ;; we check for the clauses with distinct features: explicit additions,
+    ;; removals, and modifications have (+ ...) / (- ...) clauses that identify
+    ;; them pretty well. Anything else is considered a failed implicit addition
 
-        ((_ s 'lang '(_ _ _ _ (x xs ...)))
-         (syntax-error "Invalid terminal description syntax" lang x xs ...)) ) )
-
-    (define-syntax $must-be:proper-list
+    (define-syntax $report-invalid-extension-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(list ...)) ($ s '(list ...)))
-        ((_ s 'lang '(list ... . stray-atom))
-         (syntax-error "Unexpected dotted list in terminal description" lang
-                       (list ... . stray-atom) stray-atom)) ) )
+        ((_ s 'lang '(explicit-additions removals modifications implicit-additions incomprehensible))
+         ($ s ($and '($every? '($must-be:terminal-explicit-addition 'lang) 'explicit-additions)
+                    '($every? '($must-be:terminal-removal           'lang) 'removals)
+                    '($every? '($must-be:terminal-modification      'lang) 'modifications)
+                    '($every? '($must-be:terminal-implicit-addition 'lang) 'implicit-additions)
+                    '($every? '($must-be:terminal-implicit-addition 'lang) 'incomprehensible) ))) ) )
 
     ;;;
     ;;; Partitioning of meta-vars of the modification extension form
@@ -93,18 +89,15 @@
       (syntax-rules (quote)
         ((_ s 'lang 'terminal-modification)
          ($ s ($set-terminal-modification-meta-vars 'lang 'terminal-modification
-                ($cleanup-terminal-modification-meta-vars 'lang 'terminal-modification
-                  ($multi-partition '($can-be:meta-var-addition?
-                                      $can-be:meta-var-removal?)
+                ($squash-terminal-modification-meta-vars
+                  ($multi-partition '($is-a:meta-var-addition? $is-a:meta-var-removal?)
                     ($get-terminal-modification-meta-vars 'lang 'terminal-modification) ) ) ))) ) )
 
-    (define-syntax $cleanup-terminal-modification-meta-vars
+    ;; Validity of meta-variables has been already checked by $is-a:terminal-modification?
+    (define-syntax $squash-terminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s _ _ '(added removed ()))
-         ($ s ($list ($drop-head-and-squash 'added)
-                     ($drop-head-and-squash 'removed) )))
-
-        ((_ s 'lang 'clause '(_ _ (x xs ...)))
-         (syntax-error "Invalid meta-var descriptions" lang clause (x xs ...))) ) )
+        ((_ s '(added removed ()))
+         ($ s ($list ($squash-extension-meta-variables 'added)
+                     ($squash-extension-meta-variables 'removed) ))) ) )
 
 ) )

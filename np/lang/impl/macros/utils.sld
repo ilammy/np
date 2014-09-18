@@ -4,7 +4,9 @@
   ;;; but lack semantic specificity to be placed elsewhere.
   ;;;
   (export $not-vector-or-list?
-          $drop-head-and-squash)
+          $drop-head-and-squash
+          $verify-result:as-boolean
+          $verify-result:syntax-error)
 
   (import (scheme base)
           (sr ck)
@@ -25,5 +27,16 @@
       (syntax-rules (quote)
         ((_ s 'list)
          ($ s ($concatenate ($map '$cdr 'list)))) ) )
+
+    (define-syntax $verify-result:as-boolean
+      (syntax-rules (quote)
+        ((_ s '#t) ($ s '#t))
+        ((_ s '::) ($ s '#f)) ) )
+
+    (define-syntax $verify-result:syntax-error
+      (syntax-rules (quote)
+        ((_ s '#t) ($ s '#t))
+        ((_ s '(msg stack)) ($ s ($verify-result:syntax-error '#f 'msg ($reverse 'stack))))
+        ((_ s '#f 'msg '(stack ...)) (syntax-error msg stack ...)) ) )
 
 ) )
