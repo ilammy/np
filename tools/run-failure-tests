@@ -22,40 +22,24 @@ error-message-diff() {
         <(expected-error-message < "$2")
 }
 
-echo
-echo Running success tests...
-
-TEST_FILES=$(find -L np -type f -name 'test-*.ss')
-TEST_TOTAL=$(count $TEST_FILES)
-TEST_PASSED=0
-
-for test in $TEST_FILES
-do
-    if output=$(chibi-scheme $test 2>&1)
-    then
-        echo "- $test"
-        TEST_PASSED=$(expr $TEST_PASSED + 1)
-    else
-        echo "X $test"
-        output-with-indent "$output"
-    fi
-done
+TEST_DIRECTORY="$1"
+[ -z "$TEST_DIRECTORY" ] && TEST_DIRECTORY="$PWD"
 
 echo
-echo Running failure tests...
+echo "Running failure tests in '$TEST_DIRECTORY'"
 
-FAIL_FILES=$(find -L np -type f -name 'fail-*.ss')
+FAIL_FILES=$(find -L "$TEST_DIRECTORY" -type f -name 'fail-*.ss' -printf '%P\n')
 FAIL_TOTAL=$(count $FAIL_FILES)
 FAIL_PASSED=0
 
 for test in $FAIL_FILES
 do
-    if output=$(chibi-scheme $test 2>&1)
+    if output=$(chibi-scheme "$TEST_DIRECTORY/$test" 2>&1)
     then
         echo "X $test"
         echo "  Program exited successfully"
     else
-        if diff=$(error-message-diff "$output" "$test")
+        if diff=$(error-message-diff "$output" "$TEST_DIRECTORY/$test")
         then
             echo "- $test"
             FAIL_PASSED=$(expr $FAIL_PASSED + 1)
@@ -69,7 +53,6 @@ done
 
 echo
 echo Done
-echo Success: [ $TEST_PASSED / $TEST_TOTAL ]
-echo Failure: [ $FAIL_PASSED / $FAIL_TOTAL ]
+echo [ $FAIL_PASSED / $FAIL_TOTAL ]
 
-[ "$(expr $TEST_PASSED + $FAIL_PASSED)" == "$(expr $TEST_TOTAL + $FAIL_TOTAL)" ]
+[ "$FAIL_PASSED" == "$FAIL_TOTAL" ]
