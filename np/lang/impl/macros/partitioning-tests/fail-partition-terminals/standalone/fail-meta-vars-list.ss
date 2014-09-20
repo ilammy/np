@@ -1,6 +1,6 @@
 ; Meta-variable name must be a symbol
 ;   lang
-;   number?
+;   number
 ;   (+ x)
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($filter-standalone-terminal-descriptions 'lang
-    '((number? ((+ x)))) ) ))
+    '((number number? ((+ x)))) ) ))
