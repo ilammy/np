@@ -29,7 +29,7 @@
 
     (define-syntax $check-for-invalid-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(valid-descriptions ())) ($ s 'valid-descriptions))
+        ((_ s 'lang '(all-valid-descriptions ())) ($ s 'all-valid-descriptions))
 
         ((_ s 'lang '(_ (invalid-descriptions ...)))
          ($ s ($map '($must-be:standalone-terminal-description 'lang)

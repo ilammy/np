@@ -7,19 +7,25 @@ count() { echo $#; }
 output-with-indent() { sed "s/^/    /" <<< "$1"; }
 
 actual-error-message() {
-    sed -e '/^\s*called from/d' \
-        -e 's/^ERROR [^:]*://'  \
-        -e 's/: /\n/'
+    local msg=$(sed -e '/^\s*called from/d' \
+                    -e 's/^ERROR [^:]*://' <<< "$1")
+
+    if [[ $(wc -l <<< "$msg") == "1" ]]
+    then
+        msg=$(sed -e 's/: /\n/' <<< "$msg")
+    fi
+
+    echo "$msg"
 }
 
 expected-error-message() {
-    grep '^; ' | sed 's/^;//'
+    cat "$1" | grep '^; ' | sed 's/^;//'
 }
 
 error-message-diff() {
-    diff --unified --ignore-all-space       \
-        <(actual-error-message <<< "$1")    \
-        <(expected-error-message < "$2")
+    diff --unified --ignore-all-space   \
+        <(actual-error-message "$1")    \
+        <(expected-error-message "$2")
 }
 
 TEST_DIRECTORY="$1"

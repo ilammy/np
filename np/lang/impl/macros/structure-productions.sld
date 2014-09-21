@@ -2,7 +2,8 @@
   ;;;
   ;;; Structural analysis of nonterminal productions (standalone and extension)
   ;;;
-  (export $can-be:standalone-production?
+  (export %verify:standalone-production
+          $can-be:standalone-production?
           $must-be:standalone-production
 
           $can-be:production-addition?
@@ -18,6 +19,24 @@
     ;;;
     ;;; Standalone form
     ;;;
+
+    (define-syntax %verify:standalone-production
+      (syntax-rules (quote)
+        ((_ s '(k t) '#(x ...))
+         ($ k '("Incorrect production syntax: vector patterns are not allowed" (#(x ...) . t))))
+
+        ((_ s '(k t) 'otherwise)
+         ($ s (%verify:production* '(k (otherwise . t)) 'otherwise))) ) )
+
+    (define-syntax %verify:standalone-production*
+      (syntax-rules (quote)
+        ((_ s '(k t) '#(x ...))
+         ($ k '("Incorrect production syntax: vector patterns are not allowed" (#(x ...) . t))))
+
+        ((_ s '(k t) '(a . d)) ($ s ($and '(%verify:production* '(k t) 'a)
+                                          '(%verify:production* '(k t) 'd) )))
+
+        ((_ s '(k t) _) ($ s '#t)) ) )
 
     (define-syntax $can-be:standalone-production?
       (syntax-rules (quote)

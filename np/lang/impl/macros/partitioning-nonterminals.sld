@@ -22,18 +22,17 @@
     (define-syntax $filter-standalone-nonterminal-descriptions
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
-         ($ s ($cleanup-partitioned-standalone-nonterminal-descriptions 'lang
-                ($partition '$can-be:standalone-nonterminal-description?
+         ($ s ($check-for-invalid-nonterminal-descriptions 'lang
+                ($partition '$is-a:standalone-nonterminal-description?
                             'descriptions ) ))) ) )
 
-    (define-syntax $cleanup-partitioned-standalone-nonterminal-descriptions
+    (define-syntax $check-for-invalid-nonterminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(possible-descriptions ()))
-         ($ s ($map '($must-be:standalone-nonterminal-description 'lang)
-                    'possible-descriptions )))
+        ((_ s 'lang '(all-valid-descriptions ())) ($ s 'all-valid-descriptions))
 
-        ((_ s 'lang '(_ (x xs ...)))
-         (syntax-error "Invalid nonterminal description syntax" x xs ...)) ) )
+        ((_ s 'lang '(_ (invalid-descriptions ...)))
+         ($ s ($map '($must-be:standalone-nonterminal-description 'lang)
+                    '(invalid-descriptions ...) ))) ) )
 
     ;;;
     ;;; Extension form

@@ -2,9 +2,10 @@
   ;;;
   ;;; Structural analysis of nonterminal descriptions (standalone and extension)
   ;;;
-  (export $can-be:standalone-nonterminal-description?
+  (export  $can-be:standalone-nonterminal-description?
+             $is-a:standalone-nonterminal-description?
           $must-be:standalone-nonterminal-description
-          
+
           $can-be:nonterminal-implicit-addition?
           $can-be:nonterminal-explicit-addition?
           $can-be:nonterminal-removal?
@@ -31,47 +32,79 @@
   (begin
 
     ;;;
-    ;;; Nonterminal descriptions (standalone)
+    ;;; Nonterminal descriptions (standalone) - interface
     ;;;
 
-    ;; Check the form without predicate first to allow (Nonterm () ())
     (define-syntax $can-be:standalone-nonterminal-description?
       (syntax-rules (quote)
-        ((_ s '(name (meta-vars ...) productions ...))
-         ($ s ($and '($not-vector-or-list? 'name)
-                    '($every? '$can-be:standalone-meta-var? '(meta-vars ...)) )))
+        ((_ s '(name predicate (meta-vars ...) productions ...)) ($ s '#t))
+        ((_ s '(name           (meta-vars ...) productions ...)) ($ s '#t))
+        ((_ s  _)                                                ($ s '#f)) ) )
 
-        ((_ s '(name predicate (meta-vars ...) productions ...))
-         ($ s ($and '($not-vector-or-list? 'name)
-                    '($not-vector-or-list? 'predicate)
-                    '($every? '$can-be:standalone-meta-var? '(meta-vars ...)) )))
-
-        ((_ s _) ($ s '#f)) ) )
+    (define-syntax $is-a:standalone-nonterminal-description?
+      (syntax-rules (quote)
+        ((_ s 'term) ($ s ($verify-result:as-boolean
+                            ($verify:standalone-nonterminal-description 'term) ))) ) )
 
     (define-syntax $must-be:standalone-nonterminal-description
       (syntax-rules (quote)
-        ((_ s 'lang '(name predicate (meta-vars ...) prod prods ...))
-         ($ s ($append ($list 'name 'predicate
-                         ($map '($must-be:standalone-meta-var 'lang 'name)
-                               '(meta-vars ...) ) )
-                       ($map '($must-be:standalone-production 'lang 'name)
-                             '(prod prods ...) ) )))
+        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
+                                  ($verify:standalone-nonterminal-description 'lang 'term) ))) ) )
 
-        ((_ s 'lang '(name (meta-vars ...) prod prods ...))
-         ($ s ($append ($list 'name
-                         ($map '($must-be:standalone-meta-var 'lang 'name)
-                               '(meta-vars ...) ) )
-                       ($map '($must-be:standalone-production 'lang 'name)
-                             '(prod prods ...) ) )))
+    ;;;
+    ;;; Nonterminal descriptions (standalone) - implementation
+    ;;;
 
-        ((_ s 'lang '(name (meta-vars ...)))
-         (syntax-error "Nonterminal must have at least one production" lang name))
+    (define-syntax $verify:standalone-nonterminal-description
+      (syntax-rules (quote)
+        ((_ s 'term)       ($ s (%verify:standalone-nonterminal-description '(s ())     'term)))
+        ((_ s 'lang 'term) ($ s (%verify:standalone-nonterminal-description '(s (lang)) 'term))) ) )
 
-        ((_ s 'lang '(name predicate (meta-vars ...)))
-         (syntax-error "Nonterminal must have at least one production" lang name))
+    (define-syntax %verify:standalone-nonterminal-description
+      (syntax-rules (quote)
+        ((_ s '(k t) '(name predicate () pro . ductions))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate ()) . t)) 'name)
+                    '(%verify:nonterminal-predicate-name '(k ((name predicate ()) . t)) 'predicate)
+                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '())
+                    '(%verify:nonterminal-production-list '(k (name . t)) '(pro . ductions))
+                    '($every? '(%verify:standalone-production '(k (name . t))) '(pro . ductions)) )))
 
-        ((_ s 'lang 'invalid-description)
-         (syntax-error "Invalid nonterminal description syntax" lang invalid-description)) ) )
+        ((_ s '(k t) '(name predicate (meta . vars) pro . ductions))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate (meta . vars)) . t)) 'name)
+                    '(%verify:nonterminal-predicate-name '(k ((name predicate (meta . vars)) . t)) 'predicate)
+                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(meta . vars))
+                    '($every? '(%verify:meta-var-name '(k (name . t))) '(meta . vars))
+                    '(%verify:nonterminal-production-list '(k (name . t)) '(pro . ductions))
+                    '($every? '(%verify:standalone-production '(k (name . t))) '(pro . ductions)) )))
+
+        ((_ s '(k t) '(name () pro . ductions))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name ()) . t)) 'name)
+                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '())
+                    '(%verify:nonterminal-production-list '(k (name . t)) '(pro . ductions))
+                    '($every? '(%verify:standalone-production '(k (name . t))) '(pro . ductions)) )))
+
+        ((_ s '(k t) '(name (meta . vars) pro . ductions))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name (meta . vars)) . t)) 'name)
+                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(meta . vars))
+                    '($every? '(%verify:meta-var-name '(k (name . t))) '(meta . vars))
+                    '(%verify:nonterminal-production-list '(k (name . t)) '(pro . ductions))
+                    '($every? '(%verify:standalone-production '(k (name . t))) '(pro . ductions)) )))
+
+        ((_ s '(k t) '(name predicate meta-vars))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate meta-vars) . t)) 'name)
+                    '(%verify:nonterminal-predicate-name '(k ((name predicate meta-vars) . t)) 'predicate)
+                    '(%verify:nonterminal-meta-var-list '(k (name . t)) 'meta-vars)
+                    '($every? '(%verify:meta-var-name '(k (name . t))) 'meta-vars)
+                    '(%verify:nonterminal-production-list '(k ((name predicate meta-vars) . t)) '()) )))
+
+        ((_ s '(k t) '(name meta-vars))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate meta-vars) . t)) 'name)
+                    '(%verify:nonterminal-meta-var-list '(k (name . t)) 'meta-vars)
+                    '($every? '(%verify:meta-var-name '(k (name . t))) 'meta-vars)
+                    '(%verify:nonterminal-production-list '(k ((name meta-vars) . t)) '()) )))
+
+        ((_ s '(k t) 'invalid-syntax)
+         ($ k '("Invalid nonterminal description syntax" (invalid-syntax . t)))) ) )
 
     ;;;
     ;;; Nonterminal descriptions (extension, predicates)
@@ -231,5 +264,36 @@
          ($ s '(name predicate (vars ...) (new-prods ...))))
         ((_ s 'lang 'expr)
          (syntax-error "Invalid nonterminal modification description" lang expr)) ) )
+
+    ;;;
+    ;;; Common matching utilities
+    ;;;
+
+    (define-syntax %verify:nonterminal-name
+      (syntax-rules (quote)
+        ((_ s '(k t) '())       ($ k '("Nonterminal name must be a symbol" (()       . t))))
+        ((_ s '(k t) '(a . d))  ($ k '("Nonterminal name must be a symbol" ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...)) ($ k '("Nonterminal name must be a symbol" (#(x ...) . t))))
+        ((_ s '(k t) 'an-atom)  ($ s '#t)) ) )
+
+    (define-syntax %verify:nonterminal-predicate-name
+      (syntax-rules (quote)
+        ((_ s '(k t) '())       ($ k '("Predicate name must be a symbol" (()       . t))))
+        ((_ s '(k t) '(a . d))  ($ k '("Predicate name must be a symbol" ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...)) ($ k '("Predicate name must be a symbol" (#(x ...) . t))))
+        ((_ s '(k t) 'an-atom)  ($ s '#t)) ) )
+
+    (define-syntax %verify:nonterminal-meta-var-list
+      (syntax-rules (quote)
+        ((_ s '(k t) '(x ...))     ($ s '#t))
+        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in nonterminal description" (a (x ... . a) . t))))
+        ((_ s '(k t) 'unexpected)  ($ k '("Expected meta-variable list" (unexpected . t)))) ) )
+
+    (define-syntax %verify:nonterminal-production-list
+      (syntax-rules (quote)
+        ((_ s '(k t) '())          ($ k '("Nonterminal must have at least one production" t)))
+        ((_ s '(k t) '(x ...))     ($ s '#t))
+        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in nonterminal description" (a (x ... . a) . t))))
+        ((_ s '(k t) 'unexpected)  ($ k '("Unexpected dotted list in nonterminal description" (unexpected . t)))) ) )
 
 ) )
