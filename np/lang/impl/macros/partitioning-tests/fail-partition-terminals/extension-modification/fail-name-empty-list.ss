@@ -1,6 +1,6 @@
 ; Terminal name must be a symbol
 ;   lang
-;   (() ((+ some) (- vars)))
+;   (() predicate? ((+ some) (- vars)))
 ;   ()
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((() ((+ some) (- vars)))) ) ))
+    '((() predicate? ((+ some) (- vars)))) ) ))

@@ -13,7 +13,10 @@ before_script:
   - ./tools/setup-test-rig
 
 script:
-  - ./tools/run-all-tests
+  - ./tools/run-success-tests np/lang/impl/macros/partitioning-tests
+  - ./tools/run-failure-tests np/lang/impl/macros/partitioning-tests/fail-partition-toplevel
+  - ./tools/run-failure-tests np/lang/impl/macros/partitioning-tests/fail-partition-terminals
+  - ./tools/run-failure-tests np/lang/impl/macros/partitioning-tests/fail-partition-nonterminals
 
 branches:
   only:

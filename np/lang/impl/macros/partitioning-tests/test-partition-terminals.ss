@@ -96,6 +96,11 @@
     (assert-equal '(() (some removed terminals) ())
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
         '((- some removed) (- terminals)) ))) ) )
+
+  (define-test ("recognizes mixed removal forms")
+    (assert-equal '(() (some removed (terminal? (t))) ())
+      ($ ($quote ($partition-extension-terminal-descriptions 'lang
+        '((- some removed (terminal? (t)))) ))) ) )
 )
 (verify-test-case! terminals:extension-removal)
 
