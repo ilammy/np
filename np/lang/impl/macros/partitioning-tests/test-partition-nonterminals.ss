@@ -206,7 +206,7 @@
           (- Some Removed) (Atom ((+ atom))) (- Nonterminals)) ))) ) )
 
   (define-test ("does not mess up in hard-to-tell cases")
-    (assert-equal '(((- () (+ +)) (+ () n) (- Minus? (some vars) (+ something)))
+    (assert-equal '(((- () (+ +)) (+ () n) (- Minus? (some vars) (+ something)) (- () (+)))
                     (Minus? (some (vars)) (and something (else)))
                     ((+ - (() ()) (() ())) (- + ((-) ()) (() ())) (+ (() ()) (() (+)))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
@@ -216,6 +216,7 @@
           (+ - ())
           (- Minus? (some (vars)) (and something (else)))
           (+ () n)
+          (- () (+))
           (+ () (- +))) ))) ) )
 )
 (verify-test-case! terminals:extension-peculiar)
