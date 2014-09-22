@@ -10,6 +10,7 @@
           (sr ck filters)
           (sr ck lists)
           (sr ck maps)
+          (sr ck predicates)
           (np lang impl macros structure-nonterminals)
           (np lang impl macros structure-meta-vars)
           (np lang impl macros utils))
@@ -41,31 +42,41 @@
     (define-syntax $partition-extension-nonterminal-descriptions
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
-         ($ s ($cleanup-partitioned-extension-nonterminal-descriptions 'lang
-                ($multi-partition '($can-be:nonterminal-modification?
-                                    $can-be:nonterminal-removal?
-                                    $can-be:nonterminal-explicit-addition?
-                                    $can-be:nonterminal-implicit-addition?)
+         ($ s ($postprocess-partitioned-extension-nonterminal-descriptions 'lang
+                ($multi-partition '($is-a:nonterminal-explicit-addition?
+                                    $is-a:nonterminal-implicit-addition?
+                                    $is-a:nonterminal-removal?
+                                    $is-a:nonterminal-modification?)
                   'descriptions ) ))) ) )
 
-    (define-syntax $cleanup-partitioned-extension-nonterminal-descriptions
+    (define-syntax $postprocess-partitioned-extension-nonterminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(edits minuses explicit-pluses implicit-pluses ()))
-         ($ s ($list
-                ($map '($must-be:nonterminal-description-addition 'lang)
-                      ($append ($drop-head-and-squash 'explicit-pluses)
-                               'implicit-pluses ) )
+        ((_ s 'lang '(explicit-additions implicit-additions removals modifications ()))
+         ($ s '(explicit-additions implicit-additions removals modifications)))
 
-                ($map '($must-be:nonterminal-description-removal 'lang)
-                      ($drop-head-and-squash 'minuses) )
+        ((_ s 'lang '(_ _ _ _ (invalid-descriptions ...)))
+         ($ s ($report-invalid-extension-nonterminal-descriptions 'lang
+                ($multi-partition '($can-be:nonterminal-explicit-addition?
+                                    $can-be:nonterminal-removal?
+                                    $can-be:nonterminal-modification?
+                                    $can-be:nonterminal-implicit-addition?)
+                  '(invalid-descriptions ...) ) ))) ) )
 
-                ($map '($must-be:nonterminal-description-modification 'lang)
-                  ($map '($partition-nonterminal-modification-productions 'lang)
-                    ($map '($partition-nonterminal-modification-meta-vars 'lang)
-                          'edits ) ) ) )))
+    ;; $can-be checks go in such order because they are used to heuristically
+    ;; guess an implied class for a structurally invalid clauses. The $multi-
+    ;; partition picks the first predicate that returns #t, therefore at first
+    ;; we check for the clauses with distinct features: explicit additions,
+    ;; removals, and modifications have (+ ...) / (- ...) clauses that identify
+    ;; them pretty well. Anything else is considered a failed implicit addition
 
-        ((_ s 'lang '(_ _ _ _ (x xs ...)))
-         (syntax-error "Invalid nonterminal description syntax" lang x xs ...)) ) )
+    (define-syntax $report-invalid-extension-nonterminal-descriptions
+      (syntax-rules (quote)
+        ((_ s 'lang '(explicit-additions removals modifications implicit-additions incomprehensible))
+         ($ s ($and '($every? '($must-be:nonterminal-explicit-addition 'lang) 'explicit-additions)
+                    '($every? '($must-be:nonterminal-removal           'lang) 'removals)
+                    '($every? '($must-be:nonterminal-modification      'lang) 'modifications)
+                    '($every? '($must-be:nonterminal-implicit-addition 'lang) 'implicit-additions)
+                    '($every? '($must-be:nonterminal-implicit-addition 'lang) 'incomprehensible) ))) ) )
 
     ;;;
     ;;; Partitioning of meta-vars of the modification extension form
