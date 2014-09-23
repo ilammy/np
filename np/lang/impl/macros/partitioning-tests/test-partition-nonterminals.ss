@@ -71,42 +71,20 @@
 
 (define-test-case (terminals:extension-addition "Partitioning of extension addition nonterminal forms")
 
-  (define-test ("recognizes implicit addition forms")
-    (assert-equal '(((Pair Pair? () (value value))) () ())
-      ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Pair Pair? () (value value))) ))) ) )
-
-  (define-test ("can tell the difference between implicit addition and modification by meta-variable list")
-    (assert-equal '(((PlusMinus (pm) (+ stuff) (- stuff))) () ())
-      ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((PlusMinus (pm) (+ stuff) (- stuff))) ))) ) )
-
-  (define-test ("can tell the difference between implicit addition and modification by production list")
-    (assert-equal '(((Foo () foo) (Bar () (bar)) (Baz Baz? () (* (foo bar)))) () ())
-      ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Foo () foo) (Bar () (bar)) (Baz Baz? () (* (foo bar)))) ))) ) )
-
-  (define-test ("recognizes explicit addition forms")
+  (define-test ("recognizes addition forms")
     (assert-equal '(((Pair () (v v))) () ())
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((+ (Pair () (v v)))) ))) ) )
 
-  (define-test ("recognizes explicit addition forms with multiple descriptions")
+  (define-test ("recognizes addition forms with multiple descriptions")
     (assert-equal '(((Foo () foo) (Bar () bar)) () ())
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((+ (Foo () foo) (Bar () bar))) ))) ) )
 
-  (define-test ("recognizes explicit addition forms with extension-like productions")
+  (define-test ("recognizes addition forms with extension-like productions")
     (assert-equal '(((PlusMinus () (+ stuff) (- stuff))) () ())
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((+ (PlusMinus () (+ stuff) (- stuff)))) ))) ) )
-
-  ;; Technical detail, putting a test here to avoid getting sudden and
-  ;; unexplainable test failures if the order changes in the future.
-  (define-test ("explicit additions appear before implicit")
-    (assert-equal '(((A () a) (B () b)) () ())
-      ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((B () b) (+ (A () a))) ))) ) )
 )
 (verify-test-case! terminals:extension-addition)
 
@@ -165,8 +143,6 @@
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((Nt ((+ v1) (- v2 v3) (+ v4)))) ))) ) )
 
-  ;; Note how modification is preferred over implicit addition for
-  ;; clauses without specified meta-variables.
   (define-test ("recognizes production addition")
     (assert-equal '(() () ((Foo (() ()) ((n) ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
@@ -204,19 +180,5 @@
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((+ (Pair () (v v))) (PlusMinus (pm) (+ stuff) (- stuff))
           (- Some Removed) (Atom ((+ atom))) (- Nonterminals)) ))) ) )
-
-  (define-test ("does not mess up in hard-to-tell cases")
-    (assert-equal '(((- () (+ +)) (+ () n) (- Minus? (some vars) (+ something)) (- () (+)))
-                    (Minus? (some (vars)) (and something (else)))
-                    ((+ - (() ()) (() ())) (- + ((-) ()) (() ())) (+ (() ()) (() (+)))))
-      ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((- + ((+ -)))
-          (+ (- () (+ +)))
-          (- Minus? (some vars) (+ something))
-          (+ - ())
-          (- Minus? (some (vars)) (and something (else)))
-          (+ () n)
-          (- () (+))
-          (+ () (- +))) ))) ) )
 )
 (verify-test-case! terminals:extension-peculiar)

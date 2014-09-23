@@ -51,29 +51,17 @@
 
 (define-test-case (terminals:extension-addition "Partitioning of extension addition terminal forms")
 
-  (define-test ("recognizes implicit addition forms")
-    (assert-equal '(((number number? (n)) (symbol? (s))) () ())
-      ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((number number? (n)) (symbol? (s))) ))) ) )
-
-  (define-test ("recognizes explicit addition forms")
+  (define-test ("recognizes addition forms")
     (assert-equal '(((number? (n)) (symbol symbol? (s))) () ())
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
         '((+ (number? (n)))
           (+ (symbol symbol? (s)))) ))) ) )
 
-  (define-test ("recognizes explicit addition forms with multiple descriptions")
+  (define-test ("recognizes addition forms with multiple descriptions")
     (assert-equal '(((number? (n)) (symbol? (s))) () ())
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
         '((+ (number? (n))
              (symbol? (s)) )) ))) ) )
-
-  ;; Technical detail, putting a test here to avoid getting sudden and
-  ;; unexplainable test failures if the order changes in the future.
-  (define-test ("explicit additions appear before implicit")
-    (assert-equal '(((a (a)) (b (b)) (c (c)) (d (d)) (e (e))) () ())
-      ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((d (d)) (+ (a (a)) (b (b))) (e (e)) (+ (c (c)))) ))) ) )
 )
 (verify-test-case! terminals:extension-addition)
 
@@ -140,23 +128,5 @@
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
         '((- some removed) (tar var? (x)) (- (terminal? (t)))
           (zog ((- var))) (+ (x (x)) (y y (y)))) ))) ) )
-
-  (define-test ("does not mess up in hard-to-tell cases")
-    (assert-equal '(((- (some meta vars))
-                     (+ (some-var) (x y))
-                     (- predicate? (var))
-                     (+ (num? (x)) (var x)))
-                    ()
-                    ((- ((add) (remove)))
-                     (+ ((remove) (add)))
-                     (- (() (-)))))
-      ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((- (some meta vars))
-          (+ (some-var) (x y))
-          (- predicate? (var))
-          (+ (num? (x)) (var x))
-          (- ((+ add) (- remove)))
-          (+ ((- add) (+ remove)))
-          (- ((- -)))) ))) ) )
 )
 (verify-test-case! terminals:extension-peculiar)
