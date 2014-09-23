@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-descriptions 'lang
-    '((#(9) ((+ vars)) (+ prod))) ) ))
+    '((! (#(9) ((+ vars)) (+ prod)))) ) ))

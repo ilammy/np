@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-descriptions 'lang
-    '(((a . d) pred? ())) ) ))
+    '((! ((a . d) pred? ()))) ) ))

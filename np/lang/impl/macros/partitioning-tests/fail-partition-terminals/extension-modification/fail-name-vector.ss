@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((#(1) ((+ some) (- vars)))) ) ))
+    '((! (#(1) ((+ some) (- vars))))) ) ))

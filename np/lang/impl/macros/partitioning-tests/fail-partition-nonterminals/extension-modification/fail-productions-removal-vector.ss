@@ -10,4 +10,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-descriptions 'lang
-    '((Nonterminal () (+ (x #(p))))) ) ))
+    '((! (Nonterminal () (+ (x #(p)))))) ) ))

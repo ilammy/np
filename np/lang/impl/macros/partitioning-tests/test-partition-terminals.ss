@@ -99,17 +99,24 @@
   (define-test ("recognizes meta-var addition")
     (assert-equal '(() () ((some-term ((n) ()))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((some-term ((+ n)))) ))) ) )
+        '((! (some-term ((+ n))))) ))) ) )
 
   (define-test ("recognizes meta-var removal")
     (assert-equal '(() () ((some-term (() (m)))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((some-term ((- m)))) ))) ) )
+        '((! (some-term ((- m))))) ))) ) )
 
   (define-test ("groups modified meta-vars")
     (assert-equal '(() () ((some-term ((c d e g h) (a b f)))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((some-term ((- a b) (+ c d e) (- f) (+ g h)))) ))) ) )
+        '((! (some-term ((- a b) (+ c d e) (- f) (+ g h))))) ))) ) )
+
+  (define-test ("recognizes multiple modifications")
+    (assert-equal '(() () ((foo ((foo) ())) (bar (() (bar))) (baz ((baz) ()))))
+      ($ ($quote ($partition-extension-terminal-descriptions 'lang
+        '((! (foo ((+ foo)))
+             (bar ((- bar))))
+          (! (baz ((+ baz))))) ))) ) )
 )
 (verify-test-case! terminals:extension-modification)
 
@@ -122,11 +129,16 @@
       ($ ($quote ($partition-extension-terminal-descriptions 'lang '()))) ) )
 
   (define-test ("can handle all forms altogether")
-    (assert-equal '(((x (x)) (y y (y)) (tar var? (x)))
+    (assert-equal '(((tar var? (x)) (x (x)))
                     (some removed (terminal? (t)))
                     ((zog (() (var)))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((- some removed) (tar var? (x)) (- (terminal? (t)))
-          (zog ((- var))) (+ (x (x)) (y y (y)))) ))) ) )
+        '((- some removed) (+ (tar var? (x))) (- (terminal? (t)))
+          (! (zog ((- var)))) (+ (x (x)))) ))) ) )
+
+  (define-test ("has not restrictions on terminal naming")
+    (assert-equal '(((+ + (+))) ((- - (-))) ((! ((+) (-)))))
+      ($ ($quote ($partition-extension-terminal-descriptions 'lang
+        '((+ (+ + (+))) (- (- - (-))) (! (! ((+ +) (- -))))) ))) ) )
 )
 (verify-test-case! terminals:extension-peculiar)

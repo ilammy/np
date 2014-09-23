@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((number? ((+ x) (- y)) x)) ) ))
+    '((! (number? ((+ x) (- y)) x))) ) ))

@@ -126,42 +126,51 @@
   (define-test ("recognizes predicate redefinition")
     (assert-equal '(() () ((Atom NewAtom? (() ()) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Atom NewAtom? ())) ))) ) )
+        '((! (Atom NewAtom? ()))) ))) ) )
 
   (define-test ("recognizes meta-var addition")
     (assert-equal '(() () ((Atom ((atom) ()) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Atom ((+ atom)))) ))) ) )
+        '((! (Atom ((+ atom))))) ))) ) )
 
   (define-test ("recognizes meta-var removal")
     (assert-equal '(() () ((Atom (() (bork)) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Atom ((- atom)))) ))) ) )
+        '((! (Atom ((- atom))))) ))) ) )
 
   (define-test ("groups modified meta-vars")
     (assert-equal '(() () ((Atom ((v1 v4) (v2 v3)) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Nt ((+ v1) (- v2 v3) (+ v4)))) ))) ) )
+        '((! (Nt ((+ v1) (- v2 v3) (+ v4))))) ))) ) )
 
   (define-test ("recognizes production addition")
     (assert-equal '(() () ((Foo (() ()) ((n) ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Foo () (+ n))) ))) ) )
+        '((! (Foo () (+ n)))) ))) ) )
 
   (define-test ("recognizes production removal")
     (assert-equal '(() () ((Foo (() ()) (() (m)))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Foo () (- m))) ))) ) )
+        '((! (Foo () (- m)))) ))) ) )
 
   (define-test ("groups modified productions")
     (assert-equal '(() () ((Bar (() ()) (((n n)) (m ())))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Bar () (- m) (+ (n n)) (- ()))) ))) ) )
+        '((! (Bar () (- m) (+ (n n)) (- ())))) ))) ) )
 
   (define-test ("can handle all options at the same time")
     (assert-equal '(() () ((Mega Predicate? ((mega) (form)) ((prod) ((list ...))))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((Mega Predicate? ((+ mega) (- form)) (+ prod) (- (list ...)))) ))) ) )
+        '((! (Mega Predicate? ((+ mega) (- form)) (+ prod) (- (list ...))))) ))) ) )
+
+  (define-test ("recognizes modification forms with multiple descriptions")
+    (assert-equal '(() () ((Foo Foo? (() ()) (() ()))
+                           (Bar ((b) ()) (() ()))
+                           (Baz (() ()) (((z z z)) ()))))
+      ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
+        '((! (Foo Foo? ())
+             (Bar ((+ b))))
+          (! (Baz () (+ (z z z))))) ))) ) )
 )
 (verify-test-case! terminals:extension-modification)
 
@@ -178,7 +187,7 @@
                     (Some Removed Nonterminals)
                     ((Atom ((atom) ()) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
-        '((+ (Pair () (v v))) (PlusMinus (pm) (+ stuff) (- stuff))
-          (- Some Removed) (Atom ((+ atom))) (- Nonterminals)) ))) ) )
+        '((+ (Pair () (v v))) (- Some Removed) (! (Atom ((+ atom))))
+          (+ (PlusMinus (pm) (+ stuff) (- stuff))) (- Nonterminals)) ))) ) )
 )
 (verify-test-case! terminals:extension-peculiar)

@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((num (atom (- x)))) ) ))
+    '((! (num (atom (- x))))) ) ))
