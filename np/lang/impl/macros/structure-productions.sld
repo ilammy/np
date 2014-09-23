@@ -2,8 +2,11 @@
   ;;;
   ;;; Structural analysis of nonterminal productions (standalone and extension)
   ;;;
-  (export $can-be:standalone-production?
+  (export %verify:standalone-production
+          $can-be:standalone-production?
           $must-be:standalone-production
+
+          $can-be:extension-production?
 
           $can-be:production-addition?
           $can-be:production-removal?)
@@ -18,6 +21,24 @@
     ;;;
     ;;; Standalone form
     ;;;
+
+    (define-syntax %verify:standalone-production
+      (syntax-rules (quote)
+        ((_ s '(k t) '#(x ...))
+         ($ k '("Incorrect production syntax: vector patterns are not allowed" (#(x ...) . t))))
+
+        ((_ s '(k t) 'otherwise)
+         ($ s (%verify:standalone-production* '(k (otherwise . t)) 'otherwise))) ) )
+
+    (define-syntax %verify:standalone-production*
+      (syntax-rules (quote)
+        ((_ s '(k t) '#(x ...))
+         ($ k '("Incorrect production syntax: vector patterns are not allowed" (#(x ...) . t))))
+
+        ((_ s '(k t) '(a . d)) ($ s ($and '(%verify:standalone-production* '(k t) 'a)
+                                          '(%verify:standalone-production* '(k t) 'd) )))
+
+        ((_ s '(k t) _) ($ s '#t)) ) )
 
     (define-syntax $can-be:standalone-production?
       (syntax-rules (quote)
@@ -49,6 +70,12 @@
     ;;;
     ;;; Extension form
     ;;;
+
+    (define-syntax $can-be:extension-production?
+      (syntax-rules (quote + -)
+        ((_ s '(+ . rest)) ($ s '#t))
+        ((_ s '(- . rest)) ($ s '#t))
+        ((_ s  _)          ($ s '#f)) ) )
 
     (define-syntax $can-be:production-addition?
       (syntax-rules (quote +)

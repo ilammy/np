@@ -1,6 +1,6 @@
 ; Predicate name must be a symbol
 ;   lang
-;   (Nonterminal (a . d) ())
+;   (Nonterminal (a . d) (x y z))
 ;   (a . d)
 (import (scheme base)
         (np lang impl macros partitioning-nonterminals)
