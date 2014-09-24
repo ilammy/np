@@ -1,6 +1,7 @@
-; Invalid terminal description syntax
+; Terminal predicate must be a variable in short form
 ;   lang
-;   ()
+;   ((a . d) (some vars))
+;   (a . d)
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)
@@ -8,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((- ())) ) ))
+    '((- ((a . d) (some vars)))) ) ))

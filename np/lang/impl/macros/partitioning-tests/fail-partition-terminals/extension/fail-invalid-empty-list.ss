@@ -1,4 +1,4 @@
-; Invalid terminal description syntax
+; Invalid extension terminal description
 ;   lang
 ;   ()
 (import (scheme base)
@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((- ())) ) ))
+    '(()) ) ))

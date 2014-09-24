@@ -1,6 +1,7 @@
-; Invalid terminal description syntax
+; Unexpected dotted list in terminal description
 ;   lang
-;   ()
+;   (! (number? ((+ n))) . random)
+;   random
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)
@@ -8,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((- ())) ) ))
+    '((! (number? ((+ n))) . random)) ) ))

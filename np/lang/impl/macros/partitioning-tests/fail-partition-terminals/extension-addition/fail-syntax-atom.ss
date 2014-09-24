@@ -1,6 +1,7 @@
-; Invalid terminal description syntax
+; Expected terminal description list
 ;   lang
-;   ()
+;   (+ . right-away)
+;   right-away
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)
@@ -8,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((- ())) ) ))
+    '((+ . right-away)) ) ))

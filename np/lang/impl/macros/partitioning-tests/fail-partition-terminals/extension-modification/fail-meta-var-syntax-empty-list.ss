@@ -1,6 +1,6 @@
-; Invalid terminal description syntax
+; Terminal must modify have at least one meta-variable
 ;   lang
-;   ()
+;   foo
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)
@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((- ())) ) ))
+    '((! (foo ()))) ) ))

@@ -1,6 +1,6 @@
-; Invalid terminal description syntax
+; Invalid extension terminal description
 ;   lang
-;   ()
+;   (some thing)
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)
@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((- ())) ) ))
+    '((some thing)) ) ))

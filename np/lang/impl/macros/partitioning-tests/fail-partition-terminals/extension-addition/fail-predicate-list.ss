@@ -1,6 +1,7 @@
-; Invalid terminal description syntax
+; Terminal predicate must be a variable in short form
 ;   lang
-;   ()
+;   ((lambda (x) (odd? x)) (some vars))
+;   (lambda (x) (odd? x))
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)
@@ -8,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((- ())) ) ))
+    '((+ ((lambda (x) (odd? x)) (some vars)))) ) ))

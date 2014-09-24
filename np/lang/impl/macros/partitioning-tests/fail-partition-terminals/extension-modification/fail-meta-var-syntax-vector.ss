@@ -1,6 +1,7 @@
-; Invalid terminal description syntax
+; Expected meta-variable modification list
 ;   lang
-;   ()
+;   bar
+;   #((+ x y z))
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)
@@ -8,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((- ())) ) ))
+    '((! (bar #((+ x y z))))) ) ))
