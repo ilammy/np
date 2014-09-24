@@ -1,7 +1,8 @@
-; Invalid extension production syntax
+; Unexpected dotted list in nonterminal description
 ;   lang
 ;   Pair
-;   (a . d)
+;   ((+ n (n n)) . foo)
+;   foo
 (import (scheme base)
         (np lang impl macros partitioning-nonterminals)
         (sr ck)
@@ -9,4 +10,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-descriptions 'lang
-    '((! (Pair ((- x)) (a . d)))) ) ))
+    '((! (Pair ((+ x)) (+ n (n n)) . foo))) ) ))
