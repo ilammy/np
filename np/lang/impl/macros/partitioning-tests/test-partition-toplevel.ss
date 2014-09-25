@@ -10,34 +10,33 @@
 
 (define-test-case (toplevel:singular "Partitioning of toplevel forms (singular clauses)")
 
-  (define-test ("default values") 
+  (define-test ("default values")
     (assert-equal '(#f #f #f #f () ())
       ($ ($quote
         ($partition-toplevel-clauses 'lang '()) )) ) )
 
   (define-test ("recognizes 'extends' clause")
-    (assert-equal '((extends another-lang) #f #f #f () ())
+    (assert-equal '((another-lang) #f #f #f () ())
       ($ ($quote
         ($partition-toplevel-clauses 'lang '((extends another-lang))) )) ) )
 
   (define-test ("recognizes 'predicate' clause")
-    (assert-equal '(#f (predicate lang?) #f #f () ())
+    (assert-equal '(#f (lang?) #f #f () ())
       ($ ($quote
         ($partition-toplevel-clauses 'lang '((predicate lang?))) )) ) )
 
   (define-test ("recognizes 'parser' clause")
-    (assert-equal '(#f #f (parser parse-lang) #f () ())
+    (assert-equal '(#f #f (parse-lang) #f () ())
       ($ ($quote
         ($partition-toplevel-clauses 'lang '((parser parse-lang))) )) ) )
 
   (define-test ("recognizes 'unparser' clause")
-    (assert-equal '(#f #f #f (unparser unparse-lang) () ())
+    (assert-equal '(#f #f #f (unparse-lang) () ())
       ($ ($quote
         ($partition-toplevel-clauses 'lang '((unparser unparse-lang))) )) ) )
 
   (define-test ("handles all singular clauses altogether")
-    (assert-equal '((extends another-lang) (predicate lang?)
-                    (parser parse-lang) (unparser unparse-lang) () ())
+    (assert-equal '((another-lang) (lang?) (parse-lang) (unparse-lang) () ())
       ($ ($quote
         ($partition-toplevel-clauses 'lang '((predicate lang?)
                                              (extends another-lang)
@@ -116,10 +115,10 @@
 (define-test-case (toplevel:peculiar "Partitioning of toplevel forms (peculiar cases)")
 
   (define-test ("clause order is (mostly) irrelevant")
-    (assert-equal '((extends another-lang) (predicate lang?) (parser parse-lang)
-                    #f ((null? (x))) ((Pair Pair? (p) (x x))
-                                      (- Some Non Terminals)
-                                      (+ (Num-Pair (np) (n n)))))
+    (assert-equal '((another-lang) (lang?) (parse-lang) #f
+                    ((null? (x))) ((Pair Pair? (p) (x x))
+                                   (- Some Non Terminals)
+                                   (+ (Num-Pair (np) (n n)))))
       ($ ($quote
         ($partition-toplevel-clauses 'lang
           '((terminals)               (Pair Pair? (p) (x x))

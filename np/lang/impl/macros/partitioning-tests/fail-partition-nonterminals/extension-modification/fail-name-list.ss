@@ -1,4 +1,4 @@
-; Nonterminal name must be a symbol
+; Name of the nonterminal must be a symbol
 ;   lang
 ;   ((awesome name) ())
 ;   (awesome name)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-descriptions 'lang
-    '(((awesome name) () (+ x))) ) ))
+    '((! ((awesome name) () (+ x)))) ) ))

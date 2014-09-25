@@ -1,4 +1,4 @@
-; Nonterminal name must be a symbol
+; Name of the nonterminal must be a symbol
 ;   lang
 ;   (#(9) ((+ vars)))
 ;   #(9)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-descriptions 'lang
-    '((#(9) ((+ vars)) (+ prod))) ) ))
+    '((! (#(9) ((+ vars)) (+ prod)))) ) ))

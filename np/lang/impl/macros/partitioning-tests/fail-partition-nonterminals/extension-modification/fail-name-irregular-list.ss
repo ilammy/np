@@ -1,6 +1,6 @@
-; Nonterminal name must be a symbol
+; Name of the nonterminal must be a symbol
 ;   lang
-;   ((a . d) pred? ())
+;   ((a . d) ((+ x)))
 ;   (a . d)
 (import (scheme base)
         (np lang impl macros partitioning-nonterminals)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-descriptions 'lang
-    '(((a . d) pred? ())) ) ))
+    '((! ((a . d) ((+ x)) (+ n)))) ) ))

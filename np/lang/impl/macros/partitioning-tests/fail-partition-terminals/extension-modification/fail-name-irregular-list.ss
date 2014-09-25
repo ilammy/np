@@ -1,4 +1,4 @@
-; Terminal name must be a symbol
+; Name of the terminal must be a symbol
 ;   lang
 ;   ((car . cdr) ((+ some) (- vars)))
 ;   (car . cdr)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '(((car . cdr) ((+ some) (- vars)))) ) ))
+    '((! ((car . cdr) ((+ some) (- vars))))) ) ))

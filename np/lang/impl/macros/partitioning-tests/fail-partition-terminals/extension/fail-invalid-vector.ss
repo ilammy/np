@@ -1,0 +1,11 @@
+; Invalid syntax of the terminal extension
+;   lang
+;   #(3 14 15)
+(import (scheme base)
+        (np lang impl macros partitioning-terminals)
+        (sr ck)
+        (sr ck kernel))
+
+($ ($quote
+  ($partition-extension-terminal-descriptions 'lang
+    '(#(3 14 15)) ) ))

@@ -1,4 +1,4 @@
-; Terminal name must be a symbol
+; Name of the terminal must be a symbol
 ;   lang
 ;   (() predicate? ((+ some) (- vars)))
 ;   ()
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((() predicate? ((+ some) (- vars)))) ) ))
+    '((! (() predicate? ((+ some) (- vars))))) ) ))

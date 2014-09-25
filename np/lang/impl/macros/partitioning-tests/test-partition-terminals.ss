@@ -51,29 +51,17 @@
 
 (define-test-case (terminals:extension-addition "Partitioning of extension addition terminal forms")
 
-  (define-test ("recognizes implicit addition forms")
-    (assert-equal '(((number number? (n)) (symbol? (s))) () ())
-      ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((number number? (n)) (symbol? (s))) ))) ) )
-
-  (define-test ("recognizes explicit addition forms")
+  (define-test ("recognizes addition forms")
     (assert-equal '(((number? (n)) (symbol symbol? (s))) () ())
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
         '((+ (number? (n)))
           (+ (symbol symbol? (s)))) ))) ) )
 
-  (define-test ("recognizes explicit addition forms with multiple descriptions")
+  (define-test ("recognizes addition forms with multiple descriptions")
     (assert-equal '(((number? (n)) (symbol? (s))) () ())
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
         '((+ (number? (n))
              (symbol? (s)) )) ))) ) )
-
-  ;; Technical detail, putting a test here to avoid getting sudden and
-  ;; unexplainable test failures if the order changes in the future.
-  (define-test ("explicit additions appear before implicit")
-    (assert-equal '(((a (a)) (b (b)) (c (c)) (d (d)) (e (e))) () ())
-      ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((d (d)) (+ (a (a)) (b (b))) (e (e)) (+ (c (c)))) ))) ) )
 )
 (verify-test-case! terminals:extension-addition)
 
@@ -111,17 +99,24 @@
   (define-test ("recognizes meta-var addition")
     (assert-equal '(() () ((some-term ((n) ()))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((some-term ((+ n)))) ))) ) )
+        '((! (some-term ((+ n))))) ))) ) )
 
   (define-test ("recognizes meta-var removal")
     (assert-equal '(() () ((some-term (() (m)))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((some-term ((- m)))) ))) ) )
+        '((! (some-term ((- m))))) ))) ) )
 
   (define-test ("groups modified meta-vars")
     (assert-equal '(() () ((some-term ((c d e g h) (a b f)))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((some-term ((- a b) (+ c d e) (- f) (+ g h)))) ))) ) )
+        '((! (some-term ((- a b) (+ c d e) (- f) (+ g h))))) ))) ) )
+
+  (define-test ("recognizes multiple modifications")
+    (assert-equal '(() () ((foo ((foo) ())) (bar (() (bar))) (baz ((baz) ()))))
+      ($ ($quote ($partition-extension-terminal-descriptions 'lang
+        '((! (foo ((+ foo)))
+             (bar ((- bar))))
+          (! (baz ((+ baz))))) ))) ) )
 )
 (verify-test-case! terminals:extension-modification)
 
@@ -134,29 +129,16 @@
       ($ ($quote ($partition-extension-terminal-descriptions 'lang '()))) ) )
 
   (define-test ("can handle all forms altogether")
-    (assert-equal '(((x (x)) (y y (y)) (tar var? (x)))
+    (assert-equal '(((tar var? (x)) (x (x)))
                     (some removed (terminal? (t)))
                     ((zog (() (var)))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((- some removed) (tar var? (x)) (- (terminal? (t)))
-          (zog ((- var))) (+ (x (x)) (y y (y)))) ))) ) )
+        '((- some removed) (+ (tar var? (x))) (- (terminal? (t)))
+          (! (zog ((- var)))) (+ (x (x)))) ))) ) )
 
-  (define-test ("does not mess up in hard-to-tell cases")
-    (assert-equal '(((- (some meta vars))
-                     (+ (some-var) (x y))
-                     (- predicate? (var))
-                     (+ (num? (x)) (var x)))
-                    ()
-                    ((- ((add) (remove)))
-                     (+ ((remove) (add)))
-                     (- (() (-)))))
+  (define-test ("has not restrictions on terminal naming")
+    (assert-equal '(((+ + (+))) ((- - (-))) ((! ((+) (-)))))
       ($ ($quote ($partition-extension-terminal-descriptions 'lang
-        '((- (some meta vars))
-          (+ (some-var) (x y))
-          (- predicate? (var))
-          (+ (num? (x)) (var x))
-          (- ((+ add) (- remove)))
-          (+ ((- add) (+ remove)))
-          (- ((- -)))) ))) ) )
+        '((+ (+ + (+))) (- (- - (-))) (! (! ((+ +) (- -))))) ))) ) )
 )
 (verify-test-case! terminals:extension-peculiar)

@@ -1,7 +1,7 @@
-; Invalid extension production syntax
+; Expected a list of production modifications
 ;   lang
 ;   Pair
-;   #(9)
+;   #(1 2 3)
 (import (scheme base)
         (np lang impl macros partitioning-nonterminals)
         (sr ck)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-descriptions 'lang
-    '((Pair ((+ x)) #(9))) ) ))
+    '((! (Pair ((+ x)) . #(1 2 3)))) ) ))

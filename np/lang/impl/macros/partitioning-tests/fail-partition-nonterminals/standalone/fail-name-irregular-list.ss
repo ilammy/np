@@ -1,6 +1,6 @@
-; Nonterminal name must be a symbol
+; Name of the nonterminal must be a symbol
 ;   lang
-;   ((car . cdr) pred? ())
+;   ((car . cdr) #(pred?) ())
 ;   (car . cdr)
 (import (scheme base)
         (np lang impl macros partitioning-nonterminals)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($filter-standalone-nonterminal-descriptions 'lang
-    '(((car . cdr) pred? () production1)) ) ))
+    '(((car . cdr) #(pred?) () production1)) ) ))

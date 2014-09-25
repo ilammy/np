@@ -1,4 +1,4 @@
-; Invalid terminal description syntax
+; Invalid syntax of the terminal modification
 ;   lang
 ;   (name predicate? ((+ x) (- y)))
 (import (scheme base)
@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((name predicate? ((+ x) (- y)))) ) ))
+    '((! (name predicate? ((+ x) (- y))))) ) ))

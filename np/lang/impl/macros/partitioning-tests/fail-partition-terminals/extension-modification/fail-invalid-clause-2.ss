@@ -1,4 +1,4 @@
-; Invalid terminal description syntax
+; Invalid syntax of the terminal modification
 ;   lang
 ;   (number? ((+ x) (- y)) x)
 (import (scheme base)
@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((number? ((+ x) (- y)) x)) ) ))
+    '((! (number? ((+ x) (- y)) x))) ) ))

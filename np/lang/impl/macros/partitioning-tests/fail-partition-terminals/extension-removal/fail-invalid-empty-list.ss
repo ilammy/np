@@ -1,6 +1,6 @@
-; At least one terminal should be specified for removal
+; Invalid syntax of the terminal
 ;   lang
-;   (-)
+;   ()
 (import (scheme base)
         (np lang impl macros partitioning-terminals)
         (sr ck)
@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-terminal-descriptions 'lang
-    '((-)) ) ))
+    '((- ())) ) ))
