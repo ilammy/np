@@ -1,4 +1,4 @@
-; Nonterminal should modify either meta-variables or productions
+; Nonterminal modification should modify either meta-variables or productions
 ;   lang
 ;   Nonterminal
 (import (scheme base)

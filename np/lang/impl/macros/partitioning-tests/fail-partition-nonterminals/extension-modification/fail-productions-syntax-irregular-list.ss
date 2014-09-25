@@ -1,4 +1,4 @@
-; Unexpected dotted list in nonterminal description
+; Unexpected dotted list in nonterminal modification
 ;   lang
 ;   Pair
 ;   ((+ n (n n)) . foo)

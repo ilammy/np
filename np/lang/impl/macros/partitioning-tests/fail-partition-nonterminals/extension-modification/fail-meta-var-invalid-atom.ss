@@ -1,4 +1,4 @@
-; Invalid extension meta-variable syntax
+; Invalid syntax of the meta-variable modification
 ;   lang
 ;   Pair
 ;   atom

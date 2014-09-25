@@ -1,4 +1,4 @@
-; Nonterminal must have at least one production
+; At least one production should be specified for a nonterminal
 ;   lang
 ;   Nonterminal
 (import (scheme base)

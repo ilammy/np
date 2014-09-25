@@ -1,7 +1,6 @@
-; Meta-variable name must be a symbol
+; Name of the meta-variable must be a symbol
 ;   lang
 ;   num
-;   (- (car . cdr))
 ;   (car . cdr)
 (import (scheme base)
         (np lang impl macros partitioning-terminals)

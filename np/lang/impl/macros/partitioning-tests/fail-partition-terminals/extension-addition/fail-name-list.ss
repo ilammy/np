@@ -1,4 +1,4 @@
-; Terminal name must be a symbol
+; Name of the terminal must be a symbol
 ;   lang
 ;   ((name) predicate? (some vars))
 ;   (name)

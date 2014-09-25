@@ -1,6 +1,7 @@
-; Invalid language description syntax
+; Name of the language unparser must be a symbol
 ;   lang
-;   42
+;   (unparser ())
+;   ()
 (import (scheme base)
         (np lang impl macros partitioning-toplevel)
         (sr ck)
@@ -8,4 +9,4 @@
 
 ($ ($quote
   ($partition-toplevel-clauses 'lang
-    '(42) ) ))
+    '((unparser ())) ) ))

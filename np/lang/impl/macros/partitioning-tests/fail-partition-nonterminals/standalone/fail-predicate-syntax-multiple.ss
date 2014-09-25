@@ -1,4 +1,4 @@
-; Only one predicate name is allowed
+; Only one nonterminal predicate name can be specified
 ;   lang
 ;   (Nonterminal #(a b c) ())
 ;   #(a b c)

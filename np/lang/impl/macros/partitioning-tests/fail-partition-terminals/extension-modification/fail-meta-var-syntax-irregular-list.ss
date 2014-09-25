@@ -1,4 +1,4 @@
-; Unexpected dotted list in terminal description
+; Unexpected dotted list in terminal modification
 ;   lang
 ;   num
 ;   ((- x) . foo)

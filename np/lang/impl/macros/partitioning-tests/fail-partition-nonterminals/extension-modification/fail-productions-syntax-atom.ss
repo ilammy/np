@@ -1,4 +1,4 @@
-; Expected production modification list
+; Expected a list of production modifications
 ;   lang
 ;   Pair
 ;   foo

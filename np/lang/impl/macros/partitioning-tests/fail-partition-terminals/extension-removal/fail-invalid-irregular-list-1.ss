@@ -1,4 +1,4 @@
-; Invalid terminal description syntax
+; Invalid syntax of the terminal
 ;   lang
 ;   (car . cdr)
 (import (scheme base)

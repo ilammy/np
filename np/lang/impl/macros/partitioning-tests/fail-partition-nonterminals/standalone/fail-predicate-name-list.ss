@@ -1,4 +1,4 @@
-; Predicate name must be a symbol
+; Name of the nonterminal predicate must be a symbol
 ;   lang
 ;   (Nonterminal #((lambda (x) (Really-Nonterminal? x))) ())
 ;   (lambda (x) (Really-Nonterminal? x))

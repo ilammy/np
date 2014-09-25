@@ -1,4 +1,4 @@
-; Unexpected dotted list in terminal description
+; Expected a list of terminal definitions or names
 ;   lang
 ;   (- . right-away)
 ;   right-away

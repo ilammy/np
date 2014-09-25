@@ -1,4 +1,4 @@
-; Predicate name cannot be empty
+; Name of the nonterminal predicate cannot be empty
 ;   lang
 ;   (Nonterminal #() ())
 ;   #()

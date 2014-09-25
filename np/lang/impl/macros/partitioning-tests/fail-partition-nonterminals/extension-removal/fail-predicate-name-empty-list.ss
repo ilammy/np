@@ -1,4 +1,4 @@
-; Predicate name must be a symbol
+; Name of the nonterminal predicate must be a symbol
 ;   lang
 ;   (Nonterminal #(()) (var))
 ;   ()

@@ -1,4 +1,4 @@
-; Expected meta-variable modification list
+; Expected a list of meta-variable modifications
 ;   lang
 ;   Nonterminal
 ;   bar

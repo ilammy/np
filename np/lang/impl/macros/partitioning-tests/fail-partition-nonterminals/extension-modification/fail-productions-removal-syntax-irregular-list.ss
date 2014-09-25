@@ -1,4 +1,4 @@
-; Unexpected dotted list in nonterminal description
+; Unexpected dotted list in production modification
 ;   lang
 ;   Foo
 ;   (- p . x)

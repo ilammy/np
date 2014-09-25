@@ -1,7 +1,7 @@
-; Unexpected dotted list in terminal description
+; Name of the language predicate must be a symbol
 ;   lang
-;   (terminals . some-atom)
-;   some-atom
+;   (predicate ())
+;   ()
 (import (scheme base)
         (np lang impl macros partitioning-toplevel)
         (sr ck)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-toplevel-clauses 'lang
-    '((terminals (num number? (n))) (terminals . some-atom)) ) ))
+    '((predicate ())) ) ))

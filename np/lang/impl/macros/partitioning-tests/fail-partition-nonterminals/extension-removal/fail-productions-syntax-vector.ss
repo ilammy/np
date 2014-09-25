@@ -1,4 +1,4 @@
-; Expected production list
+; Expected a list of productions
 ;   lang
 ;   Nonterminal
 ;   #()

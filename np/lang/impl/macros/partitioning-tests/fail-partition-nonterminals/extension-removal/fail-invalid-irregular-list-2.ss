@@ -1,4 +1,4 @@
-; Invalid nonterminal description syntax
+; Invalid syntax of the nonterminal
 ;   lang
 ;   (Number #(pred) . HA-HA!)
 (import (scheme base)

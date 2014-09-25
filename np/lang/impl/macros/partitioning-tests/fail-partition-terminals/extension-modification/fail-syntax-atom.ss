@@ -1,4 +1,4 @@
-; Unexpected dotted list in terminal description
+; Expected a list of terminal modifications
 ;   lang
 ;   (! . right-away)
 ;   right-away

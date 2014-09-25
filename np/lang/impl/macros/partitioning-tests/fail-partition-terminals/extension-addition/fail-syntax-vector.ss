@@ -1,4 +1,4 @@
-; Expected terminal description list
+; Expected a list of terminal definitions
 ;   lang
 ;   (+ . #(number? (n)))
 ;   #(number? (n))

@@ -1,4 +1,4 @@
-; Terminal must have at least one meta-variable
+; At least one meta-variable should be specified for a terminal
 ;   lang
 ;   number?
 (import (scheme base)

@@ -1,4 +1,4 @@
-; Expected meta-variable list
+; Expected a list of meta-variables
 ;   lang
 ;   Foo
 ;   (+ . foo)

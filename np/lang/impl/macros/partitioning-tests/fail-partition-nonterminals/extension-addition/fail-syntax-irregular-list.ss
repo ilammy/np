@@ -1,4 +1,4 @@
-; Unexpected dotted list in nonterminal description
+; Unexpected dotted list in nonterminal extension
 ;   lang
 ;   (+ (Number (n) n n) . random)
 ;   random

@@ -1,4 +1,4 @@
-; Terminal must modify have at least one meta-variable
+; Terminal modification should modify meta-variables
 ;   lang
 ;   foo
 (import (scheme base)

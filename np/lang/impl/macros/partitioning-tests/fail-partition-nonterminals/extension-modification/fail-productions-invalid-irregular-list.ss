@@ -1,4 +1,4 @@
-; Invalid extension production syntax
+; Invalid syntax of the production modification
 ;   lang
 ;   Pair
 ;   (a . d)

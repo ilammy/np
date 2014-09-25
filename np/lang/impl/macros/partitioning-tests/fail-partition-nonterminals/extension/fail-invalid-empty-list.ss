@@ -1,4 +1,4 @@
-; Invalid extension nonterminal description
+; Invalid syntax of the nonterminal extension
 ;   lang
 ;   ()
 (import (scheme base)

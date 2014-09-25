@@ -1,6 +1,6 @@
-; Invalid language description syntax
+; Name of the language predicate cannot be empty
 ;   lang
-;   #(obviosly incorrect syntax)
+;   (predicate)
 (import (scheme base)
         (np lang impl macros partitioning-toplevel)
         (sr ck)
@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-toplevel-clauses 'lang
-    '(#(obviosly incorrect syntax)) ) ))
+    '((predicate)) ) ))

@@ -1,4 +1,4 @@
-; Invalid extension terminal description
+; Invalid syntax of the terminal extension
 ;   lang
 ;   ()
 (import (scheme base)

@@ -1,4 +1,4 @@
-; Incorrect production syntax: vector patterns are not allowed
+; Invalid syntax of the production: vector patterns are not allowed
 ;   lang
 ;   Nonterminal
 ;   (x #(p))

@@ -1,4 +1,4 @@
-; Expected nonterminal description list
+; Expected a list of nonterminal definitions
 ;   lang
 ;   (+ . #(Number (n) p))
 ;   #(Number (n) p)

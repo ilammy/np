@@ -1,4 +1,4 @@
-; Expected nonterminal description list
+; Expected a list of nonterminal definitions or names
 ;   lang
 ;   (- . right-away)
 ;   right-away
