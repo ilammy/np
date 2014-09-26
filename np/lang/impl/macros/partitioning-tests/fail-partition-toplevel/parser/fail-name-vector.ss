@@ -1,7 +1,7 @@
 ; Name of the language parser must be a symbol
 ;   lang
 ;   (parser #(some-parser))
-;   #(some-lang)
+;   #(some-parser)
 (import (scheme base)
         (np lang impl macros partitioning-toplevel)
         (sr ck)
