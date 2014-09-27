@@ -6,13 +6,9 @@
              $is-a:standalone-terminal-description?
           $must-be:standalone-terminal-description
 
-           $can-be:terminal-explicit-addition?
-             $is-a:terminal-explicit-addition?
-          $must-be:terminal-explicit-addition
-
-           $can-be:terminal-implicit-addition?
-             $is-a:terminal-implicit-addition?
-          $must-be:terminal-implicit-addition
+           $can-be:terminal-addition?
+             $is-a:terminal-addition?
+          $must-be:terminal-addition
 
            $can-be:terminal-removal?
              $is-a:terminal-removal?
@@ -51,7 +47,8 @@
         ((_ s  _)                              ($ s '#f)) ) )
 
     (define-standard-verifiers ($is-a:standalone-terminal-description?
-                                $must-be:standalone-terminal-description)
+                                $must-be:standalone-terminal-description
+                                : %verify:standalone-terminal-description)
       (syntax-rules (quote)
         ((_ s '(k t) 'term '(name predicate meta-var-list))
          ($ s ($and '(%verify:terminal-name '(k (term . t)) 'name)
@@ -66,187 +63,125 @@
         ((_ s '(k t) 'term _)
          ($ k '("Invalid syntax of the terminal" (term . t)))) ) )
 
-    ;;;
-    ;;; Terminal descriptions (extension, implicit addition)
-    ;;;
-
-    (define-syntax $can-be:terminal-implicit-addition?
+    (define-syntax %verify:standalone-terminal-description*
       (syntax-rules (quote)
-        ((_ s 'term) ($ s ($can-be:standalone-terminal-description? 'term))) ) )
-
-    (define-syntax $is-a:terminal-implicit-addition?
-      (syntax-rules (quote)
-        ((_ s 'term) ($ s ($is-a:standalone-terminal-description? 'term))) ) )
-
-    (define-syntax $must-be:terminal-implicit-addition
-      (syntax-rules (quote)
-        ((_ s 'lang 'term) ($ s ($must-be:standalone-terminal-description 'lang 'term))) ) )
+        ((_ s '(k t) 'term) ($ s (%verify:standalone-terminal-description '(k t) 'term 'term))) ) )
 
     ;;;
-    ;;; Terminal descriptions (extension, explicit addition) - interface
+    ;;; Terminal descriptions (addition)
     ;;;
 
-    (define-syntax $can-be:terminal-explicit-addition?
+    (define-syntax $can-be:terminal-addition?
       (syntax-rules (quote +)
-        ((_ s '(+ . rest)) ($ s '#t))
-        ((_ s  _)          ($ s '#f)) ) )
+        ((_ s '(+ . anything)) ($ s '#t))
+        ((_ s  _)              ($ s '#f)) ) )
 
-    (define-syntax $is-a:terminal-explicit-addition?
-      (syntax-rules (quote)
-        ((_ s 'term) ($ s ($verify-result:as-boolean
-                            ($verify:terminal-explicit-addition 'term) ))) ) )
+    (define-standard-verifiers ($is-a:terminal-addition? $must-be:terminal-addition)
+      (syntax-rules (quote +)
+        ((_ s '(k t) 'term '(+ . added-terminal-list))
+         ($ s ($and '(%verify:terminal-addition-list '(k (term . t)) 'added-terminal-list)
+                    '($every? '(%verify:standalone-terminal-description* '(k t)) 'added-terminal-list) )))
 
-    (define-syntax $must-be:terminal-explicit-addition
-      (syntax-rules (quote)
-        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
-                                  ($verify:terminal-explicit-addition 'lang 'term) ))) ) )
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the terminal extension" (term . t)))) ) )
 
-    ;;;
-    ;;; Terminal descriptions (extension, implicit addition) - implementation
-    ;;;
-
-    (define-syntax $verify:terminal-explicit-addition
-      (syntax-rules (quote)
-        ((_ s 'term)       ($ s (%verify:terminal-explicit-addition '(s ())     'term)))
-        ((_ s 'lang 'term) ($ s (%verify:terminal-explicit-addition '(s (lang)) 'term))) ) )
-
-    (define-syntax %verify:terminal-explicit-addition
-      (syntax-rules (quote)
-        ((_ s '(k t) '(? . descriptions))
-         ($ s ($and '(%verify:terminal-addition-list '(k t) '(? . descriptions) '(? . descriptions))
-                    '(%verify:terminal-description-list '(k ((? . descriptions) . t)) 'descriptions)
-                    '($every? '(%verify:standalone-terminal-description '(k t)) 'descriptions) )))
-
-        ((_ s '(k t) 'invalid-syntax)
-         ($ k '("Invalid terminal description syntax" (invalid-syntax . t)))) ) )
-
-    ;; The 2nd and 3rd arguments are actually the same. This trick is necessary
-    ;; to get the (+) form from the original source, because writing just `(+)`
-    ;; in the expansion yields a list that contains another plus--that free one
-    ;; from (scheme base) as '+' is not a pattern variable here.
     (define-syntax %verify:terminal-addition-list
-      (syntax-rules (quote +)
-        ((_ s '(k t) '(+)         'x) ($ k '("At least one terminal should be specified for addition" (x . t))))
-        ((_ s '(k t) '(+ . other) 'x) ($ s '#t))
-        ((_ s '(k t)  _           'x) ($ k '("Invalid terminal description syntax" (x . t)))) ) )
+      (syntax-rules (quote)
+        ((_ s '(k t) '())      ($ k '("At least one terminal should be specified for addition" t)))
+        ((_ s '(k t) '(a ...)) ($ s '#t))
+        ((_ s '(k t) 'other)   ($ k '("Invalid terminal description syntax" (other . t)))) ) )
 
     ;;;
-    ;;; Terminal descriptions (extension, removal) - interface
+    ;;; Terminal descriptions (removal)
     ;;;
 
     (define-syntax $can-be:terminal-removal?
       (syntax-rules (quote -)
-        ((_ s '(- . rest)) ($ s '#t))
-        ((_ s  _)          ($ s '#f)) ) )
+        ((_ s '(- . anything)) ($ s '#t))
+        ((_ s  _)              ($ s '#f)) ) )
 
-    (define-syntax $is-a:terminal-removal?
-      (syntax-rules (quote)
-        ((_ s 'term) ($ s ($verify-result:as-boolean
-                            ($verify:terminal-removal 'term) ))) ) )
+    (define-standard-verifiers ($is-a:terminal-removal? $must-be:terminal-removal)
+      (syntax-rules (quote -)
+        ((_ s '(k t) 'term '(- . removed-terminal-list))
+         ($ s ($and '(%verify:terminal-removal-list '(k (term . t)) 'removed-terminal-list)
+                    '($every? '(%verify:terminal-name/terminal-description '(k t)) 'removed-terminal-list) )))
 
-    (define-syntax $must-be:terminal-removal
-      (syntax-rules (quote)
-        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
-                                  ($verify:terminal-removal 'lang 'term) ))) ) )
-
-    ;;;
-    ;;; Terminal descriptions (extension, removal) - implementation
-    ;;;
-
-    (define-syntax $verify:terminal-removal
-      (syntax-rules (quote)
-        ((_ s 'term)       ($ s (%verify:terminal-removal '(s ())     'term)))
-        ((_ s 'lang 'term) ($ s (%verify:terminal-removal '(s (lang)) 'term))) ) )
-
-    (define-syntax %verify:terminal-removal
-      (syntax-rules (quote)
-        ((_ s '(k t) '(? . descriptions))
-         ($ s ($and '(%verify:terminal-removal-list '(k t) '(? . descriptions) '(? . descriptions))
-                    '(%verify:terminal-description-list '(k ((? . descriptions) . t)) 'descriptions)
-                    '($every? '(%verify:terminal-name/terminal-description '(k t)) 'descriptions) )))
-
-        ((_ s '(k t) 'invalid-syntax)
-         ($ k '("Invalid terminal description syntax" (invalid-syntax . t)))) ) )
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the terminal extension" (term . t)))) ) )
 
     (define-syntax %verify:terminal-name/terminal-description
       (syntax-rules (quote)
-        ((_ s '(k t) '())       ($ s (%verify:standalone-terminal-description '(k t) '())))
-        ((_ s '(k t) '(a . d))  ($ s (%verify:standalone-terminal-description '(k t) '(a . d))))
-        ((_ s '(k t) '#(x ...)) ($ s (%verify:standalone-terminal-description '(k t) '#(x ...))))
+        ((_ s '(k t) '())       ($ s (%verify:standalone-terminal-description* '(k t) '())))
+        ((_ s '(k t) '(a . d))  ($ s (%verify:standalone-terminal-description* '(k t) '(a . d))))
+        ((_ s '(k t) '#(x ...)) ($ s (%verify:standalone-terminal-description* '(k t) '#(x ...))))
         ((_ s '(k t) 'atom)     ($ s '#t)) ) )
 
-    ;; (See comment for %verify:terminal-addition-list)
     (define-syntax %verify:terminal-removal-list
-      (syntax-rules (quote -)
-        ((_ s '(k t) '(-)         'x) ($ k '("At least one terminal should be specified for removal" (x . t))))
-        ((_ s '(k t) '(- . other) 'x) ($ s '#t))
-        ((_ s '(k t)  _           'x) ($ k '("Invalid terminal description syntax" (x . t)))) ) )
+      (syntax-rules (quote)
+        ((_ s '(k t) '())      ($ k '("At least one terminal should be specified for removal" t)))
+        ((_ s '(k t) '(a ...)) ($ s '#t))
+        ((_ s '(k t) 'other)   ($ k '("Invalid terminal description syntax" (other . t)))) ) )
 
     ;;;
-    ;;; Terminal descriptions (extension, modification) - interface
+    ;;; Terminal descriptions (modification)
     ;;;
 
-    ;; A form with predicate is also allowed here as extension meta-variable syntax
-    ;; implies a misplaced predicate rather than invalid (standalone) meta-vars
     (define-syntax $can-be:terminal-modification?
-      (syntax-rules (quote)
-        ((_ s '(name           (vars ...))) ($ s ($any? '$can-be:extension-meta-var? '(vars ...))))
-        ((_ s '(name predicate (vars ...))) ($ s ($any? '$can-be:extension-meta-var? '(vars ...))))
-        ((_ s _)                            ($ s '#f)) ) )
+      (syntax-rules (quote !)
+        ((_ s '(! . anything)) ($ s '#t))
+        ((_ s  _)              ($ s '#f)) ) )
 
-    (define-syntax $is-a:terminal-modification?
-      (syntax-rules (quote)
-        ((_ s 'term)
-         ($ s ($verify-result:as-boolean ($verify:terminal-modification 'term)))) ) )
+    (define-standard-verifiers ($is-a:terminal-modification? $must-be:terminal-modification)
+      (syntax-rules (quote !)
+        ((_ s '(k t) 'term '(! . modified-terminal-list))
+         ($ s ($and '(%verify:terminal-modification-list '(k (term . t)) 'modified-terminal-list)
+                    '($every? '(%verify:terminal-modification* '(k t)) 'modified-terminal-list) )))
 
-    (define-syntax $must-be:terminal-modification
-      (syntax-rules (quote)
-        ((_ s 'lang 'term)
-         ($ s ($verify-result:syntax-error ($verify:terminal-modification 'lang 'term)))) ) )
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the terminal extension" (term . t)))) ) )
 
-    ;;;
-    ;;; Terminal descriptions (extension, modification) - implementation
-    ;;;
-
-    (define-syntax $verify:terminal-modification
+    (define-syntax %verify:terminal-modification-list
       (syntax-rules (quote)
-        ((_ s 'term)       ($ s (%verify:terminal-modification '(s ())     'term)))
-        ((_ s 'lang 'term) ($ s (%verify:terminal-modification '(s (lang)) 'term))) ) )
+        ((_ s '(k t) '())      ($ k '("At least one terminal should be specified for modification" t)))
+        ((_ s '(k t) '(a ...)) ($ s '#t))
+        ((_ s '(k t) 'other)   ($ k '("Invalid terminal description syntax" (other . t)))) ) )
+
+    (define-syntax %verify:terminal-modification*
+      (syntax-rules (quote)
+        ((_ s '(k t) 'term) ($ s (%verify:terminal-modification '(k t) 'term 'term))) ) )
 
     (define-syntax %verify:terminal-modification
       (syntax-rules (quote)
-        ((_ s '(k t) '(name ()))
-         ($ s ($and '(%verify:terminal-name '(k ((name ()) . t)) 'name)
-                    '(%verify:terminal-meta-var-list '(k (name . t)) '()) )))
+        ((_ s '(k t) 'term '(name meta-var-modification-list))
+         ($ s ($and '(%verify:terminal-name '(k (term . t)) 'name)
+                    '(%verify:meta-var-modification-list '(k (name . t)) 'meta-var-modification-list)
+                    '($every? '(%verify:meta-var-modification* '(k (name . t))) 'meta-var-modification-list) )))
 
-        ((_ s '(k t) '(name (ext-meta . vars)))
-         ($ s ($and '(%verify:terminal-name '(k ((name (ext-meta . vars)) . t)) 'name)
-                    '(%verify:terminal-meta-var-list '(k (name . t)) '(ext-meta . vars))
-                    '($every? '(%verify:ext-meta-vars '(k (name . t))) '(ext-meta . vars)) )))
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the terminal modification" (term . t)))) ) )
 
-        ((_ s '(k t) 'invalid-syntax)
-         ($ k '("Invalid terminal description syntax" (invalid-syntax . t)))) ) )
+    (define-syntax %verify:meta-var-modification-list
+      (syntax-rules (quote)
+        ((_ s '(k t) '())      ($ k '("Terminal modification should modify meta-variables" t)))
+        ((_ s '(k t) '(a ...)) ($ s '#t))
+        ((_ s '(k t) 'other)   ($ k '("Expected a list of meta-variable modifications" (other . t)))) ) )
 
-    ;; (See comment for %verify:terminal-addition-list)
-    (define-syntax %verify:ext-meta-vars
+    (define-syntax %verify:meta-var-modification*
+      (syntax-rules (quote)
+        ((_ s '(k t) 'term) ($ s (%verify:meta-var-modification '(k t) 'term 'term))) ) )
+
+    (define-syntax %verify:meta-var-modification
       (syntax-rules (quote + -)
-        ((_ s '(k t) 'x) ($ s (%verify:ext-meta-vars '(k t) 'x 'x)))
+        ((_ s '(k t) 'term '(+ . meta-var-name-list))
+         ($ s ($and '(%verify:terminal-meta-var-list '(k t) 'meta-var-name-list)
+                    '($every? '(%verify:meta-var-name '(k t)) 'meta-var-name-list) )))
 
-        ((_ s '(k t) '(+) 'x)
-         ($ k '("At least one meta-variable should be specified for addition" (x . t))))
+        ((_ s '(k t) 'term '(- . meta-var-name-list))
+         ($ s ($and '(%verify:terminal-meta-var-list '(k t) 'meta-var-name-list)
+                    '($every? '(%verify:meta-var-name '(k t)) 'meta-var-name-list) )))
 
-        ((_ s '(k t) '(-) 'x)
-         ($ k '("At least one meta-variable should be specified for removal" (x . t))))
-
-        ((_ s '(k t) '(+ . list) 'x)
-         ($ s ($and '(%verify:terminal-meta-var-list '(k t) 'x)
-                    '($every? '(%verify:meta-var-name '(k (x . t))) 'list) )))
-
-        ((_ s '(k t) '(- . list) 'x)
-         ($ s ($and '(%verify:terminal-meta-var-list '(k t) 'x)
-                    '($every? '(%verify:meta-var-name '(k (x . t))) 'list) )))
-
-        ((_ s '(k t) _ 'x) ($ k '("Invalid extension meta-variable syntax" (x . t)))) ) )
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid extension meta-variable syntax" (term . t)))) ) )
 
     ;;;
     ;;; Getter/setter for meta-vars in terminal modification descriptions
