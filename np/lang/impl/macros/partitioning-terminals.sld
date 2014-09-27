@@ -43,43 +43,40 @@
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
          ($ s ($postprocess-partitioned-extension-terminal-descriptions 'lang
-                ($multi-partition '($is-a:terminal-explicit-addition?
-                                    $is-a:terminal-implicit-addition?
+                ($multi-partition '($is-a:terminal-addition?
                                     $is-a:terminal-removal?
                                     $is-a:terminal-modification?)
                   'descriptions ) ))) ) )
 
     (define-syntax $postprocess-partitioned-extension-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(explicit-additions implicit-additions removals modifications ()))
+        ((_ s 'lang '(additions removals modifications ()))
          ($ s ($list
-                ($squash-terminal-additions 'explicit-additions 'implicit-additions)
+                ($squash-terminal-additions 'additions)
                 ($squash-terminal-removals 'removals)
                 ($map '($partition-terminal-modification-meta-vars 'lang) 'modifications) )))
 
-        ((_ s 'lang '(_ _ _ _ (invalid-descriptions ...)))
+        ((_ s 'lang '(_ _ _ (invalid-descriptions ...)))
          ($ s ($report-invalid-extension-terminal-descriptions 'lang
-                ($multi-partition '($can-be:terminal-explicit-addition?
+                ($multi-partition '($can-be:terminal-addition?
                                     $can-be:terminal-removal?
-                                    $can-be:terminal-modification?
-                                    $can-be:terminal-implicit-addition?)
+                                    $can-be:terminal-modification?)
                   '(invalid-descriptions ...) ) ))) ) )
-
-    ;; $can-be checks go in such order because they are used to heuristically
-    ;; guess an implied class for a structurally invalid clauses. The $multi-
-    ;; partition picks the first predicate that returns #t, therefore at first
-    ;; we check for the clauses with distinct features: explicit additions,
-    ;; removals, and modifications have (+ ...) / (- ...) clauses that identify
-    ;; them pretty well. Anything else is considered a failed implicit addition
 
     (define-syntax $report-invalid-extension-terminal-descriptions
       (syntax-rules (quote)
-        ((_ s 'lang '(explicit-additions removals modifications implicit-additions incomprehensible))
-         ($ s ($and '($every? '($must-be:terminal-explicit-addition 'lang) 'explicit-additions)
-                    '($every? '($must-be:terminal-removal           'lang) 'removals)
-                    '($every? '($must-be:terminal-modification      'lang) 'modifications)
-                    '($every? '($must-be:terminal-implicit-addition 'lang) 'implicit-additions)
-                    '($every? '($must-be:terminal-implicit-addition 'lang) 'incomprehensible) ))) ) )
+        ((_ s 'lang '(additions removals modifications incomprehensible))
+         ($ s ($and '($every? '($must-be:terminal-addition     'lang) 'additions)
+                    '($every? '($must-be:terminal-removal      'lang) 'removals)
+                    '($every? '($must-be:terminal-modification 'lang) 'modifications)
+                    '($map '($report-failed-terminal-definition 'lang) 'incomprehensible) ))) ) )
+
+    ;; This is separate, because $must-be:terminal-definition that (re)checks for all
+    ;; correct toplevel clauses is an overkill. We only need to barf an error now.
+    (define-syntax $report-failed-terminal-definition
+      (syntax-rules (quote)
+        ((_ s 'lang 'invalid-definition)
+         (syntax-error "Invalid syntax of the terminal extension" lang invalid-definition)) ) )
 
     ;;;
     ;;; Partitioning of meta-vars of the modification extension form
