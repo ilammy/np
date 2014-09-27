@@ -41,56 +41,30 @@
   (begin
 
     ;;;
-    ;;; Terminal descriptions (standalone) - interface
+    ;;; Terminal descriptions (standalone)
     ;;;
 
     (define-syntax $can-be:standalone-terminal-description?
       (syntax-rules (quote)
-        ((_ s '(name predicate (meta . vars))) ($ s '#t))
-        ((_ s '(predicate      (meta . vars))) ($ s '#t))
+        ((_ s '(name predicate meta-var-list)) ($ s '#t))
+        ((_ s '(predicate-name meta-var-list)) ($ s '#t))
         ((_ s  _)                              ($ s '#f)) ) )
 
-    (define-syntax $is-a:standalone-terminal-description?
+    (define-standard-verifiers ($is-a:standalone-terminal-description?
+                                $must-be:standalone-terminal-description)
       (syntax-rules (quote)
-        ((_ s 'term) ($ s ($verify-result:as-boolean
-                            ($verify:standalone-terminal-description 'term) ))) ) )
+        ((_ s '(k t) 'term '(name predicate meta-var-list))
+         ($ s ($and '(%verify:terminal-name '(k (term . t)) 'name)
+                    '(%verify:terminal-meta-var-list '(k (name . t)) 'meta-var-list)
+                    '($every? '(%verify:meta-var-name '(k (name . t))) 'meta-var-list) )))
 
-    (define-syntax $must-be:standalone-terminal-description
-      (syntax-rules (quote)
-        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
-                                  ($verify:standalone-terminal-description 'lang 'term) ))) ) )
+        ((_ s '(k t) 'term '(predicate-name meta-var-list))
+         ($ s ($and '(%verify:short-predicate-name '(k (term . t)) 'predicate-name)
+                    '(%verify:terminal-meta-var-list '(k (predicate-name . t)) 'meta-var-list)
+                    '($every? '(%verify:meta-var-name '(k (predicate-name . t))) 'meta-var-list) )))
 
-    ;;;
-    ;;; Terminal descriptions (standalone) - implementation
-    ;;;
-
-    (define-syntax $verify:standalone-terminal-description
-      (syntax-rules (quote)
-        ((_ s 'term)       ($ s (%verify:standalone-terminal-description '(s ())     'term)))
-        ((_ s 'lang 'term) ($ s (%verify:standalone-terminal-description '(s (lang)) 'term))) ) )
-
-    (define-syntax %verify:standalone-terminal-description
-      (syntax-rules (quote)
-        ((_ s '(k t) '(name predicate ()))
-         ($ s ($and '(%verify:terminal-name '(k ((name predicate ()) . t)) 'name)
-                    '(%verify:terminal-meta-var-list '(k ((name predicate ()) . t)) '()) )))
-
-        ((_ s '(k t) '(name predicate (meta . vars)))
-         ($ s ($and '(%verify:terminal-name '(k ((name predicate (meta . vars)) . t)) 'name)
-                    '(%verify:terminal-meta-var-list '(k (name . t)) '(meta . vars))
-                    '($every? '(%verify:meta-var-name '(k (name . t))) '(meta . vars)) )))
-
-        ((_ s '(k t) '(predicate-name ()))
-         ($ s ($and '(%verify:short-predicate-name '(k ((predicate-name ()) . t)) 'predicate-name)
-                    '(%verify:terminal-meta-var-list '(k ((predicate-name ()) . t)) '()) )))
-
-        ((_ s '(k t) '(predicate-name (meta . vars)))
-         ($ s ($and '(%verify:short-predicate-name '(k ((predicate-name (meta . vars)) . t)) 'predicate-name)
-                    '(%verify:terminal-meta-var-list '(k (predicate-name . t)) '(meta . vars))
-                    '($every? '(%verify:meta-var-name '(k (predicate-name . t))) '(meta . vars)) )))
-
-        ((_ s '(k t) 'invalid-syntax)
-         ($ k '("Invalid terminal description syntax" (invalid-syntax . t)))) ) )
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the terminal" (term . t)))) ) )
 
     ;;;
     ;;; Terminal descriptions (extension, implicit addition)
@@ -307,17 +281,17 @@
 
     (define-syntax %verify:terminal-name
       (syntax-rules (quote)
-        ((_ s '(k t) '())       ($ k '("Terminal name must be a symbol" (()       . t))))
-        ((_ s '(k t) '(a . d))  ($ k '("Terminal name must be a symbol" ((a . d)  . t))))
-        ((_ s '(k t) '#(x ...)) ($ k '("Terminal name must be a symbol" (#(x ...) . t))))
-        ((_ s '(k t) 'an-atom)  ($ s '#t)) ) )
+        ((_ s '(k t) '())       ($ k '("Name of the terminal must be a symbol" (()       . t))))
+        ((_ s '(k t) '(a . d))  ($ k '("Name of the terminal must be a symbol" ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...)) ($ k '("Name of the terminal must be a symbol" (#(x ...) . t))))
+        ((_ s '(k t)  _)        ($ s '#t)) ) )
 
     (define-syntax %verify:short-predicate-name
       (syntax-rules (quote)
-        ((_ s '(k t) '())       ($ k '("Predicate must be a symbol in short form" (()       . t))))
-        ((_ s '(k t) '(a . d))  ($ k '("Predicate must be a symbol in short form" ((a . d)  . t))))
-        ((_ s '(k t) '#(x ...)) ($ k '("Predicate must be a symbol in short form" (#(x ...) . t))))
-        ((_ s '(k t) 'an-atom)  ($ s '#t)) ) )
+        ((_ s '(k t) '())       ($ k '("Terminal predicate must be a variable in short form" (()       . t))))
+        ((_ s '(k t) '(a . d))  ($ k '("Terminal predicate must be a variable in short form" ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...)) ($ k '("Terminal predicate must be a variable in short form" (#(x ...) . t))))
+        ((_ s '(k t)  _)        ($ s '#t)) ) )
 
     (define-syntax %verify:terminal-description-list
       (syntax-rules (quote)
@@ -327,8 +301,8 @@
 
     (define-syntax %verify:terminal-meta-var-list
       (syntax-rules (quote)
-        ((_ s '(k t) '())          ($ k '("Terminal must have at least one meta-variable" t)))
-        ((_ s '(k t) '(x ...))     ($ s '#t))
-        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in terminal description" (a (x ... . a) . t))))
-        ((_ s '(k t) 'unexpected)  ($ k '("Expected meta-variable list" (unexpected . t)))) ) )
+        ((_ s '(k t) '())            ($ k '("At least one meta-variable should be specified for a terminal" t)))
+        ((_ s '(k t) '(a b ...))     ($ s '#t))
+        ((_ s '(k t) '(a b ... . c)) ($ k '("Unexpected dotted list in terminal definition" (c (a b ... . c) . t))))
+        ((_ s '(k t) 'unexpected)    ($ k '("Expected a list of meta-variables" (unexpected . t)))) ) )
 ) )

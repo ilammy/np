@@ -25,9 +25,9 @@
 
     (define-syntax %verify:meta-var-name
       (syntax-rules (quote)
-        ((_ s '(k t) '())       ($ k '("Meta-variable name must be a symbol" (()       . t))))
-        ((_ s '(k t) '(a . d))  ($ k '("Meta-variable name must be a symbol" ((a . d)  . t))))
-        ((_ s '(k t) '#(x ...)) ($ k '("Meta-variable name must be a symbol" (#(x ...) . t))))
+        ((_ s '(k t) '())       ($ k '("Name of the meta-variable must be a symbol" (()       . t))))
+        ((_ s '(k t) '(a . d))  ($ k '("Name of the meta-variable must be a symbol" ((a . d)  . t))))
+        ((_ s '(k t) '#(x ...)) ($ k '("Name of the meta-variable must be a symbol" (#(x ...) . t))))
         ((_ s '(k t)  _)        ($ s '#t)) ) )
 
     ;;;
