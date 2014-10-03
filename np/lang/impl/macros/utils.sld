@@ -5,9 +5,17 @@
   ;;;
   (export $not-vector-or-list?
           $drop-head-and-squash
+
           $verify-result:as-boolean
           $verify-result:syntax-error
-          define-standard-verifiers)
+
+          define-standard-checkers
+          define-standard-checked-verifier
+
+          define-verifier
+          define-verifier/atom
+          define-verifier/proper-list
+          define-verifier/proper-nonempty-list)
 
   (import (scheme base)
           (sr ck)
@@ -29,6 +37,10 @@
         ((_ s 'list)
          ($ s ($concatenate ($map '$cdr 'list)))) ) )
 
+    ;;;
+    ;;; Verification landing pads
+    ;;;
+
     (define-syntax $verify-result:as-boolean
       (syntax-rules (quote)
         ((_ s '#t) ($ s '#t))
@@ -40,15 +52,24 @@
         ((_ s '(msg stack)) ($ s ($verify-result:syntax-error '#f 'msg ($reverse 'stack))))
         ((_ s '#f 'msg '(stack ...)) (syntax-error msg stack ...)) ) )
 
-    ;; This helper macro defines a pair of standard verification macrofunctions:
-    ;; $is-a:<something> and $must-be:<something> which are implemented in terms
-    ;; of a %verification macrofunction that is defined inline.
-    (define-syntax define-standard-verifiers
-      (syntax-rules (:)
-        ((_ ($is-a? $must-be) . %verify-body)
-         (define-standard-verifiers ($is-a? $must-be : %verify) . %verify-body))
+    ;;;
+    ;;; Verifier declarations
+    ;;;
 
-        ((_ ($is-a? $must-be : %verify) . %verify-body)
+    (define-syntax define-verifier
+      (syntax-rules ()
+        ((_ %verify . body)
+         (begin
+           (define-syntax %verify
+             (syntax-rules (quote)
+               ((_ s '(k t) 'term) ($ s (%verify* '(k t) 'term 'term))) ) )
+
+           (define-syntax %verify*
+             . body ) )) ) )
+
+    (define-syntax define-standard-checkers
+      (syntax-rules ()
+        ((_ %verify ($is-a? $must-be))
          (begin
            (define-syntax $is-a?
              (syntax-rules (quote)
@@ -62,10 +83,47 @@
 
            (define-syntax $trampoline
              (syntax-rules (quote)
-               ((_ s 'term)       ($ s (%verify '(s ())     'term 'term)))
-               ((_ s 'lang 'term) ($ s (%verify '(s (lang)) 'term 'term))) ) )
+               ((_ s 'term)       ($ s (%verify '(s ())     'term)))
+               ((_ s 'lang 'term) ($ s (%verify '(s (lang)) 'term))) ) ) )) ) )
 
-           (define-syntax %verify
-             . %verify-body ) )) ) )
+    (define-syntax define-standard-checked-verifier
+      (syntax-rules ()
+        ((_ ($is-a? $must-be) . verifier-body)
+         (begin
+           (define-verifier          %verify . verifier-body)
+           (define-standard-checkers %verify ($is-a? $must-be)) )) ) )
+
+    ;;;
+    ;;; Common verifiers
+    ;;;
+
+    (define-syntax define-verifier/atom
+      (syntax-rules ::: ()
+        ((_ %verify (:not-atom-error-message))
+         (define-verifier %verify
+           (syntax-rules (quote)
+             ((_ s '(k t) 'term '())       ($ k '(:not-atom-error-message (term . t))))
+             ((_ s '(k t) 'term '(a . d))  ($ k '(:not-atom-error-message (term . t))))
+             ((_ s '(k t) 'term '#(x ...)) ($ k '(:not-atom-error-message (term . t))))
+             ((_ s '(k t) 'term  _)        ($ s '#t)) ) )) ) )
+
+    (define-syntax define-verifier/proper-list
+      (syntax-rules ::: ()
+        ((_ %verify (:proper-error-message :unexpected-error-message))
+         (define-verifier %verify
+           (syntax-rules (quote)
+             ((_ s '(k t) 'term '(x ...))     ($ s '#t))
+             ((_ s '(k t) 'term '(x ... . d)) ($ k '(:proper-error-message (d term . t))))
+             ((_ s '(k t) 'term  _)           ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
+
+    (define-syntax define-verifier/proper-nonempty-list
+      (syntax-rules ::: ()
+        ((_ %verify (:nonempty-error-message :proper-error-message :unexpected-error-message))
+         (define-verifier %verify
+           (syntax-rules (quote)
+             ((_ s '(k t) 'term '())            ($ k '(:nonempty-error-message t)))
+             ((_ s '(k t) 'term '(x y ...))     ($ s '#t))
+             ((_ s '(k t) 'term '(x y ... . d)) ($ k '(:proper-error-message (d term . t))))
+             ((_ s '(k t) 'term  _)             ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
 
 ) )

@@ -47,7 +47,7 @@
     ;;; 'Oh my goodness! Shut me down. Machines building machines. How perverse'
     ;;;                                                               -- C-3PO
 
-    (define-syntax define-simple-matchers
+    (define-syntax define-simple-checkers
       (syntax-rules ::: ()
         ((_ &keyword ($is-a? $must-be $can-be?)
             (:name-error-message :empty-error-message :unique-error-message :invalid-error-message))
@@ -57,42 +57,37 @@
                ((_ s '(&keyword . _)) ($ s '#t))
                ((_ s  _)              ($ s '#f)) ) )
 
-           (define-standard-verifiers ($is-a? $must-be)
+           (define-standard-checked-verifier ($is-a? $must-be)
              (syntax-rules (quote &keyword)
                ((_ s '(k t) 'term '(&keyword name))      ($ s (%verify-name '(k (term . t)) 'name)))
                ((_ s '(k t) 'term '(&keyword))           ($ k '(:empty-error-message (term . t))))
                ((_ s '(k t) 'term '(&keyword names ...)) ($ k '(:unique-error-message (term . t))))
                ((_ s '(k t) 'term  _)                    ($ k '(:invalid-error-message (term . t)))) ) )
 
-           (define-syntax %verify-name
-             (syntax-rules (quote)
-               ((_ s '(k t) '())       ($ k '(:name-error-message (()       . t))))
-               ((_ s '(k t) '(a . d))  ($ k '(:name-error-message ((a . d)  . t))))
-               ((_ s '(k t) '#(x ...)) ($ k '(:name-error-message (#(x ...) . t))))
-               ((_ s '(k t)  _)        ($ s '#t)) ) ) )) ) )
+           (define-verifier/atom %verify-name (:name-error-message)) )) ) )
 
-    (define-simple-matchers extends
+    (define-simple-checkers extends
       ($is-an:extends-clause? $must-be:extends-clause $can-be:extends-clause?)
       ("Name of the language to be extended must be a symbol"
        "Name of the language to be extended cannot be empty"
        "Only one language can be extended"
        "Invalid syntax of the extension clause") )
 
-    (define-simple-matchers predicate
+    (define-simple-checkers predicate
       ($is-a:predicate-clause? $must-be:predicate-clause $can-be:predicate-clause?)
       ("Name of the language predicate must be a symbol"
        "Name of the language predicate cannot be empty"
        "Only one language predicate name can be specified"
        "Invalid syntax of the predicate clause") )
 
-    (define-simple-matchers parser
+    (define-simple-checkers parser
       ($is-a:parser-clause? $must-be:parser-clause $can-be:parser-clause?)
       ("Name of the language parser must be a symbol"
        "Name of the language parser cannot be empty"
        "Only one language parser name can be specified"
        "Invalid syntax of the parser clause") )
 
-    (define-simple-matchers unparser
+    (define-simple-checkers unparser
       ($is-an:unparser-clause? $must-be:unparser-clause $can-be:unparser-clause?)
       ("Name of the language unparser must be a symbol"
        "Name of the language unparser cannot be empty"
@@ -108,7 +103,7 @@
         ((_ s '(terminals . _)) ($ s '#t))
         ((_ s  _)               ($ s '#f)) ) )
 
-    (define-standard-verifiers ($is-a:terminals-clause? $must-be:terminals-clause)
+    (define-standard-checked-verifier ($is-a:terminals-clause? $must-be:terminals-clause)
       (syntax-rules (quote terminals)
         ((_ s '(k t) 'term '(terminals . (x ...))) ($ s '#t))
 
