@@ -1,9 +1,9 @@
 (define-library (np lang impl macros partitioning-terminals)
   ;;;
-  ;;; Partitioning terminal description clauses (standalone and extension)
+  ;;; Partitioning terminal definition clauses (standalone and extension)
   ;;;
-  (export $filter-standalone-terminal-descriptions
-          $partition-extension-terminal-descriptions)
+  (export $filter-standalone-terminal-definitions
+          $partition-extension-terminal-definitions)
 
   (import (scheme base)
           (sr ck)
@@ -20,80 +20,72 @@
     ;;; Standalone form
     ;;;
 
-    (define-syntax $filter-standalone-terminal-descriptions
+    (define-syntax $filter-standalone-terminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang 'descriptions)
-         ($ s ($check-for-invalid-terminal-descriptions 'lang
-                ($partition '$is-a:standalone-terminal-description?
-                            'descriptions ) )))  ) )
+        ((_ s 'lang 'definitions)
+         ($ s ($check-for-invalid-terminal-definitions 'lang
+                ($partition '$is-a:standalone-terminal?
+                            'definitions ) ))) ) )
 
-    (define-syntax $check-for-invalid-terminal-descriptions
+    (define-syntax $check-for-invalid-terminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang '(all-valid-descriptions ())) ($ s 'all-valid-descriptions))
+        ((_ s 'lang '(all-valid-definitions ())) ($ s 'all-valid-definitions))
 
-        ((_ s 'lang '(_ (invalid-descriptions ...)))
-         ($ s ($map '($must-be:standalone-terminal-description 'lang)
-                    '(invalid-descriptions ...) ))) ) )
+        ((_ s 'lang '(_ (invalid-definitions ...)))
+         ($ s ($map '($must-be:standalone-terminal 'lang)
+                    '(invalid-definitions ...) ))) ) )
 
     ;;;
     ;;; Extension form
     ;;;
 
-    (define-syntax $partition-extension-terminal-descriptions
+    (define-syntax $partition-extension-terminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang 'descriptions)
-         ($ s ($postprocess-partitioned-extension-terminal-descriptions 'lang
-                ($multi-partition '($is-a:terminal-explicit-addition?
-                                    $is-a:terminal-implicit-addition?
+        ((_ s 'lang 'definitions)
+         ($ s ($postprocess-partitioned-extension-terminal-definitions 'lang
+                ($multi-partition '($is-a:terminal-addition?
                                     $is-a:terminal-removal?
                                     $is-a:terminal-modification?)
-                  'descriptions ) ))) ) )
+                  'definitions ) ))) ) )
 
-    (define-syntax $postprocess-partitioned-extension-terminal-descriptions
+    (define-syntax $postprocess-partitioned-extension-terminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang '(explicit-additions implicit-additions removals modifications ()))
+        ((_ s 'lang '(additions removals modifications ()))
          ($ s ($list
-                ($squash-terminal-additions 'explicit-additions 'implicit-additions)
-                ($squash-terminal-removals 'removals)
-                ($map '($partition-terminal-modification-meta-vars 'lang) 'modifications) )))
+                ($squash-extension-clauses 'additions)
+                ($squash-extension-clauses 'removals)
+                ($map '($partition-terminal-modification-meta-vars 'lang)
+                      ($squash-extension-clauses 'modifications) ) )))
 
-        ((_ s 'lang '(_ _ _ _ (invalid-descriptions ...)))
-         ($ s ($report-invalid-extension-terminal-descriptions 'lang
-                ($multi-partition '($can-be:terminal-explicit-addition?
+        ((_ s 'lang '(_ _ _ (invalid-definitions ...)))
+         ($ s ($report-invalid-extension-terminal-definitions 'lang
+                ($multi-partition '($can-be:terminal-addition?
                                     $can-be:terminal-removal?
-                                    $can-be:terminal-modification?
-                                    $can-be:terminal-implicit-addition?)
-                  '(invalid-descriptions ...) ) ))) ) )
+                                    $can-be:terminal-modification?)
+                  '(invalid-definitions ...) ) ))) ) )
 
-    ;; $can-be checks go in such order because they are used to heuristically
-    ;; guess an implied class for a structurally invalid clauses. The $multi-
-    ;; partition picks the first predicate that returns #t, therefore at first
-    ;; we check for the clauses with distinct features: explicit additions,
-    ;; removals, and modifications have (+ ...) / (- ...) clauses that identify
-    ;; them pretty well. Anything else is considered a failed implicit addition
-
-    (define-syntax $report-invalid-extension-terminal-descriptions
+    (define-syntax $report-invalid-extension-terminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang '(explicit-additions removals modifications implicit-additions incomprehensible))
-         ($ s ($and '($every? '($must-be:terminal-explicit-addition 'lang) 'explicit-additions)
-                    '($every? '($must-be:terminal-removal           'lang) 'removals)
-                    '($every? '($must-be:terminal-modification      'lang) 'modifications)
-                    '($every? '($must-be:terminal-implicit-addition 'lang) 'implicit-additions)
-                    '($every? '($must-be:terminal-implicit-addition 'lang) 'incomprehensible) ))) ) )
+        ((_ s 'lang '(additions removals modifications incomprehensible))
+         ($ s ($and '($every? '($must-be:terminal-addition     'lang) 'additions)
+                    '($every? '($must-be:terminal-removal      'lang) 'removals)
+                    '($every? '($must-be:terminal-modification 'lang) 'modifications)
+                    '($map '($expected-a:terminal-definition   'lang) 'incomprehensible) ))) ) )
 
     ;;;
     ;;; Partitioning of meta-vars of the modification extension form
     ;;;
 
+    ;; Validity of meta-variables has been already verified by $is-a:terminal-modification?
+    ;; so we can assume it and use $can-be? checks here (which are more simple).
     (define-syntax $partition-terminal-modification-meta-vars
       (syntax-rules (quote)
         ((_ s 'lang 'terminal-modification)
          ($ s ($set-terminal-modification-meta-vars 'lang 'terminal-modification
                 ($squash-terminal-modification-meta-vars
-                  ($multi-partition '($is-a:meta-var-addition? $is-a:meta-var-removal?)
+                  ($multi-partition '($can-be:meta-var-addition? $can-be:meta-var-removal?)
                     ($get-terminal-modification-meta-vars 'lang 'terminal-modification) ) ) ))) ) )
 
-    ;; Validity of meta-variables has been already checked by $is-a:terminal-modification?
     (define-syntax $squash-terminal-modification-meta-vars
       (syntax-rules (quote)
         ((_ s '(added removed ()))

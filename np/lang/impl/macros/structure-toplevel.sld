@@ -29,7 +29,9 @@
 
         $can-be:nonterminals-clause?
  
-        $squash-terminals-clauses)
+        $squash-terminals-clauses
+
+        $expected-a:toplevel-clause)
 
   (import (scheme base)
           (sr ck)
@@ -47,7 +49,7 @@
     ;;; 'Oh my goodness! Shut me down. Machines building machines. How perverse'
     ;;;                                                               -- C-3PO
 
-    (define-syntax define-simple-matchers
+    (define-syntax define-simple-checkers
       (syntax-rules ::: ()
         ((_ &keyword ($is-a? $must-be $can-be?)
             (:name-error-message :empty-error-message :unique-error-message :invalid-error-message))
@@ -57,68 +59,37 @@
                ((_ s '(&keyword . _)) ($ s '#t))
                ((_ s  _)              ($ s '#f)) ) )
 
-           (define-syntax $is-a?
-             (syntax-rules (quote)
-               ((_ s 'term)
-                ($ s ($verify-result:as-boolean ($trampoline 'term)))) ) )
-
-           (define-syntax $must-be
-             (syntax-rules (quote)
-               ((_ s 'lang 'term)
-                ($ s ($verify-result:syntax-error ($trampoline 'lang 'term)))) ) )
-
-           (define-syntax $trampoline
-             (syntax-rules (quote)
-               ((_ s 'term)       ($ s (%verify '(s ())     'term 'term)))
-               ((_ s 'lang 'term) ($ s (%verify '(s (lang)) 'term 'term))) ) )
-
-           ;; Need to duplicate terms there to be able to simultaneously decompose
-           ;; and match them as well as to pass them further. One cannot just
-           ;; write (&keyword name) in the _template_ when &keyword is a literal,
-           ;; not a pattern variable, as that will result into _another_ &keyword,
-           ;; not the one from the original expression.
-           (define-syntax %verify
+           (define-standard-checked-verifier ($is-a? $must-be)
              (syntax-rules (quote &keyword)
-               ((_ s '(k t) 'term '(&keyword name)) ($ s (%verify-name '(k (term . t)) 'name)))
+               ((_ s '(k t) 'term '(&keyword name))      ($ s (%verify-name '(k (term . t)) 'name)))
+               ((_ s '(k t) 'term '(&keyword))           ($ k '(:empty-error-message (term . t))))
+               ((_ s '(k t) 'term '(&keyword names ...)) ($ k '(:unique-error-message (term . t))))
+               ((_ s '(k t) 'term  _)                    ($ k '(:invalid-error-message (term . t)))) ) )
 
-               ((_ s '(k t) 'term '(&keyword))
-                ($ k '(:empty-error-message (term . t))))
+           (define-verifier/atom %verify-name (:name-error-message)) )) ) )
 
-               ((_ s '(k t) 'term '(&keyword several names ...))
-                ($ k '(:unique-error-message (term . t))))
-
-               ((_ s '(k t) 'invalid-syntax _)
-                ($ k '(:invalid-error-message (invalid-syntax . t)))) ) )
-
-           (define-syntax %verify-name
-             (syntax-rules (quote)
-               ((_ s '(k t) '())       ($ k '(:name-error-message (()       . t))))
-               ((_ s '(k t) '(a . d))  ($ k '(:name-error-message ((a . d)  . t))))
-               ((_ s '(k t) '#(x ...)) ($ k '(:name-error-message (#(x ...) . t))))
-               ((_ s '(k t)  _)        ($ s '#t)) ) ) )) ) )
-
-    (define-simple-matchers extends
+    (define-simple-checkers extends
       ($is-an:extends-clause? $must-be:extends-clause $can-be:extends-clause?)
       ("Name of the language to be extended must be a symbol"
        "Name of the language to be extended cannot be empty"
        "Only one language can be extended"
        "Invalid syntax of the extension clause") )
 
-    (define-simple-matchers predicate
+    (define-simple-checkers predicate
       ($is-a:predicate-clause? $must-be:predicate-clause $can-be:predicate-clause?)
       ("Name of the language predicate must be a symbol"
        "Name of the language predicate cannot be empty"
        "Only one language predicate name can be specified"
        "Invalid syntax of the predicate clause") )
 
-    (define-simple-matchers parser
+    (define-simple-checkers parser
       ($is-a:parser-clause? $must-be:parser-clause $can-be:parser-clause?)
       ("Name of the language parser must be a symbol"
        "Name of the language parser cannot be empty"
        "Only one language parser name can be specified"
        "Invalid syntax of the parser clause") )
 
-    (define-simple-matchers unparser
+    (define-simple-checkers unparser
       ($is-an:unparser-clause? $must-be:unparser-clause $can-be:unparser-clause?)
       ("Name of the language unparser must be a symbol"
        "Name of the language unparser cannot be empty"
@@ -129,43 +100,26 @@
     ;;; Terminals clause
     ;;;
 
-    ;; Hand-coding this due to specific checks
-
     (define-syntax $can-be:terminals-clause?
       (syntax-rules (quote terminals)
         ((_ s '(terminals . _)) ($ s '#t))
         ((_ s  _)               ($ s '#f)) ) )
 
-    (define-syntax $is-a:terminals-clause?
-      (syntax-rules (quote)
-        ((_ s 'term)
-         ($ s ($verify-result:as-boolean ($verify:terminals-clause 'term)))) ) )
-
-    (define-syntax $must-be:terminals-clause
-      (syntax-rules (quote)
-        ((_ s 'lang 'term)
-          ($ s ($verify-result:syntax-error ($verify:terminals-clause 'lang 'term)))) ) )
-
-    (define-syntax $verify:terminals-clause
-      (syntax-rules (quote)
-        ((_ s 'term)       ($ s (%verify:terminals-clause '(s ())     'term 'term)))
-        ((_ s 'lang 'term) ($ s (%verify:terminals-clause '(s (lang)) 'term 'term))) ) )
-
-    (define-syntax %verify:terminals-clause
+    (define-standard-checked-verifier ($is-a:terminals-clause? $must-be:terminals-clause)
       (syntax-rules (quote terminals)
-        ((_ s '(k t) '(terminals . (x ...)) _) ($ s '#t))
+        ((_ s '(k t) 'term '(terminals . (x ...))) ($ s '#t))
 
         ((_ s '(k t) 'term '(terminals . #(x ...)))
          ($ k '("Expected a list of terminal definitions" (#(x ...) term . t))))
 
-        ((_ s '(k t) 'term '(terminals . (x y ... . z)))
-         ($ k '("Unexpected dotted list in language definition" (z term . t))))
+        ((_ s '(k t) 'term '(terminals . (x y ... . dot)))
+         ($ k '("Unexpected dotted list in language definition" (dot term . t))))
 
         ((_ s '(k t) 'term '(terminals . atom))
          ($ k '("Expected a list of terminal definitions" (atom term . t))))
 
-        ((_ s '(k t) 'invalid-syntax _)
-         ($ k '("Invalid syntax of the terminals clause" (invalid-syntax . t)))) ) )
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the terminals clause" (term . t)))) ) )
 
     ;;;
     ;;; Toplevel getters
@@ -175,28 +129,22 @@
     ;; which means that no respective clause is present, or the clause. Return
     ;; the value in a list to be able to discern between 'default #f' and the
     ;; one we would get from (extends #f), for example.
-    (define-syntax $get-extended-language  
-      (syntax-rules (quote extends)
-        ((_ s '#f)             ($ s '#f))
-        ((_ s '(extends name)) ($ s '(name))) ) )
 
-    (define-syntax $get-language-predicate 
-      (syntax-rules (quote predicate)
-        ((_ s '#f)               ($ s '#f))
-        ((_ s '(predicate name)) ($ s '(name))) ) )
+    (define-syntax define-simple-getter
+      (syntax-rules ()
+        ((_ ($getter) &keyword)
+         (define-syntax $getter
+           (syntax-rules (quote &keyword)
+             ((_ s '#f)              ($ s '#f))
+             ((_ s '(&keyword name)) ($ s '(name))) ) )) ) )
 
-    (define-syntax $get-language-parser    
-      (syntax-rules (quote parser)
-        ((_ s '#f)            ($ s '#f))
-        ((_ s '(parser name)) ($ s '(name))) ) )
-
-    (define-syntax $get-language-unparser  
-      (syntax-rules (quote unparser)
-        ((_ s '#f)              ($ s '#f))
-        ((_ s '(unparser name)) ($ s '(name))) ) )
+    (define-simple-getter ($get-extended-language)  extends)
+    (define-simple-getter ($get-language-predicate) predicate)
+    (define-simple-getter ($get-language-parser)    parser)
+    (define-simple-getter ($get-language-unparser)  unparser)
 
     ;;;
-    ;;; Random stuff
+    ;;; Squashers, checkers, other random stuff
     ;;;
 
     ;; Pretty loose definition, but this will do.
@@ -209,5 +157,10 @@
     (define-syntax $squash-terminals-clauses
       (syntax-rules (quote)
         ((_ s 'clauses) ($ s ($concatenate ($map '$cdr 'clauses)))) ) )
+
+    (define-syntax $expected-a:toplevel-clause
+      (syntax-rules (quote)
+        ((_ s 'lang 'invalid-clause)
+         (syntax-error "Invalid syntax of the toplevel clause" lang invalid-clause)) ) )
 
 ) )

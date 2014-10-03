@@ -8,5 +8,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($filter-standalone-terminal-descriptions 'lang
+  ($filter-standalone-terminal-definitions 'lang
     '((#(1 2 3) (some vars))) ) ))

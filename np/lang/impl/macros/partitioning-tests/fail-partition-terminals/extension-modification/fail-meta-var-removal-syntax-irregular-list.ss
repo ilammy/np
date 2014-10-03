@@ -9,5 +9,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($partition-extension-terminal-descriptions 'lang
+  ($partition-extension-terminal-definitions 'lang
     '((! (num ((- car . cdr))))) ) ))
