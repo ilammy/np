@@ -15,7 +15,8 @@
           define-verifier
           define-verifier/atom
           define-verifier/proper-list
-          define-verifier/proper-nonempty-list)
+          define-verifier/proper-nonempty-list
+          define-verifier/proper-nonempty-list:report-dot-only)
 
   (import (scheme base)
           (sr ck)
@@ -124,6 +125,16 @@
              ((_ s '(k t) 'term '())            ($ k '(:nonempty-error-message t)))
              ((_ s '(k t) 'term '(x y ...))     ($ s '#t))
              ((_ s '(k t) 'term '(x y ... . d)) ($ k '(:proper-error-message (d term . t))))
+             ((_ s '(k t) 'term  _)             ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
+
+    (define-syntax define-verifier/proper-nonempty-list:report-dot-only
+      (syntax-rules ::: ()
+        ((_ %verify (:nonempty-error-message :proper-error-message :unexpected-error-message))
+         (define-verifier %verify
+           (syntax-rules (quote)
+             ((_ s '(k t) 'term '())            ($ k '(:nonempty-error-message t)))
+             ((_ s '(k t) 'term '(x y ...))     ($ s '#t))
+             ((_ s '(k t) 'term '(x y ... . d)) ($ k '(:proper-error-message (d . t))))
              ((_ s '(k t) 'term  _)             ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
 
 ) )

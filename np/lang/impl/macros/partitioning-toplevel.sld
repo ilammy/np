@@ -70,19 +70,12 @@
     (define-syntax $report-invalid-toplevel-clauses
       (syntax-rules (quote)
         ((_ s 'lang '(extends predicates parsers unparsers terminals invalid))
-         ($ s ($and '($every? '($must-be:extends-clause     'lang) 'extends)
-                    '($every? '($must-be:predicate-clause   'lang) 'predicates)
-                    '($every? '($must-be:parser-clause      'lang) 'parsers)
-                    '($every? '($must-be:unparser-clause    'lang) 'unparsers)
-                    '($every? '($must-be:terminals-clause   'lang) 'terminals)
-                    '($map '($report-failed-toplevel-clause 'lang) 'invalid) ))) ) )
-
-    ;; This is separate, because $must-be:toplevel-clause that (re)checks for all
-    ;; correct toplevel clauses is an overkill. We only need to barf an error now.
-    (define-syntax $report-failed-toplevel-clause
-      (syntax-rules (quote)
-        ((_ s 'lang 'invalid-clause)
-         (syntax-error "Invalid syntax of the toplevel clause" lang invalid-clause)) ) )
+         ($ s ($and '($every? '($must-be:extends-clause   'lang) 'extends)
+                    '($every? '($must-be:predicate-clause 'lang) 'predicates)
+                    '($every? '($must-be:parser-clause    'lang) 'parsers)
+                    '($every? '($must-be:unparser-clause  'lang) 'unparsers)
+                    '($every? '($must-be:terminals-clause 'lang) 'terminals)
+                    '($map '($expected-a:toplevel-clause  'lang) 'invalid) ))) ) )
 
     (define-syntax $only-one
       (syntax-rules (quote)

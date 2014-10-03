@@ -29,7 +29,9 @@
 
         $can-be:nonterminals-clause?
  
-        $squash-terminals-clauses)
+        $squash-terminals-clauses
+
+        $expected-a:toplevel-clause)
 
   (import (scheme base)
           (sr ck)
@@ -142,7 +144,7 @@
     (define-simple-getter ($get-language-unparser)  unparser)
 
     ;;;
-    ;;; Random stuff
+    ;;; Squashers, checkers, other random stuff
     ;;;
 
     ;; Pretty loose definition, but this will do.
@@ -155,5 +157,10 @@
     (define-syntax $squash-terminals-clauses
       (syntax-rules (quote)
         ((_ s 'clauses) ($ s ($concatenate ($map '$cdr 'clauses)))) ) )
+
+    (define-syntax $expected-a:toplevel-clause
+      (syntax-rules (quote)
+        ((_ s 'lang 'invalid-clause)
+         (syntax-error "Invalid syntax of the toplevel clause" lang invalid-clause)) ) )
 
 ) )

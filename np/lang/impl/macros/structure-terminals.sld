@@ -18,11 +18,12 @@
              $is-a:terminal-modification?
           $must-be:terminal-modification
 
-          $squash-terminal-additions
-          $squash-terminal-removals
+          $squash-extension-clauses
 
           $get-terminal-modification-meta-vars
-          $set-terminal-modification-meta-vars)
+          $set-terminal-modification-meta-vars
+
+          $expected-a:terminal-definition)
 
   (import (scheme base)
           (sr ck)
@@ -135,31 +136,26 @@
          ($ k '("Invalid syntax of the terminal modification" (term . t)))) ) )
 
     ;;;
-    ;;; Getter/setter for meta-vars in terminal modification definitions
+    ;;; Getters, setters, squashers, etc. (Valid input is assumed everywhere.)
     ;;;
+
+    (define-syntax $squash-extension-clauses
+      (syntax-rules (quote)
+        ((_ s 'clauses) ($ s ($concatenate ($map '$cdr 'clauses)))) ) )
 
     (define-syntax $get-terminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s 'lang '(name predicate meta-vars)) ($ s 'meta-vars))
-        ((_ s 'lang '(predicate-name meta-vars)) ($ s 'meta-vars)) ) )
+        ((_ s 'lang '(name meta-var-modification-list)) ($ s 'meta-var-modification-list)) ) )
 
     (define-syntax $set-terminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s 'lang '(name predicate meta-vars) 'meta-vars*) ($ s '(name predicate meta-vars*)))
-        ((_ s 'lang '(predicate-name meta-vars) 'meta-vars*) ($ s '(predicate-name meta-vars*))) ) )
+        ((_ s 'lang '(name meta-var-modification-list) 'meta-var-modification-list*)
+         ($ s '(name meta-var-modification-list*))) ) )
 
-    ;;;
-    ;;; Explicit clause squashers (to be applied only to valid clauses)
-    ;;;
-
-    (define-syntax $squash-terminal-additions
+    (define-syntax $expected-a:terminal-definition
       (syntax-rules (quote)
-        ((_ s 'explicit 'implicit) ($ s ($append ($concatenate ($map '$cdr 'explicit))
-                                                 'implicit ))) ) )
-
-    (define-syntax $squash-terminal-removals
-      (syntax-rules (quote)
-        ((_ s 'removals) ($ s ($concatenate ($map '$cdr 'removals)))) ) )
+        ((_ s 'lang 'invalid-definition)
+         (syntax-error "Invalid syntax of the terminal extension" lang invalid-definition)) ) )
 
     ;;;
     ;;; Common verifiers
@@ -180,17 +176,17 @@
        "Unexpected dotted list in terminal definition"
        "Expected a list of meta-variables") )
 
-    (define-verifier/proper-nonempty-list %verify:terminal-addition-list
+    (define-verifier/proper-nonempty-list:report-dot-only %verify:terminal-addition-list
       ("At least one terminal should be specified for addition"
        "Unexpected dotted list in terminal extension"
        "Expected a list of terminal definitions") )
 
-    (define-verifier/proper-nonempty-list %verify:terminal-removal-list
+    (define-verifier/proper-nonempty-list:report-dot-only %verify:terminal-removal-list
       ("At least one terminal should be specified for removal"
        "Unexpected dotted list in terminal extension"
        "Expected a list of terminal definitions or names") )
 
-    (define-verifier/proper-nonempty-list %verify:terminal-modification-list
+    (define-verifier/proper-nonempty-list:report-dot-only %verify:terminal-modification-list
       ("At least one terminal should be specified for modification"
        "Unexpected dotted list in terminal extension"
        "Expected a list of terminal modifications") )
