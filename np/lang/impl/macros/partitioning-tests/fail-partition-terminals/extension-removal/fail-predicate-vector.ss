@@ -8,5 +8,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($partition-extension-terminal-descriptions 'lang
+  ($partition-extension-terminal-definitions 'lang
     '((- (#(1 2 3) (some vars)))) ) ))

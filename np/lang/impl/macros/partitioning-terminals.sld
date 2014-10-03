@@ -1,9 +1,9 @@
 (define-library (np lang impl macros partitioning-terminals)
   ;;;
-  ;;; Partitioning terminal description clauses (standalone and extension)
+  ;;; Partitioning terminal definition clauses (standalone and extension)
   ;;;
-  (export $filter-standalone-terminal-descriptions
-          $partition-extension-terminal-descriptions)
+  (export $filter-standalone-terminal-definitions
+          $partition-extension-terminal-definitions)
 
   (import (scheme base)
           (sr ck)
@@ -20,35 +20,35 @@
     ;;; Standalone form
     ;;;
 
-    (define-syntax $filter-standalone-terminal-descriptions
+    (define-syntax $filter-standalone-terminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang 'descriptions)
-         ($ s ($check-for-invalid-terminal-descriptions 'lang
+        ((_ s 'lang 'definitions)
+         ($ s ($check-for-invalid-terminal-definitions 'lang
                 ($partition '$is-a:standalone-terminal?
-                            'descriptions ) ))) ) )
+                            'definitions ) ))) ) )
 
-    (define-syntax $check-for-invalid-terminal-descriptions
+    (define-syntax $check-for-invalid-terminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang '(all-valid-descriptions ())) ($ s 'all-valid-descriptions))
+        ((_ s 'lang '(all-valid-definitions ())) ($ s 'all-valid-definitions))
 
-        ((_ s 'lang '(_ (invalid-descriptions ...)))
+        ((_ s 'lang '(_ (invalid-definitions ...)))
          ($ s ($map '($must-be:standalone-terminal 'lang)
-                    '(invalid-descriptions ...) ))) ) )
+                    '(invalid-definitions ...) ))) ) )
 
     ;;;
     ;;; Extension form
     ;;;
 
-    (define-syntax $partition-extension-terminal-descriptions
+    (define-syntax $partition-extension-terminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang 'descriptions)
-         ($ s ($postprocess-partitioned-extension-terminal-descriptions 'lang
+        ((_ s 'lang 'definitions)
+         ($ s ($postprocess-partitioned-extension-terminal-definitions 'lang
                 ($multi-partition '($is-a:terminal-addition?
                                     $is-a:terminal-removal?
                                     $is-a:terminal-modification?)
-                  'descriptions ) ))) ) )
+                  'definitions ) ))) ) )
 
-    (define-syntax $postprocess-partitioned-extension-terminal-descriptions
+    (define-syntax $postprocess-partitioned-extension-terminal-definitions
       (syntax-rules (quote)
         ((_ s 'lang '(additions removals modifications ()))
          ($ s ($list
@@ -57,14 +57,14 @@
                 ($map '($partition-terminal-modification-meta-vars 'lang)
                       ($squash-extension-clauses 'modifications) ) )))
 
-        ((_ s 'lang '(_ _ _ (invalid-descriptions ...)))
-         ($ s ($report-invalid-extension-terminal-descriptions 'lang
+        ((_ s 'lang '(_ _ _ (invalid-definitions ...)))
+         ($ s ($report-invalid-extension-terminal-definitions 'lang
                 ($multi-partition '($can-be:terminal-addition?
                                     $can-be:terminal-removal?
                                     $can-be:terminal-modification?)
-                  '(invalid-descriptions ...) ) ))) ) )
+                  '(invalid-definitions ...) ) ))) ) )
 
-    (define-syntax $report-invalid-extension-terminal-descriptions
+    (define-syntax $report-invalid-extension-terminal-definitions
       (syntax-rules (quote)
         ((_ s 'lang '(additions removals modifications incomprehensible))
          ($ s ($and '($every? '($must-be:terminal-addition     'lang) 'additions)
