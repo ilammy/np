@@ -1,6 +1,6 @@
 (define-library (np lang impl macros partitioning-nonterminals)
   ;;;
-  ;;; Partitioning nonterminal description clauses (standalone and extension)
+  ;;; Partitioning nonterminal definition clauses (standalone and extension)
   ;;;
   (export $filter-standalone-nonterminal-descriptions
           $partition-extension-nonterminal-descriptions)
@@ -24,7 +24,7 @@
       (syntax-rules (quote)
         ((_ s 'lang 'descriptions)
          ($ s ($check-for-invalid-nonterminal-descriptions 'lang
-                ($partition '$is-a:standalone-nonterminal-description?
+                ($partition '$is-a:standalone-nonterminal?
                             'descriptions ) ))) ) )
 
     (define-syntax $check-for-invalid-nonterminal-descriptions
@@ -32,7 +32,7 @@
         ((_ s 'lang '(all-valid-descriptions ())) ($ s 'all-valid-descriptions))
 
         ((_ s 'lang '(_ (invalid-descriptions ...)))
-         ($ s ($map '($must-be:standalone-nonterminal-description 'lang)
+         ($ s ($map '($must-be:standalone-nonterminal 'lang)
                     '(invalid-descriptions ...) ))) ) )
 
     ;;;

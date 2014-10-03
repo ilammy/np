@@ -14,7 +14,8 @@
   (import (scheme base)
           (sr ck)
           (sr ck maps)
-          (sr ck predicates))
+          (sr ck predicates)
+          (np lang impl macros utils))
 
   (begin
 
@@ -22,23 +23,23 @@
     ;;; Standalone form
     ;;;
 
-    (define-syntax %verify:standalone-production
+    (define-verifier %verify:standalone-production
       (syntax-rules (quote)
-        ((_ s '(k t) '#(x ...))
-         ($ k '("Incorrect production syntax: vector patterns are not allowed" (#(x ...) . t))))
+        ((_ s '(k t) 'term '#(x ...))
+         ($ k '("Invalid syntax of the production: vector patterns are not allowed" (term . t))))
 
-        ((_ s '(k t) 'otherwise)
-         ($ s (%verify:standalone-production* '(k (otherwise . t)) 'otherwise))) ) )
+        ((_ s '(k t) 'term _)
+         ($ s (%verify:standalone-production* '(k (term . t)) 'term))) ) )
 
-    (define-syntax %verify:standalone-production*
+    (define-verifier %verify:standalone-production*
       (syntax-rules (quote)
-        ((_ s '(k t) '#(x ...))
-         ($ k '("Incorrect production syntax: vector patterns are not allowed" (#(x ...) . t))))
+        ((_ s '(k t) 'term '#(x ...))
+         ($ k '("Invalid syntax of the production: vector patterns are not allowed" (term . t))))
 
-        ((_ s '(k t) '(a . d)) ($ s ($and '(%verify:standalone-production* '(k t) 'a)
-                                          '(%verify:standalone-production* '(k t) 'd) )))
+        ((_ s '(k t) 'term '(a . d)) ($ s ($and '(%verify:standalone-production* '(k t) 'a)
+                                                '(%verify:standalone-production* '(k t) 'd) )))
 
-        ((_ s '(k t) _) ($ s '#t)) ) )
+        ((_ s '(k t) 'term _) ($ s '#t)) ) )
 
     (define-syntax $can-be:standalone-production?
       (syntax-rules (quote)
