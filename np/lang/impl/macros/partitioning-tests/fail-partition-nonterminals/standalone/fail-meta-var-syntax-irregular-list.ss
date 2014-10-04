@@ -1,4 +1,4 @@
-; Unexpected dotted list in nonterminal description
+; Unexpected dotted list in nonterminal definition
 ;   lang
 ;   Number
 ;   (a . d)
@@ -9,5 +9,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($filter-standalone-nonterminal-descriptions 'lang
+  ($filter-standalone-nonterminal-definitions 'lang
     '((Number (a . d) n)) ) ))

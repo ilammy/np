@@ -8,5 +8,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($filter-standalone-nonterminal-descriptions 'lang
+  ($filter-standalone-nonterminal-definitions 'lang
     '((Nonterminal #(#(x y z)) (var1 var2) (p p))) ) ))

@@ -8,5 +8,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($partition-extension-nonterminal-descriptions 'lang
+  ($partition-extension-nonterminal-definitions 'lang
     '((+ ((car . cdr) #(pred?) () production1))) ) ))

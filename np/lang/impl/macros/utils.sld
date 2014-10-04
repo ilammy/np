@@ -113,9 +113,9 @@
         ((_ %verify (:proper-error-message :unexpected-error-message))
          (define-verifier %verify
            (syntax-rules (quote)
-             ((_ s '(k t) 'term '(x ...))     ($ s '#t))
-             ((_ s '(k t) 'term '(x ... . d)) ($ k '(:proper-error-message (d term . t))))
-             ((_ s '(k t) 'term  _)           ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
+             ((_ s '(k t) 'term '(x ...))       ($ s '#t))
+             ((_ s '(k t) 'term '(x y ... . d)) ($ k '(:proper-error-message (d term . t))))
+             ((_ s '(k t) 'term  _)             ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
 
     (define-syntax define-verifier/proper-nonempty-list
       (syntax-rules ::: ()
