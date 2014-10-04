@@ -1,5 +1,19 @@
-# A dummy file to keep Travis busy building other branches
-# without breaking master that does not have any code yet.
 language: c
 
-script: true
+before_install:
+  - mkdir -p /tmp/build
+  - mkdir -p /tmp/scratch
+
+install:
+  - ./tools/install-chibi
+  - ./tools/checkout-syntax-rules
+  - ./tools/checkout-test-essentials
+
+before_script:
+  - ./tools/setup-test-rig
+
+script:
+  - ./tools/run-success-tests np/lang/macros/test-partitioning
+  - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-toplevel
+  - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-terminals
+  - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-nonterminals

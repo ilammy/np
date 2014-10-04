@@ -1,0 +1,12 @@
+; Terminal predicate must be a variable in short form
+;   lang
+;   ((lambda (x) (odd? x)) (some vars))
+;   (lambda (x) (odd? x))
+(import (scheme base)
+        (np lang macros partitioning-terminals)
+        (sr ck)
+        (sr ck kernel))
+
+($ ($quote
+  ($filter-standalone-terminal-definitions 'lang
+    '(((lambda (x) (odd? x)) (some vars))) ) ))

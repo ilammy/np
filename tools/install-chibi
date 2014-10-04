@@ -1,0 +1,13 @@
+#!/bin/bash
+set -ex
+
+CHIBI_REVISION=d9abd0f7f973076650c15a18370a53f2800b8ec1
+
+cd /tmp/scratch
+hg clone -r $CHIBI_REVISION https://code.google.com/p/chibi-scheme/
+
+cd chibi-scheme
+make -j$(expr $(nproc) + 1)
+make test-all
+
+sudo make install
