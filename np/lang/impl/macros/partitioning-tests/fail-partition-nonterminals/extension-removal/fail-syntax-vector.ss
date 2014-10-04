@@ -1,7 +1,7 @@
 ; Expected a list of nonterminal definitions or names
 ;   lang
-;   (- . #(Number (n) p))
-;   #(Number (n) p)
+;   (- . #(Number #(pp) (n)))
+;   #(Number #(pp) (n))
 (import (scheme base)
         (np lang impl macros partitioning-nonterminals)
         (sr ck)

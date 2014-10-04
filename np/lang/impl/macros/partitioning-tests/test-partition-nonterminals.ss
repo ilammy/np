@@ -69,7 +69,7 @@
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(define-test-case (terminals:extension-addition "Partitioning of extension addition nonterminal forms")
+(define-test-case (nonterminals:extension-addition "Partitioning of extension addition nonterminal forms")
 
   (define-test ("recognizes addition forms")
     (assert-equal '(((Pair () (v v))) () ())
@@ -86,11 +86,11 @@
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((+ (PlusMinus () (+ stuff) (- stuff)))) ))) ) )
 )
-(verify-test-case! terminals:extension-addition)
+(verify-test-case! nonterminals:extension-addition)
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(define-test-case (terminals:extension-removal "Partitioning of extension removal nonterminal forms")
+(define-test-case (nonterminals:extension-removal "Partitioning of extension removal nonterminal forms")
 
   (define-test ("recognizes full removal forms")
     (assert-equal '(() ((Pair #(Pair?) () (value value))) ())
@@ -117,11 +117,11 @@
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((- Some (Atom ()) (Pair #(Pair?) () (value value)))) ))) ) )
 )
-(verify-test-case! terminals:extension-removal)
+(verify-test-case! nonterminals:extension-removal)
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(define-test-case (terminals:extension-modification "Partitioning of extension modification terminal forms")
+(define-test-case (nonterminals:extension-modification "Partitioning of extension modification nonterminal forms")
 
   (define-test ("recognizes meta-var addition")
     (assert-equal '(() () ((Atom ((atom) ()) (() ()))))
@@ -129,12 +129,12 @@
         '((! (Atom ((+ atom))))) ))) ) )
 
   (define-test ("recognizes meta-var removal")
-    (assert-equal '(() () ((Atom (() (bork)) (() ()))))
+    (assert-equal '(() () ((Atom (() (atom)) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((! (Atom ((- atom))))) ))) ) )
 
   (define-test ("groups modified meta-vars")
-    (assert-equal '(() () ((Atom ((v1 v4) (v2 v3)) (() ()))))
+    (assert-equal '(() () ((Nt ((v1 v4) (v2 v3)) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-descriptions 'lang
         '((! (Nt ((+ v1) (- v2 v3) (+ v4))))) ))) ) )
 
@@ -167,11 +167,11 @@
              (Bar ((+ b))))
           (! (Baz () (+ (z z z))))) ))) ) )
 )
-(verify-test-case! terminals:extension-modification)
+(verify-test-case! nonterminals:extension-modification)
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(define-test-case (terminals:extension-peculiar "Partitioning of tricky extension terminal forms")
+(define-test-case (nonterminals:extension-peculiar "Partitioning of tricky extension nonterminal forms")
 
   (define-test ("is not afraid of empty list")
     (assert-equal '(() () ())
@@ -185,4 +185,4 @@
         '((+ (Pair () (v v))) (- Some Removed) (! (Atom ((+ atom))))
           (+ (PlusMinus (pm) (+ stuff) (- stuff))) (- Nonterminals)) ))) ) )
 )
-(verify-test-case! terminals:extension-peculiar)
+(verify-test-case! nonterminals:extension-peculiar)

@@ -6,13 +6,9 @@
              $is-a:standalone-nonterminal?
           $must-be:standalone-nonterminal
 
-           $can-be:nonterminal-implicit-addition?
-             $is-a:nonterminal-implicit-addition?
-          $must-be:nonterminal-implicit-addition
-
-           $can-be:nonterminal-explicit-addition?
-             $is-a:nonterminal-explicit-addition?
-          $must-be:nonterminal-explicit-addition
+           $can-be:nonterminal-addition?
+             $is-a:nonterminal-addition?
+          $must-be:nonterminal-addition
 
            $can-be:nonterminal-removal?
              $is-a:nonterminal-removal?
@@ -22,11 +18,15 @@
              $is-a:nonterminal-modification?
           $must-be:nonterminal-modification
 
+          $squash-extension-clauses
+
           $get-nonterminal-modification-meta-vars
           $set-nonterminal-modification-meta-vars
 
           $get-nonterminal-modification-productions
-          $set-nonterminal-modification-productions)
+          $set-nonterminal-modification-productions
+
+          $expected-a:nonterminal-definition)
 
   (import (scheme base)
           (sr ck)
@@ -84,344 +84,145 @@
         ((_ s '(k t) 'term '#(xs ...)) ($ k '("Only one nonterminal predicate name can be specified" (term . t)))) ) )
 
     ;;;
-    ;;;  Nonterminal descriptions (implicit addition)
+    ;;;  Nonterminal definitions (addition)
     ;;;
 
-    (define-syntax $can-be:nonterminal-implicit-addition?
-      (syntax-rules (quote)
-        ((_ s 'term) ($ s ($can-be:standalone-nonterminal-description? 'term))) ) )
-
-    (define-syntax $is-a:nonterminal-implicit-addition?
-      (syntax-rules (quote)
-        ((_ s 'term) ($ s ($is-a:standalone-nonterminal-description? 'term))) ) )
-
-    (define-syntax $must-be:nonterminal-implicit-addition
-      (syntax-rules (quote)
-        ((_ s 'lang 'term) ($ s ($must-be:standalone-nonterminal-description 'lang 'term))) ) )
-
-    ;;;
-    ;;;  Nonterminal descriptions (explicit addition) - interface
-    ;;;
-
-    (define-syntax $can-be:nonterminal-explicit-addition?
+    (define-syntax $can-be:nonterminal-addition?
       (syntax-rules (quote +)
-        ((_ s '(+ . rest)) ($ s '#t))
-        ((_ s  _)          ($ s '#f)) ) )
+        ((_ s '(+ . added-nonterminal-list)) ($ s '#t))
+        ((_ s  _)                            ($ s '#f)) ) )
 
-    (define-syntax $is-a:nonterminal-explicit-addition?
-      (syntax-rules (quote)
-        ((_ s 'term) ($ s ($verify-result:as-boolean
-                            ($verify:nonterminal-explicit-addition 'term) ))) ) )
-
-    (define-syntax $must-be:nonterminal-explicit-addition
-      (syntax-rules (quote)
-        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
-                                  ($verify:nonterminal-explicit-addition 'lang 'term) ))) ) )
-
-    ;;;
-    ;;;  Nonterminal descriptions (explicit addition) - interface
-    ;;;
-
-    (define-syntax $verify:nonterminal-explicit-addition
-      (syntax-rules (quote)
-        ((_ s 'term)       ($ s (%verify:nonterminal-explicit-addition '(s ())     'term)))
-        ((_ s 'lang 'term) ($ s (%verify:nonterminal-explicit-addition '(s (lang)) 'term))) ) )
-
-    (define-syntax %verify:nonterminal-explicit-addition
-      (syntax-rules (quote)
-        ((_ s '(k t) '(? . descriptions))
-         ($ s ($and '(%verify:nonterminal-addition-list '(k t) '(? . descriptions) '(? . descriptions))
-                    '(%verify:nonterminal-description-list '(k ((? . descriptions) . t)) 'descriptions)
-                    '($every? '(%verify:standalone-nonterminal-description '(k t)) 'descriptions) )))
-
-        ((_ s '(k t) 'invalid-syntax)
-         ($ k '("Invalid nonterminal description syntax" (invalid-syntax . t)))) ) )
-
-    ;; The 2nd and 3rd arguments are actually the same. This trick is necessary
-    ;; to get the (+) form from the original source, because writing just `(+)`
-    ;; in the expansion yields a list that contains another plus--that free one
-    ;; from (scheme base) as '+' is not a pattern variable here.
-    (define-syntax %verify:nonterminal-addition-list
+    (define-standard-checked-verifier ($is-a:nonterminal-addition? $must-be:nonterminal-addition)
       (syntax-rules (quote +)
-        ((_ s '(k t) '(+)         'x) ($ k '("At least one nonterminal should be specified for addition" (x . t))))
-        ((_ s '(k t) '(+ . other) 'x) ($ s '#t))
-        ((_ s '(k t)  _           'x) ($ k '("Invalid terminal description syntax" (x . t)))) ) )
+        ((_ s '(k t) 'term '(+ . added-nonterminal-list))
+         ($ s ($and '(%verify:nonterminal-addition-list '(k (term . t)) 'added-nonterminal-list)
+                    '($every? '(%verify:standalone-nonterminal '(k t)) 'added-nonterminal-list) )))
+
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the nonterminal extension" (term . t)))) ) )
 
     ;;;
-    ;;; Nonterminal descriptions (removal) - interface
+    ;;; Nonterminal definitions (removal)
     ;;;
 
     (define-syntax $can-be:nonterminal-removal?
       (syntax-rules (quote -)
-        ((_ s '(- . rest)) ($ s '#t))
-        ((_ s  _)          ($ s '#f)) ) )
+        ((_ s '(- . removed-nonterminal-list)) ($ s '#t))
+        ((_ s  _)                              ($ s '#f)) ) )
 
-    (define-syntax $is-a:nonterminal-removal?
-      (syntax-rules (quote)
-        ((_ s 'term) ($ s ($verify-result:as-boolean
-                            ($verify:nonterminal-removal 'term) ))) ) )
-
-    (define-syntax $must-be:nonterminal-removal
-      (syntax-rules (quote)
-        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
-                                  ($verify:nonterminal-removal 'lang 'term) ))) ) )
-
-    ;;;
-    ;;; Nonterminal descriptions (removal) - implementation
-    ;;;
-
-    (define-syntax $verify:nonterminal-removal
-      (syntax-rules (quote)
-        ((_ s 'term)       ($ s (%verify:nonterminal-removal '(s ())     'term)))
-        ((_ s 'lang 'term) ($ s (%verify:nonterminal-removal '(s (lang)) 'term))) ) )
-
-    (define-syntax %verify:nonterminal-removal
-      (syntax-rules (quote)
-        ((_ s '(k t) '(? . descriptions))
-         ($ s ($and '(%verify:nonterminal-removal-list '(k t) '(? . descriptions) '(? . descriptions))
-                    '(%verify:nonterminal-description-list '(k ((? . descriptions) . t)) 'descriptions)
-                    '($every? '(%verify:nonterminal-name/nonterminal-concise-description '(k t)) 'descriptions) )))
-
-        ((_ s '(k t) 'invalid-syntax)
-         ($ k '("Invalid terminal description syntax" (invalid-syntax . t)))) ) )
-
-    (define-syntax %verify:nonterminal-name/nonterminal-concise-description
-      (syntax-rules (quote)
-        ((_ s '(k t) '())       ($ s (%verify:concise-nonterminal-description '(k t) '())))
-        ((_ s '(k t) '(a . d))  ($ s (%verify:concise-nonterminal-description '(k t) '(a . d))))
-        ((_ s '(k t) '#(x ...)) ($ s (%verify:concise-nonterminal-description '(k t) '#(x ...))))
-        ((_ s '(k t) 'atom)     ($ s '#t)) ) )
-
-    ;; (See comment for %verify:nonterminal-addition-list)
-    (define-syntax %verify:nonterminal-removal-list
+    (define-standard-checked-verifier ($is-a:nonterminal-removal? $must-be:nonterminal-removal)
       (syntax-rules (quote -)
-        ((_ s '(k t) '(-)         'x) ($ k '("At least one nonterminal should be specified for removal" (x . t))))
-        ((_ s '(k t) '(- . other) 'x) ($ s '#t))
-        ((_ s '(k t)  _           'x) ($ k '("Invalid nonterminal description syntax" (x . t)))) ) )
+        ((_ s '(k t) 'term '(- . removed-nonterminal-list))
+         ($ s ($and '(%verify:nonterminal-removal-list '(k (term . t)) 'removed-nonterminal-list)
+                    '($every? '(%verify:nonterminal-name/concise-definition '(k t)) 'removed-nonterminal-list) )))
 
-    ;; Effectively this is %verify:standalone-nonterminal-description that allows empty production list
-    (define-syntax %verify:concise-nonterminal-description
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the nonterminal extension" (term . t)))) ) )
+
+    (define-verifier %verify:nonterminal-name/concise-definition
       (syntax-rules (quote)
-        ((_ s '(k t) '(name predicate () pro . ductions))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate ()) . t)) 'name)
-                    '(%verify:nonterminal-predicate-name '(k ((name predicate ()) . t)) 'predicate)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '())
-                    '(%verify:concise-nonterminal-production-list '(k (name . t)) '(pro . ductions))
-                    '($every? '(%verify:standalone-production '(k (name . t))) '(pro . ductions)) )))
+        ((_ s '(k t) 'term '())       ($ s (%verify:nonterminal-concise-definition '(k t) 'term)))
+        ((_ s '(k t) 'term '(a . d))  ($ s (%verify:nonterminal-concise-definition '(k t) 'term)))
+        ((_ s '(k t) 'term '#(x ...)) ($ s (%verify:nonterminal-concise-definition '(k t) 'term)))
+        ((_ s '(k t) 'term  _)        ($ s '#t)) ) )
 
-        ((_ s '(k t) '(name predicate (meta . vars) pro . ductions))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate (meta . vars)) . t)) 'name)
-                    '(%verify:nonterminal-predicate-name '(k ((name predicate (meta . vars)) . t)) 'predicate)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(meta . vars))
-                    '($every? '(%verify:meta-var-name '(k (name . t))) '(meta . vars))
-                    '(%verify:concise-nonterminal-production-list '(k (name . t)) '(pro . ductions))
-                    '($every? '(%verify:standalone-production '(k (name . t))) '(pro . ductions)) )))
+    ;; Effectively this is %verify:standalone-nonterminal-definition that allows empty production list.
+    ;; The difference is in usage of %verify:nonterminal-*concise*-production-list.
+    (define-verifier %verify:nonterminal-concise-definition
+      (syntax-rules (quote)
+        ((_ s '(k t) 'term '(name #(predicate-name ...) meta-var-list . production-list))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name #(predicate-name ...) meta-var-list) . t)) 'name)
+                    '(%verify:nonterminal-predicate-name-count '(k ((name #(predicate-name ...) meta-var-list) . t)) '#(predicate-name ...))
+                    '(%verify:nonterminal-predicate-name '(k ((name #(predicate-name ...) meta-var-list) . t)) 'predicate-name ...)
+                    '(%verify:nonterminal-meta-var-list '(k (name . t)) 'meta-var-list)
+                    '($every? '(%verify:meta-var-name '(k (name . t))) 'meta-var-list)
+                    '(%verify:nonterminal-concise-production-list '(k (name . t)) 'production-list)
+                    '($every? '(%verify:standalone-production '(k (name . t))) 'production-list) )))
 
-        ((_ s '(k t) '(name predicate ()))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate ()) . t)) 'name)
-                    '(%verify:nonterminal-predicate-name '(k ((name predicate ()) . t)) 'predicate)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '()) )))
+        ((_ s '(k t) 'term '(name #(predicate-name ...) . _))     ; Taking a shortcut here...
+         ($ k '("Invalid syntax of the nonterminal" (term . t))))
 
-        ((_ s '(k t) '(name predicate (meta . vars)))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate (ext-meta . vars)) . t)) 'name)
-                    '(%verify:nonterminal-predicate-name '(k ((name predicate (meta . vars)) . t)) 'predicate)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(meta . vars))
-                    '($every? '(%verify:meta-var-name '(k (name . t))) '(meta . vars)) )))
+        ((_ s '(k t) 'term '(name meta-var-list . production-list))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name meta-var-list) . t)) 'name)
+                    '(%verify:nonterminal-meta-var-list '(k (name . t)) 'meta-var-list)
+                    '($every? '(%verify:meta-var-name '(k (name . t))) 'meta-var-list)
+                    '(%verify:nonterminal-concise-production-list '(k (name . t)) 'production-list)
+                    '($every? '(%verify:standalone-production '(k (name . t))) 'production-list) )))
 
-        ((_ s '(k t) '(name () pro . ductions))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name ()) . t)) 'name)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '())
-                    '(%verify:concise-nonterminal-production-list '(k (name . t)) '(pro . ductions))
-                    '($every? '(%verify:standalone-production '(k (name . t))) '(pro . ductions)) )))
-
-        ((_ s '(k t) '(name (meta . vars) pro . ductions))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name (meta . vars)) . t)) 'name)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(meta . vars))
-                    '($every? '(%verify:meta-var-name '(k (name . t))) '(meta . vars))
-                    '(%verify:concise-nonterminal-production-list '(k (name . t)) '(pro . ductions))
-                    '($every? '(%verify:standalone-production '(k (name . t))) '(pro . ductions)) )))
-
-        ((_ s '(k t) '(name ()))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name ()) . t)) 'name)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '()) )))
-
-        ((_ s '(k t) '(name (meta . vars)))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name (meta . vars)) . t)) 'name)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(meta . vars))
-                    '($every? '(%verify:meta-var-name '(k (name . t))) '(meta . vars)) )))
-
-        ((_ s '(k t) 'invalid-syntax)
-         ($ k '("Invalid nonterminal description syntax" (invalid-syntax . t)))) ) )
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the nonterminal" (term . t)))) ) )
 
     ;;;
-    ;;; Nonterminal descriptions (modification) - interface
+    ;;; Nonterminal definitions (modification)
     ;;;
 
     (define-syntax $can-be:nonterminal-modification?
+      (syntax-rules (quote !)
+        ((_ s '(! . modified-nonterminal-list)) ($ s '#t))
+        ((_ s  _)                               ($ s '#f)) ) )
+
+    (define-standard-checked-verifier ($is-a:nonterminal-modification? $must-be:nonterminal-modification)
+      (syntax-rules (quote !)
+        ((_ s '(k t) 'term '(! . modified-nonterminal-list))
+         ($ s ($and '(%verify:nonterminal-modification-list '(k (term . t)) 'modified-nonterminal-list)
+                    '($every? '(%verify:nonterminal-modification '(k t)) 'modified-nonterminal-list) )))
+
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the nonterminal extension" (term . t)))) ) )
+
+    (define-verifier %verify:nonterminal-modification
       (syntax-rules (quote)
-        ((_ s '(name predicate (vars ...) productions ...))
-         ($ s ($or '($any? '$can-be:extension-meta-var? '(vars ...))
-                   '($any? '$can-be:extension-production? '(productions ...)) )))
+        ((_ s '(k t) 'term '(name meta-var-modification-list . production-modification-list))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name meta-var-modification-list) . t)) 'name)
+                    '(%verify:nonterminal-meta-var-modification-list '(k (name . t)) 'meta-var-modification-list)
+                    '($every? '(%verify:meta-var-modification '(k (name . t))) 'meta-var-modification-list)
+                    '(%verify:nonterminal-production-modification-list '(k (name . t)) 'production-modification-list)
+                    '($every? '(%verify:production-modification '(k (name . t))) 'production-modification-list)
+                    '(%verify:meta-vars-or-productions-are-modified '(k (name . t))
+                       'meta-var-modification-list 'production-modification-list ) )))
 
-        ((_ s '(name (vars ...) productions ...))
-         ($ s ($or '($any? '$can-be:extension-meta-var? '(vars ...))
-                   '($any? '$can-be:extension-production? '(productions ...)) )))
+        ((_ s '(k t) 'term _)
+         ($ k '("Invalid syntax of the nonterminal modification" (term . t)))) ) )
 
-        ((_ s _) ($ s '#f)) ) )
-
-    (define-syntax $is-a:nonterminal-modification?
+    (define-syntax %verify:meta-vars-or-productions-are-modified
       (syntax-rules (quote)
-        ((_ s 'term) ($ s ($verify-result:as-boolean
-                            ($verify:nonterminal-modification 'term) ))) ) )
+        ((_ s '(k t) '() '())
+         ($ k '("Nonterminal modification should modify either meta-variables or productions" t)))
 
-    (define-syntax $must-be:nonterminal-modification
-      (syntax-rules (quote)
-        ((_ s 'lang 'term) ($ s ($verify-result:syntax-error
-                                  ($verify:nonterminal-modification 'lang 'term) ))) ) )
+        ((_ s '(k t) _ _) ($ s '#t)) ) )
 
     ;;;
-    ;;; Nonterminal descriptions (modification) - implementation
+    ;;; Getters, setters, squashers, etc. (Valid input is assumed everywhere.)
     ;;;
 
-    (define-syntax $verify:nonterminal-modification
+    (define-syntax $squash-extension-clauses
       (syntax-rules (quote)
-        ((_ s 'term)       ($ s (%verify:nonterminal-modification '(s ())     'term)))
-        ((_ s 'lang 'term) ($ s (%verify:nonterminal-modification '(s (lang)) 'term))) ) )
-
-    (define-syntax %verify:nonterminal-modification
-      (syntax-rules (quote)
-        ((_ s '(k t) '(name predicate () ext-pro . ductions))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate ()) . t)) 'name)
-                    '(%verify:nonterminal-predicate-name '(k ((name predicate ()) . t)) 'predicate)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '())
-                    '(%verify:concise-nonterminal-production-list '(k (name . t)) '(ext-pro . ductions))
-                    '($every? '(%verify:ext-productions '(k (name . t))) '(ext-pro . ductions)) )))
-
-        ((_ s '(k t) '(name predicate (ext-meta . vars) ext-pro . ductions))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate (ext-meta . vars)) . t)) 'name)
-                    '(%verify:nonterminal-predicate-name '(k ((name predicate (ext-meta . vars)) . t)) 'predicate)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(ext-meta . vars))
-                    '($every? '(%verify:ext-meta-vars '(k (name . t))) '(ext-meta . vars))
-                    '(%verify:concise-nonterminal-production-list '(k (name . t)) '(ext-pro . ductions))
-                    '($every? '(%verify:ext-productions '(k (name . t))) '(ext-pro . ductions)) )))
-
-        ((_ s '(k t) '(name predicate ()))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate ()) . t)) 'name)
-                    '(%verify:nonterminal-predicate-name '(k ((name predicate ()) . t)) 'predicate)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '()) )))
-
-        ((_ s '(k t) '(name predicate (ext-meta . vars)))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate (ext-meta . vars)) . t)) 'name)
-                    '(%verify:nonterminal-predicate-name '(k ((name predicate (ext-meta . vars)) . t)) 'predicate)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(ext-meta . vars))
-                    '($every? '(%verify:ext-meta-vars '(k (name . t))) '(ext-meta . vars)) )))
-
-        ((_ s '(k t) '(name () ext-pro . ductions))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name ()) . t)) 'name)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '())
-                    '(%verify:concise-nonterminal-production-list '(k (name . t)) '(ext-pro . ductions))
-                    '($every? '(%verify:ext-productions '(k (name . t))) '(ext-pro . ductions)) )))
-
-        ((_ s '(k t) '(name (ext-meta . vars) ext-pro . ductions))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name (ext-meta . vars)) . t)) 'name)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(ext-meta . vars))
-                    '($every? '(%verify:ext-meta-vars '(k (name . t))) '(ext-meta . vars))
-                    '(%verify:concise-nonterminal-production-list '(k (name . t)) '(ext-pro . ductions))
-                    '($every? '(%verify:ext-productions '(k (name . t))) '(ext-pro . ductions)) )))
-
-        ((_ s '(k t) '(name ()))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name ()) . t)) 'name)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '()) )))
-
-        ((_ s '(k t) '(name (ext-meta . vars)))
-         ($ s ($and '(%verify:nonterminal-name '(k ((name (ext-meta . vars)) . t)) 'name)
-                    '(%verify:nonterminal-meta-var-list '(k (name . t)) '(ext-meta . vars))
-                    '($every? '(%verify:ext-meta-vars '(k (name . t))) '(ext-meta . vars)) )))
-
-        ((_ s '(k t) 'invalid-syntax)
-         ($ k '("Invalid nonterminal description syntax" (invalid-syntax . t)))) ) )
-
-    ;; (See comment for %verify:nonterminal-addition-list)
-    (define-syntax %verify:ext-meta-vars
-      (syntax-rules (quote + -)
-        ((_ s '(k t) 'x) ($ s (%verify:ext-meta-vars '(k t) 'x 'x)))
-
-        ((_ s '(k t) '(+) 'x)
-         ($ k '("At least one meta-variable should be specified for addition" (x . t))))
-
-        ((_ s '(k t) '(-) 'x)
-         ($ k '("At least one meta-variable should be specified for removal" (x . t))))
-
-        ((_ s '(k t) '(+ . list) 'x)
-         ($ s ($and '(%verify:nonterminal-meta-var-list '(k t) 'x)
-                    '($every? '(%verify:meta-var-name '(k (x . t))) 'list) )))
-
-        ((_ s '(k t) '(- . list) 'x)
-         ($ s ($and '(%verify:nonterminal-meta-var-list '(k t) 'x)
-                    '($every? '(%verify:meta-var-name '(k (x . t))) 'list) )))
-
-        ((_ s '(k t) _ 'x) ($ k '("Invalid extension meta-variable syntax" (x . t)))) ) )
-
-    ;; (See comment for %verify:nonterminal-addition-list)
-    (define-syntax %verify:ext-productions
-      (syntax-rules (quote + -)
-        ((_ s '(k t) 'x) ($ s (%verify:ext-productions '(k t) 'x 'x)))
-
-        ((_ s '(k t) '(+) 'x)
-         ($ k '("At least one production should be specified for addition" (x . t))))
-
-        ((_ s '(k t) '(-) 'x)
-         ($ k '("At least one production should be specified for removal" (x . t))))
-
-        ((_ s '(k t) '(+ . list) 'x)
-         ($ s ($and '(%verify:nonterminal-production-list '(k t) 'x)
-                    '($every? '(%verify:standalone-production '(k (x . t))) 'list) )))
-
-        ((_ s '(k t) '(- . list) 'x)
-         ($ s ($and '(%verify:nonterminal-production-list '(k t) 'x)
-                    '($every? '(%verify:standalone-production '(k (x . t))) 'list) )))
-
-        ((_ s '(k t) _ 'x) ($ k '("Invalid extension production syntax" (x . t)))) ) )
-
-    ;;;
-    ;;; Getter/setter for subclauses in nonterminal modification descriptions
-    ;;;
+        ((_ s 'clauses) ($ s ($concatenate ($map '$cdr 'clauses)))) ) )
 
     (define-syntax $get-nonterminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s _ '(name predicate (vars ...) prods ...))
-         ($ s '(vars ...)))
-        ((_ s _ '(name (vars ...) prods ...))
-         ($ s '(vars ...)))
-        ((_ s 'lang 'expr)
-         (syntax-error "Invalid nonterminal modification description" lang expr)) ) )
+        ((_ s 'lang '(name meta-var-modification-list . production-modification-list))
+         ($ s 'meta-var-modification-list)) ))
 
     (define-syntax $set-nonterminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s _ '(name predicate (vars ...) prods ...) '(new-vars ...))
-         ($ s '(name predicate (new-vars ...) prods ...)))
-        ((_ s _ '(name (vars ...) prods ...) '(new-vars ...))
-         ($ s '(name (new-vars ...) prods ...)))
-        ((_ s 'lang 'expr)
-         (syntax-error "Invalid nonterminal modification description" lang expr)) ) )
+        ((_ s 'lang '(name meta-var-modification-list . production-modification-list) 'meta-var-modification-list*)
+         ($ s '(name meta-var-modification-list* . production-modification-list))) ) )
 
     (define-syntax $get-nonterminal-modification-productions
       (syntax-rules (quote)
-        ((_ s _ '(name predicate (vars ...) prods ...))
-         ($ s '(prods ...)))
-        ((_ s _ '(name (vars ...) prods ...))
-         ($ s '(prods ...)))
-        ((_ s 'lang 'expr)
-         (syntax-error "Invalid nonterminal modification description" lang expr)) ) )
+        ((_ s 'lang '(name meta-var-modification-list . production-modification-list))
+         ($ s 'production-modification-list)) ))
 
     (define-syntax $set-nonterminal-modification-productions
       (syntax-rules (quote)
-        ((_ s _ '(name predicate (vars ...) prods ...) '(new-prods ...))
-         ($ s '(name predicate (vars ...) (new-prods ...))))
-        ((_ s _ '(name predicate (vars ...) prods ...) '(new-prods ...))
-         ($ s '(name predicate (vars ...) (new-prods ...))))
-        ((_ s 'lang 'expr)
-         (syntax-error "Invalid nonterminal modification description" lang expr)) ) )
+        ((_ s 'lang '(name meta-var-modification-list . production-modification-list) 'production-modification-list*)
+         ($ s '(name meta-var-modification-list production-modification-list*))) ) )
+
+    (define-syntax $expected-a:nonterminal-definition
+      (syntax-rules (quote)
+        ((_ s 'lang 'invalid-definition)
+         (syntax-error "Invalid syntax of the nonterminal extension" lang invalid-definition)) ) )
 
     ;;;
     ;;; Common verifiers
@@ -448,10 +249,30 @@
        "Unexpected dotted list in nonterminal definition"
        "Expected a list of productions") )
 
-    (define-syntax %verify:concise-nonterminal-production-list
-      (syntax-rules (quote)
-        ((_ s '(k t) '(x ...))     ($ s '#t))
-        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in nonterminal description" (a (x ... . a) . t))))
-        ((_ s '(k t) 'unexpected)  ($ k '("Unexpected dotted list in nonterminal description" (unexpected . t)))) ) )
+    (define-verifier/proper-list %verify:nonterminal-concise-production-list
+      ("Unexpected dotted list in nonterminal definition"
+       "Expected a list of productions") )
 
+    (define-verifier/proper-nonempty-list:report-dot-only %verify:nonterminal-addition-list
+      ("At least one nonterminal should be specified for addition"
+       "Unexpected dotted list in nonterminal extension"
+       "Expected a list of nonterminal definitions") )
+
+    (define-verifier/proper-nonempty-list:report-dot-only %verify:nonterminal-removal-list
+      ("At least one nonterminal should be specified for removal"
+       "Unexpected dotted list in nonterminal extension"
+       "Expected a list of nonterminal definitions or names") )
+
+    (define-verifier/proper-nonempty-list:report-dot-only %verify:nonterminal-modification-list
+      ("At least one nonterminal should be specified for modification"
+       "Unexpected dotted list in nonterminal extension"
+       "Expected a list of nonterminal modifications") )
+
+    (define-verifier/proper-list %verify:nonterminal-meta-var-modification-list
+      ("Unexpected dotted list in nonterminal modification"
+       "Expected a list of meta-variable modifications") )
+
+    (define-verifier/proper-list %verify:nonterminal-production-modification-list
+      ("Unexpected dotted list in nonterminal modification"
+       "Expected a list of production modifications") )
 ) )
