@@ -1,0 +1,12 @@
+; Name of the nonterminal must be a symbol
+;   lang
+;   (#(9) ((+ vars)))
+;   #(9)
+(import (scheme base)
+        (np lang macros partitioning-nonterminals)
+        (sr ck)
+        (sr ck kernel))
+
+($ ($quote
+  ($partition-extension-nonterminal-definitions 'lang
+    '((! (#(9) ((+ vars)) (+ prod)))) ) ))
