@@ -7,5 +7,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($partition-extension-nonterminal-descriptions 'lang
+  ($partition-extension-nonterminal-definitions 'lang
     '(#(3 14 15)) ) ))

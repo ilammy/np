@@ -2,8 +2,8 @@
   ;;;
   ;;; Partitioning nonterminal definition clauses (standalone and extension)
   ;;;
-  (export $filter-standalone-nonterminal-descriptions
-          $partition-extension-nonterminal-descriptions)
+  (export $filter-standalone-nonterminal-definitions
+          $partition-extension-nonterminal-definitions)
 
   (import (scheme base)
           (sr ck)
@@ -21,35 +21,35 @@
     ;;; Standalone form
     ;;;
 
-    (define-syntax $filter-standalone-nonterminal-descriptions
+    (define-syntax $filter-standalone-nonterminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang 'descriptions)
-         ($ s ($check-for-invalid-nonterminal-descriptions 'lang
+        ((_ s 'lang 'definitions)
+         ($ s ($check-for-invalid-nonterminal-definitions 'lang
                 ($partition '$is-a:standalone-nonterminal?
-                            'descriptions ) ))) ) )
+                            'definitions ) ))) ) )
 
-    (define-syntax $check-for-invalid-nonterminal-descriptions
+    (define-syntax $check-for-invalid-nonterminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang '(all-valid-descriptions ())) ($ s 'all-valid-descriptions))
+        ((_ s 'lang '(all-valid-definitions ())) ($ s 'all-valid-definitions))
 
-        ((_ s 'lang '(_ (invalid-descriptions ...)))
+        ((_ s 'lang '(_ (invalid-definitions ...)))
          ($ s ($map '($must-be:standalone-nonterminal 'lang)
-                    '(invalid-descriptions ...) ))) ) )
+                    '(invalid-definitions ...) ))) ) )
 
     ;;;
     ;;; Extension form
     ;;;
 
-    (define-syntax $partition-extension-nonterminal-descriptions
+    (define-syntax $partition-extension-nonterminal-definitions
       (syntax-rules (quote)
-        ((_ s 'lang 'descriptions)
-         ($ s ($postprocess-partitioned-extension-nonterminal-descriptions 'lang
+        ((_ s 'lang 'definitions)
+         ($ s ($postprocess-partitioned-extension-nonterminal-definitions 'lang
                 ($multi-partition '($is-a:nonterminal-addition?
                                     $is-a:nonterminal-removal?
                                     $is-a:nonterminal-modification?)
-                  'descriptions ) ))) ) )
+                  'definitions ) ))) ) )
 
-    (define-syntax $postprocess-partitioned-extension-nonterminal-descriptions
+    (define-syntax $postprocess-partitioned-extension-nonterminal-definitions
       (syntax-rules (quote)
         ((_ s 'lang '(additions removals modifications ()))
          ($ s ($list
@@ -59,14 +59,14 @@
                   ($map '($partition-nonterminal-modification-meta-vars 'lang)
                         ($squash-extension-clauses 'modifications) ) ) )))
 
-        ((_ s 'lang '(_ _ _ (invalid-descriptions ...)))
-         ($ s ($report-invalid-extension-nonterminal-descriptions 'lang
+        ((_ s 'lang '(_ _ _ (invalid-definitions ...)))
+         ($ s ($report-invalid-extension-nonterminal-definitions 'lang
                 ($multi-partition '($can-be:nonterminal-addition?
                                     $can-be:nonterminal-removal?
                                     $can-be:nonterminal-modification?)
-                  '(invalid-descriptions ...) ) ))) ) )
+                  '(invalid-definitions ...) ) ))) ) )
 
-    (define-syntax $report-invalid-extension-nonterminal-descriptions
+    (define-syntax $report-invalid-extension-nonterminal-definitions
       (syntax-rules (quote)
         ((_ s 'lang '(additions removals modifications incomprehensible))
          ($ s ($and '($every? '($must-be:nonterminal-addition     'lang) 'additions)

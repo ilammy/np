@@ -8,5 +8,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($partition-extension-nonterminal-descriptions 'lang
+  ($partition-extension-nonterminal-definitions 'lang
     '((+ (Nonterminal #(#(x y z)) (var1 var2) (p p)))) ) ))

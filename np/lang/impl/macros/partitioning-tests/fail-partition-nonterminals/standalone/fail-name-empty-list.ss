@@ -8,5 +8,5 @@
         (sr ck kernel))
 
 ($ ($quote
-  ($filter-standalone-nonterminal-descriptions 'lang
+  ($filter-standalone-nonterminal-definitions 'lang
     '((() (var) production1 (production2 production3))) ) ))

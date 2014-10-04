@@ -234,11 +234,11 @@
     (define-verifier/atom %verify:nonterminal-predicate-name
       ("Name of the nonterminal predicate must be a symbol") )
 
-    (define-syntax %verify:nonterminal-description-list
+    (define-syntax %verify:nonterminal-definition-list
       (syntax-rules (quote)
         ((_ s '(k t) '(x ...))     ($ s '#t))
-        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in nonterminal description" (a . t))))
-        ((_ s '(k t) 'unexpected)  ($ k '("Expected nonterminal description list" (unexpected . t)))) ) )
+        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in nonterminal definition" (a . t))))
+        ((_ s '(k t) 'unexpected)  ($ k '("Expected nonterminal definition list" (unexpected . t)))) ) )
 
     (define-verifier/proper-list %verify:nonterminal-meta-var-list
       ("Unexpected dotted list in nonterminal definition"
