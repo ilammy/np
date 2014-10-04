@@ -709,7 +709,7 @@ Common terms
     <dd>Matches as <tt>(x ...)</tt> in the source code.</dd>
 
     <dt>Dotted list</dt>
-    <dd>Matches as <tt>(x ... . y)</tt> in the source code.</dd>
+    <dd>Matches as <tt>(x y ... . d)</tt> in the source code.</dd>
 
     <dt>List</dt>
     <dd>An <i>empty list</i>, a <i>proper list</i>, or a <i>dotted list</i>.
