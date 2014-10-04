@@ -18,15 +18,15 @@
              $is-a:nonterminal-modification?
           $must-be:nonterminal-modification
 
-          $squash-extension-clauses
+          $expected-a:nonterminal-definition
+
+          $squash-extension-nonterminal-clauses
 
           $get-nonterminal-modification-meta-vars
           $set-nonterminal-modification-meta-vars
 
           $get-nonterminal-modification-productions
-          $set-nonterminal-modification-productions
-
-          $expected-a:nonterminal-definition)
+          $set-nonterminal-modification-productions)
 
   (import (scheme base)
           (sr ck)
@@ -35,7 +35,7 @@
           (sr ck predicates)
           (np lang impl macros structure-meta-vars)
           (np lang impl macros structure-productions)
-          (np lang impl macros utils))
+          (np lang impl macros verify-utils))
 
   (begin
 
@@ -195,7 +195,12 @@
     ;;; Getters, setters, squashers, etc. (Valid input is assumed everywhere.)
     ;;;
 
-    (define-syntax $squash-extension-clauses
+    (define-syntax $expected-a:nonterminal-definition
+      (syntax-rules (quote)
+        ((_ s 'lang 'invalid-definition)
+         (syntax-error "Invalid syntax of the nonterminal extension" lang invalid-definition)) ) )
+
+    (define-syntax $squash-extension-nonterminal-clauses
       (syntax-rules (quote)
         ((_ s 'clauses) ($ s ($concatenate ($map '$cdr 'clauses)))) ) )
 
@@ -219,11 +224,6 @@
         ((_ s 'lang '(name meta-var-modification-list . production-modification-list) 'production-modification-list*)
          ($ s '(name meta-var-modification-list production-modification-list*))) ) )
 
-    (define-syntax $expected-a:nonterminal-definition
-      (syntax-rules (quote)
-        ((_ s 'lang 'invalid-definition)
-         (syntax-error "Invalid syntax of the nonterminal extension" lang invalid-definition)) ) )
-
     ;;;
     ;;; Common verifiers
     ;;;
@@ -233,12 +233,6 @@
 
     (define-verifier/atom %verify:nonterminal-predicate-name
       ("Name of the nonterminal predicate must be a symbol") )
-
-    (define-syntax %verify:nonterminal-definition-list
-      (syntax-rules (quote)
-        ((_ s '(k t) '(x ...))     ($ s '#t))
-        ((_ s '(k t) '(x ... . a)) ($ k '("Unexpected dotted list in nonterminal definition" (a . t))))
-        ((_ s '(k t) 'unexpected)  ($ k '("Expected nonterminal definition list" (unexpected . t)))) ) )
 
     (define-verifier/proper-list %verify:nonterminal-meta-var-list
       ("Unexpected dotted list in nonterminal definition"
@@ -275,4 +269,5 @@
     (define-verifier/proper-list %verify:nonterminal-production-modification-list
       ("Unexpected dotted list in nonterminal modification"
        "Expected a list of production modifications") )
+
 ) )

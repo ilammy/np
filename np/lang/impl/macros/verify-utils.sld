@@ -1,15 +1,8 @@
-(define-library (np lang impl macros utils)
+(define-library (np lang impl macros verify-utils)
   ;;;
-  ;;; Miscellaneous utility macrofunctions that are used here and there,
-  ;;; but lack semantic specificity to be placed elsewhere.
+  ;;; Utilities for declaring %verification macrofunctions.
   ;;;
-  (export $not-vector-or-list?
-          $drop-head-and-squash
-
-          $verify-result:as-boolean
-          $verify-result:syntax-error
-
-          define-standard-checkers
+  (export define-standard-checkers
           define-standard-checked-verifier
 
           define-verifier
@@ -20,23 +13,9 @@
 
   (import (scheme base)
           (sr ck)
-          (sr ck lists)
-          (sr ck maps)
-          (sr ck predicates))
+          (sr ck lists))
 
   (begin
-
-    (define-syntax $not-vector-or-list?
-      (syntax-rules (quote)
-        ((_ s '())           ($ s '#f))
-        ((_ s '(car . cdr))  ($ s '#f))
-        ((_ s '#(stuff ...)) ($ s '#f))
-        ((_ s 'atom)         ($ s '#t)) ) )
-
-    (define-syntax $drop-head-and-squash
-      (syntax-rules (quote)
-        ((_ s 'list)
-         ($ s ($concatenate ($map '$cdr 'list)))) ) )
 
     ;;;
     ;;; Verification landing pads
@@ -45,12 +24,12 @@
     (define-syntax $verify-result:as-boolean
       (syntax-rules (quote)
         ((_ s '#t) ($ s '#t))
-        ((_ s '::) ($ s '#f)) ) )
+        ((_ s  _)  ($ s '#f)) ) )
 
     (define-syntax $verify-result:syntax-error
       (syntax-rules (quote)
-        ((_ s '#t) ($ s '#t))
-        ((_ s '(msg stack)) ($ s ($verify-result:syntax-error '#f 'msg ($reverse 'stack))))
+        ((_ s '#t)                   ($ s '#t))
+        ((_ s '(msg stack))          ($ s ($verify-result:syntax-error '#f 'msg ($reverse 'stack))))
         ((_ s '#f 'msg '(stack ...)) (syntax-error msg stack ...)) ) )
 
     ;;;

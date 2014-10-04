@@ -3,15 +3,10 @@
   ;;; Structural analysis of nonterminal productions (standalone and extension)
   ;;;
   (export %verify:standalone-production
-          $can-be:standalone-production?
-          $must-be:standalone-production
-
-          $can-be:extension-production?
+          %verify:production-modification
 
           $can-be:production-addition?
           $can-be:production-removal?
-
-          %verify:production-modification
 
           $squash-extension-productions)
 
@@ -20,7 +15,7 @@
           (sr ck lists)
           (sr ck maps)
           (sr ck predicates)
-          (np lang impl macros utils))
+          (np lang impl macros verify-utils))
 
   (begin
 
@@ -46,42 +41,9 @@
 
         ((_ s '(k t) 'term _) ($ s '#t)) ) )
 
-    (define-syntax $can-be:standalone-production?
-      (syntax-rules (quote)
-        ((_ s '#(x ...)) ($ s '#f))
-        ((_ s '(x ...))
-         ($ s ($every? '$can-be:standalone-production? '(x ...))))
-        ((_ s 'atom) ($ s '#t)) ) )
-
-    (define-syntax $must-be:standalone-production
-      (syntax-rules (quote)
-        ((_ s 'lang 'clause '#(x ...))
-         (syntax-error "Production cannot be a vector" lang clause #(x ...)))
-
-        ((_ s 'lang 'clause '(x ...))
-         ($ s ($map '($must-be:standalone-production* 'lang 'clause '(x ...)) '(x ...))))
-
-        ((_ s _ _ 'atom) ($ s 'atom)) ) )
-
-    (define-syntax $must-be:standalone-production*
-      (syntax-rules (quote)
-        ((_ s 'lang 'clause 'production '#(x ...))
-         (syntax-error "Production cannot contain a vector" lang clause production #(x ...)))
-
-        ((_ s 'lang 'clause 'production '(x ...))
-         ($ s ($map '($must-be:standalone-production* 'lang 'clause 'production) '(x ...))))
-
-        ((_ s _ _ _ 'atom) ($ s 'atom)) ) )
-
     ;;;
     ;;; Extension form
     ;;;
-
-    (define-syntax $can-be:extension-production?
-      (syntax-rules (quote + -)
-        ((_ s '(+ . rest)) ($ s '#t))
-        ((_ s '(- . rest)) ($ s '#t))
-        ((_ s  _)          ($ s '#f)) ) )
 
     (define-syntax $can-be:production-addition?
       (syntax-rules (quote +)
@@ -122,6 +84,6 @@
 
     (define-syntax $squash-extension-productions
       (syntax-rules (quote)
-        ((_ s 'prods) ($ s ($concatenate ($map '$cdr 'prods)))) ) )
+        ((_ s 'productions) ($ s ($concatenate ($map '$cdr 'productions)))) ) )
 
 ) )

@@ -13,9 +13,10 @@
           (sr ck predicates)
           (np lang impl macros structure-terminals)
           (np lang impl macros structure-meta-vars)
-          (np lang impl macros utils))
+          (np lang impl macros verify-utils))
 
   (begin
+
     ;;;
     ;;; Standalone form
     ;;;
@@ -52,10 +53,10 @@
       (syntax-rules (quote)
         ((_ s 'lang '(additions removals modifications ()))
          ($ s ($list
-                ($squash-extension-clauses 'additions)
-                ($squash-extension-clauses 'removals)
+                ($squash-extension-terminal-clauses 'additions)
+                ($squash-extension-terminal-clauses 'removals)
                 ($map '($partition-terminal-modification-meta-vars 'lang)
-                      ($squash-extension-clauses 'modifications) ) )))
+                      ($squash-extension-terminal-clauses 'modifications) ) )))
 
         ((_ s 'lang '(_ _ _ (invalid-definitions ...)))
          ($ s ($report-invalid-extension-terminal-definitions 'lang
@@ -78,6 +79,7 @@
 
     ;; Validity of meta-variables has been already verified by $is-a:terminal-modification?
     ;; so we can assume it and use $can-be? checks here (which are more simple).
+
     (define-syntax $partition-terminal-modification-meta-vars
       (syntax-rules (quote)
         ((_ s 'lang 'terminal-modification)

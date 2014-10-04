@@ -81,6 +81,6 @@
       (syntax-rules (quote)
         ((_ s 'lang '()        'message) ($ s '#f))
         ((_ s 'lang '(x)       'message) ($ s 'x))
-        ((_ s 'lang '(a b ...) 'message)
-         (syntax-error message lang a b ...)) ) )
+        ((_ s 'lang '(x y ...) 'message) (syntax-error message lang x y ...)) ) )
+
 ) )

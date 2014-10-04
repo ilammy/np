@@ -18,12 +18,12 @@
              $is-a:terminal-modification?
           $must-be:terminal-modification
 
-          $squash-extension-clauses
+          $expected-a:terminal-definition
+
+          $squash-extension-terminal-clauses
 
           $get-terminal-modification-meta-vars
-          $set-terminal-modification-meta-vars
-
-          $expected-a:terminal-definition)
+          $set-terminal-modification-meta-vars)
 
   (import (scheme base)
           (sr ck)
@@ -33,9 +33,10 @@
           (sr ck maps)
           (sr ck predicates)
           (np lang impl macros structure-meta-vars)
-          (np lang impl macros utils))
+          (np lang impl macros verify-utils))
 
   (begin
+
     ;;;
     ;;; Terminal definitions (standalone)
     ;;;
@@ -139,7 +140,12 @@
     ;;; Getters, setters, squashers, etc. (Valid input is assumed everywhere.)
     ;;;
 
-    (define-syntax $squash-extension-clauses
+    (define-syntax $expected-a:terminal-definition
+      (syntax-rules (quote)
+        ((_ s 'lang 'invalid-definition)
+         (syntax-error "Invalid syntax of the terminal extension" lang invalid-definition)) ) )
+
+    (define-syntax $squash-extension-terminal-clauses
       (syntax-rules (quote)
         ((_ s 'clauses) ($ s ($concatenate ($map '$cdr 'clauses)))) ) )
 
@@ -151,11 +157,6 @@
       (syntax-rules (quote)
         ((_ s 'lang '(name meta-var-modification-list) 'meta-var-modification-list*)
          ($ s '(name meta-var-modification-list*))) ) )
-
-    (define-syntax $expected-a:terminal-definition
-      (syntax-rules (quote)
-        ((_ s 'lang 'invalid-definition)
-         (syntax-error "Invalid syntax of the terminal extension" lang invalid-definition)) ) )
 
     ;;;
     ;;; Common verifiers
@@ -195,4 +196,5 @@
       ("Terminal modification should modify meta-variables"
        "Unexpected dotted list in terminal modification"
        "Expected a list of meta-variable modifications") )
+
 ) )

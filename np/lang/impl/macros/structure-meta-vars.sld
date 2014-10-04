@@ -15,7 +15,7 @@
           (sr ck lists)
           (sr ck maps)
           (sr ck predicates)
-          (np lang impl macros utils))
+          (np lang impl macros verify-utils))
 
   (begin
 
@@ -69,5 +69,6 @@
 
     (define-syntax $squash-extension-meta-variables
       (syntax-rules (quote)
-        ((_ s 'vars) ($ s ($concatenate ($map '$cdr 'vars)))) ) )
+        ((_ s 'meta-vars) ($ s ($concatenate ($map '$cdr 'meta-vars)))) ) )
+
 ) )

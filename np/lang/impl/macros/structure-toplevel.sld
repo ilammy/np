@@ -2,42 +2,42 @@
   ;;;
   ;;; Structural analysis of toplevel define-language clauses
   ;;;
-  (export $is-an:extends-clause?
-         $can-be:extends-clause?
-        $must-be:extends-clause
+  (export  $can-be:extends-clause?
+            $is-an:extends-clause?
+          $must-be:extends-clause
 
-           $is-a:predicate-clause?
-         $can-be:predicate-clause?
-        $must-be:predicate-clause
+           $can-be:predicate-clause?
+             $is-a:predicate-clause?
+          $must-be:predicate-clause
 
-           $is-a:parser-clause?
-         $can-be:parser-clause?
-        $must-be:parser-clause
+           $can-be:parser-clause?
+             $is-a:parser-clause?
+          $must-be:parser-clause
 
-          $is-an:unparser-clause?
-         $can-be:unparser-clause?
-        $must-be:unparser-clause
+           $can-be:unparser-clause?
+            $is-an:unparser-clause?
+          $must-be:unparser-clause
 
-           $is-a:terminals-clause?
-         $can-be:terminals-clause?
-        $must-be:terminals-clause
+           $can-be:terminals-clause?
+             $is-a:terminals-clause?
+          $must-be:terminals-clause
 
-        $get-extended-language
-        $get-language-predicate
-        $get-language-parser
-        $get-language-unparser
-
-        $can-be:nonterminals-clause?
+          $can-be:nonterminals-clause?
  
-        $squash-terminals-clauses
+          $expected-a:toplevel-clause
 
-        $expected-a:toplevel-clause)
+          $squash-terminals-clauses
+
+          $get-extended-language
+          $get-language-predicate
+          $get-language-parser
+          $get-language-unparser)
 
   (import (scheme base)
           (sr ck)
           (sr ck maps)
           (sr ck lists)
-          (np lang impl macros utils))
+          (np lang impl macros verify-utils))
 
   (begin
 
@@ -112,11 +112,11 @@
         ((_ s '(k t) 'term '(terminals . #(x ...)))
          ($ k '("Expected a list of terminal definitions" (#(x ...) term . t))))
 
-        ((_ s '(k t) 'term '(terminals . (x y ... . dot)))
-         ($ k '("Unexpected dotted list in language definition" (dot term . t))))
+        ((_ s '(k t) 'term '(terminals . (x y ... . d)))
+         ($ k '("Unexpected dotted list in language definition" (d term . t))))
 
-        ((_ s '(k t) 'term '(terminals . atom))
-         ($ k '("Expected a list of terminal definitions" (atom term . t))))
+        ((_ s '(k t) 'term '(terminals . d))
+         ($ k '("Expected a list of terminal definitions" (d term . t))))
 
         ((_ s '(k t) 'term _)
          ($ k '("Invalid syntax of the terminals clause" (term . t)))) ) )
@@ -153,14 +153,14 @@
         ((_ s '(a . d)) ($ s '#t))
         ((_ s  _)       ($ s '#f)) ) )
 
-    ;; Assuming that the argument is actually a list of terminal clauses
-    (define-syntax $squash-terminals-clauses
-      (syntax-rules (quote)
-        ((_ s 'clauses) ($ s ($concatenate ($map '$cdr 'clauses)))) ) )
-
     (define-syntax $expected-a:toplevel-clause
       (syntax-rules (quote)
         ((_ s 'lang 'invalid-clause)
          (syntax-error "Invalid syntax of the toplevel clause" lang invalid-clause)) ) )
+
+    ;; Assuming that the argument is actually a list of terminal clauses
+    (define-syntax $squash-terminals-clauses
+      (syntax-rules (quote)
+        ((_ s 'clauses) ($ s ($concatenate ($map '$cdr 'clauses)))) ) )
 
 ) )

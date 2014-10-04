@@ -14,9 +14,10 @@
           (np lang impl macros structure-nonterminals)
           (np lang impl macros structure-meta-vars)
           (np lang impl macros structure-productions)
-          (np lang impl macros utils))
+          (np lang impl macros verify-utils))
 
   (begin
+
     ;;;
     ;;; Standalone form
     ;;;
@@ -53,11 +54,11 @@
       (syntax-rules (quote)
         ((_ s 'lang '(additions removals modifications ()))
          ($ s ($list
-                ($squash-extension-clauses 'additions)
-                ($squash-extension-clauses 'removals)
+                ($squash-extension-nonterminal-clauses 'additions)
+                ($squash-extension-nonterminal-clauses 'removals)
                 ($map '($partition-nonterminal-modification-productions 'lang)
                   ($map '($partition-nonterminal-modification-meta-vars 'lang)
-                        ($squash-extension-clauses 'modifications) ) ) )))
+                        ($squash-extension-nonterminal-clauses 'modifications) ) ) )))
 
         ((_ s 'lang '(_ _ _ (invalid-definitions ...)))
          ($ s ($report-invalid-extension-nonterminal-definitions 'lang
