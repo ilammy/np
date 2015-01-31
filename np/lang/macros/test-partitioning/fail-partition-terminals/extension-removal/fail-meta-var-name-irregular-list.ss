@@ -1,4 +1,4 @@
-; Name of the meta-variable must be a symbol
+; Name of the meta-variable must be an identifier
 ;   lang
 ;   num
 ;   (car . cdr)

@@ -1,4 +1,4 @@
-; Name of the language unparser must be a symbol
+; Name of the language unparser must be an identifier
 ;   lang
 ;   (unparser ())
 ;   ()

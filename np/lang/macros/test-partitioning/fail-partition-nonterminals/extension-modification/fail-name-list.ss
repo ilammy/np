@@ -1,4 +1,4 @@
-; Name of the nonterminal must be a symbol
+; Name of the nonterminal must be an identifier
 ;   lang
 ;   ((awesome name) ())
 ;   (awesome name)

@@ -228,11 +228,11 @@
     ;;; Common verifiers
     ;;;
 
-    (define-verifier/atom %verify:nonterminal-name
-      ("Name of the nonterminal must be a symbol") )
+    (define-verifier/symbol %verify:nonterminal-name
+      ("Name of the nonterminal must be an identifier") )
 
-    (define-verifier/atom %verify:nonterminal-predicate-name
-      ("Name of the nonterminal predicate must be a symbol") )
+    (define-verifier/symbol %verify:nonterminal-predicate-name
+      ("Name of the nonterminal predicate must be an identifier") )
 
     (define-verifier/proper-list %verify:nonterminal-meta-var-list
       ("Unexpected dotted list in nonterminal definition"

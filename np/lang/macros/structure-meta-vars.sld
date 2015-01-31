@@ -23,8 +23,8 @@
     ;;; Standalone meta-vars
     ;;;
 
-    (define-verifier/atom %verify:meta-var-name
-      ("Name of the meta-variable must be a symbol") )
+    (define-verifier/symbol %verify:meta-var-name
+      ("Name of the meta-variable must be an identifier") )
 
     ;;;
     ;;; Extension meta-vars

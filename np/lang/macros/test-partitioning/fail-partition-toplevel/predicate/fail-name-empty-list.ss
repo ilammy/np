@@ -1,4 +1,4 @@
-; Name of the language predicate must be a symbol
+; Name of the language predicate must be an identifier
 ;   lang
 ;   (predicate ())
 ;   ()

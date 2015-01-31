@@ -1,12 +1,12 @@
 _**Partitioning**_ is reponsible for partitioning clauses into classes by their
-_structural_ differences. This means that only structure (grammar, if you wish)
-is taken into account at this moment. I.e., it does not matter whether a thing
-is a number or a symbol, but it does matter whether it is a list, a vector, or
-an atom.
+_syntactical_ differences. Effectively, only structure of subclauses is taken
+into account while actually partitioning clauses (i.e., the patterns of lists,
+vectors, and atoms matter). But this stage also verifies lexical correctness of
+the input (e.g., whether symbols and stuff are used where they should be used).
 
-A number of structural oddities can be detected and reported while analysing
-the structure of clauses. They are gathered here together with respective error
-messages to keep everything consistent.
+A number of oddities can be detected and reported while analysing the syntax of
+the clauses. They are gathered here together with respective error messages to
+keep everything consistent.
 
 
 Language definition
@@ -25,9 +25,9 @@ Referenced as: _language-definition_
     — Invalid syntax of the language definition: <br/>
       <_invalid-language-definition_>
 
- 2. **name** must be an atom.
+ 2. **name** must be an identifier.
 
-    — Name of the language must be a symbol: <br/>
+    — Name of the language must be an identifier: <br/>
       <_invalid-language-name_>
 
  3. **toplevel-clause-list** must be a proper list.
@@ -90,12 +90,12 @@ Referenced as: _extension-clause_
     — Invalid syntax of the extension clause: <br/>
       <_language_> <_invalid-extension-clause_>
 
- 1. **name** must be an atom.
+ 1. **name** must be an identifier.
 
-    — Name of the language to be extended must be a symbol: <br/>
+    — Name of the language to be extended must be an identifier: <br/>
       <_language_> <_extension-clause_> <_invalid-name_>
 
- 2. **name** must be unique.
+ 2. **name** must be singular.
 
     — Name of the language to be extended cannot be empty: <br/>
       <_language_> <_invalid-extension-clause_>
@@ -117,12 +117,12 @@ Referenced as: _extension-clause_
     — Invalid syntax of the predicate clause: <br/>
       <_language_> <_invalid-predicate-clause_>
 
- 2. **name** must be an atom.
+ 2. **name** must be an identifier.
 
-    — Name of the language predicate must be a symbol: <br/>
+    — Name of the language predicate must be an identifier: <br/>
       <_language_> <_predicate-clause_> <_invalid-name_>
 
- 3. **name** must be unique.
+ 3. **name** must be singular.
 
     — Name of the language predicate cannot be empty: <br/>
       <_language_> <_invalid-predicate-clause_>
@@ -144,12 +144,12 @@ Referenced as: _parser-clause_
     — Invalid syntax of the parser clause: <br/>
       <_language_> <_invalid-parser-clause_>
 
- 2. **name** must be an atom.
+ 2. **name** must be an identifier.
 
-    — Name of the language parser must be a symbol: <br/>
+    — Name of the language parser must be an identifier: <br/>
       <_language_> <_parser-clause_> <_invalid-name_>
 
- 3. **name** must be unique.
+ 3. **name** must be singular.
 
     — Name of the language parser cannot be empty: <br/>
       <_language_> <_invalid-parser-clause_>
@@ -171,12 +171,12 @@ Referenced as: _unparser-clause_
     — Invalid syntax of the unparser clause: <br/>
       <_language_> <_invalid-unparser-clause_>
 
- 2. **name** must be an atom.
+ 2. **name** must be an identifier.
 
-    — Name of the language unparser must be a symbol: <br/>
+    — Name of the language unparser must be an identifier: <br/>
       <_language_> <_unparser-clause_> <_invalid-name_>
 
- 3. **name** must be unique.
+ 3. **name** must be singular.
 
     — Name of the language unparser cannot be empty: <br/>
       <_language_> <_invalid-unparser-clause_>
@@ -250,12 +250,12 @@ Referenced as: _standalone-terminal_
     — Invalid syntax of the terminal: <br/>
       <_language_> <_invalid-standalone-terminal_>
 
- 2. **name** must be an atom.
+ 2. **name** must be an identifier.
 
-    — Name of the terminal must be a symbol: <br/>
+    — Name of the terminal must be an identifier: <br/>
       <_language_> <_standalone-terminal_> <_invalid-name_>
 
- 3. **predicate-name** must be an atom.
+ 3. **predicate-name** must be an identifier.
 
     — Terminal predicate must be a variable in short form: <br/>
       <_language_> <_standalone-terminal_> <_invalid-predicate-name_>
@@ -329,10 +329,10 @@ Referenced as: _terminal-removal_
       <_language_> <_invalid-terminal-removal_>
 
  3. Each **removed-terminal** must be either a _standalone-terminal_,
-    or an atom representing the terminal name.
+    or an identifier representing the terminal name.
 
     — Invalid syntax of the terminal: <br/>
-      <_language_> <_not-standalone-terminal-or-atom_>
+      <_language_> <_not-standalone-terminal-or-identifier_>
 
 
 ### Modification
@@ -373,9 +373,9 @@ Referenced as: _modified-terminal_
     — Invalid syntax of the terminal modification: <br/>
       <_language_> <_invalid-modified-terminal_>
 
- 2. **name** must be an atom.
+ 2. **name** must be an identifier.
 
-    — Name of the terminal must be a symbol: <br/>
+    — Name of the terminal must be an identifier: <br/>
       <_language_> <_modified-terminal_> <_name_>
 
  3. **meta-var-modification-list** must be a proper non-empty list.
@@ -412,17 +412,17 @@ Referenced as: _standalone-nonterminal_
     — Invalid syntax of the nonterminal: <br/>
       <_language_> <_invalid-standalone-nonterminal_>
 
- 2. **name** must be an atom.
+ 2. **name** must be an identifier.
 
-    — Name of the nonterminal must be a symbol: <br/>
+    — Name of the nonterminal must be an identifier: <br/>
       <_language_> <_standalone-nonterminal-without-productions_> <_invalid-name_>
 
- 3. **predicate-name** must be an atom.
+ 3. **predicate-name** must be an identifier.
 
-    — Name of the nonterminal predicate must be a symbol: <br/>
+    — Name of the nonterminal predicate must be an identifier: <br/>
       <_language_> <_standalone-nonterminal-without-productions_> <_invalid-predicate-name_>
 
- 4. **predicate-name** must be unique.
+ 4. **predicate-name** must be singular.
 
     — Name of the nonterminal predicate cannot be empty: <br/>
       <_language_> <_standalone-nonterminal-without-productions_> <_invalid-predicate-name-clause_>
@@ -451,7 +451,7 @@ Referenced as: _standalone-nonterminal_
     — At least one production should be specified for a nonterminal: <br/>
       <_language_> <_nonterminal-name_>
 
- 8. Each **production** must be _production-definition_.
+ 8. Each **production** must be a _production-definition_.
 
 
 Extension
@@ -509,11 +509,11 @@ Referenced as: _nonterminal-removal_
       <_language_> <_invalid-nonterminal-removal_>
 
  3. Each **removed-nonterminal** must be either a _standalone-nonterminal_
-    (with an exception that absent production list is allowed), or an atom
+    (with an exception that absent production list is allowed), or an identifier
     representing the nonterminal name.
 
     — Invalid syntax of the nonterminal: <br/>
-      <_language_> <_not-standalone-nonterminal-or-atom_>
+      <_language_> <_not-standalone-nonterminal-or-identifier_>
 
 
 ### Modification
@@ -554,9 +554,9 @@ Referenced as: _modified-nonterminal_
     — Invalid syntax of the nonterminal modification: <br/>
       <_language_> <_invalid-modified-nonterminal_>
 
- 2. **name** must be an atom.
+ 2. **name** must be an identifier.
 
-    — Name of the nonterminal must be a symbol: <br/>
+    — Name of the nonterminal must be an identifier: <br/>
       <_language_> <_modified-nonterminal_> <_name_>
 
  3. **meta-var-modification-list** must be a proper list.
@@ -599,9 +599,9 @@ Referenced as: _meta-variable-name_
 
 ##### _Syntax violations_: #######################
 
- 1. **meta-var-name** must be an atom.
+ 1. **meta-var-name** must be an identifier.
 
-    — Name of the meta-variable must be a symbol: <br/>
+    — Name of the meta-variable must be an identifier: <br/>
       <_language_> <_terminal-or-nonterminal-name_> <_invalid-meta-var-name_>
 
 
@@ -713,7 +713,7 @@ Common terms
 
     <dt>List</dt>
     <dd>An <i>empty list</i>, a <i>proper list</i>, or a <i>dotted list</i>.
-        Or a <i>pair</i>, techically.</dd>
+        Or a <i>pair</i>, technically.</dd>
 
     <dt>Pair</dt>
     <dd>Matches as <tt>(a . d)</tt> in the source code. Can be thought of as
@@ -721,4 +721,9 @@ Common terms
 
     <dt>Vector</dt>
     <dd>Matches as <tt>#(x ...)</tt> in the source code.</dd>
+
+    <dt>Identifier</dt>
+    <dd>An identifier as specified by the syntax of Scheme. Any form is
+        acceptable (`regular`, `|explicit|`, `with-\x55;nicode`, etc.).
+        Generally referred to as _symbol_ in the source code.</dd>
 </dl>

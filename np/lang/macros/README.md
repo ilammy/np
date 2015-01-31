@@ -4,7 +4,7 @@ A little note on file and macro-function naming principles here.
 #### **partition-_something_.sld**
 
 These files contain functions that partition, group, and regroup expressions
-into various classes based on their _structural_ features.
+into various classes based on their _syntactical_ features.
 
 They also can do some preprocessing of the forms: as squashing extension
 groups like `(+ decl1 decl2 ...)` for example.
@@ -13,8 +13,8 @@ groups like `(+ decl1 decl2 ...)` for example.
 #### **structure-_something_.sld**
 
 These files contain functions that match and check the structure of clauses.
-They only check the structure of forms--count and positions of their elements,
-but not types of the elements or their semantics.
+They check the structure of forms--count and positions of their elements--and
+occasionally some types of the elements, but not their semantics.
 
 Functions there can be divided into several classes:
 
