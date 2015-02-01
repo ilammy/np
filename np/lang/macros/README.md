@@ -1,6 +1,13 @@
 A little note on file and macro-function naming principles here.
 
 
+#### **normalization-_something_.sld**
+
+These files contain functions that convert partitioned expressions into their
+canonical form by filling in default values, flattening nested lists. That is,
+they do additional postprocessing after the partitioning stage.
+
+
 #### **partition-_something_.sld**
 
 These files contain functions that partition, group, and regroup expressions
