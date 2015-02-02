@@ -66,32 +66,32 @@
                ((_ s '(k t) 'term '(&keyword names ...)) ($ k '(:unique-error-message (term . t))))
                ((_ s '(k t) 'term  _)                    ($ k '(:invalid-error-message (term . t)))) ) )
 
-           (define-verifier/atom %verify-name (:name-error-message)) )) ) )
+           (define-verifier/symbol %verify-name (:name-error-message)) )) ) )
 
     (define-simple-checkers extends
       ($is-an:extends-clause? $must-be:extends-clause $can-be:extends-clause?)
-      ("Name of the language to be extended must be a symbol"
+      ("Name of the language to be extended must be an identifier"
        "Name of the language to be extended cannot be empty"
        "Only one language can be extended"
        "Invalid syntax of the extension clause") )
 
     (define-simple-checkers predicate
       ($is-a:predicate-clause? $must-be:predicate-clause $can-be:predicate-clause?)
-      ("Name of the language predicate must be a symbol"
+      ("Name of the language predicate must be an identifier"
        "Name of the language predicate cannot be empty"
        "Only one language predicate name can be specified"
        "Invalid syntax of the predicate clause") )
 
     (define-simple-checkers parser
       ($is-a:parser-clause? $must-be:parser-clause $can-be:parser-clause?)
-      ("Name of the language parser must be a symbol"
+      ("Name of the language parser must be an identifier"
        "Name of the language parser cannot be empty"
        "Only one language parser name can be specified"
        "Invalid syntax of the parser clause") )
 
     (define-simple-checkers unparser
       ($is-an:unparser-clause? $must-be:unparser-clause $can-be:unparser-clause?)
-      ("Name of the language unparser must be a symbol"
+      ("Name of the language unparser must be an identifier"
        "Name of the language unparser cannot be empty"
        "Only one language unparser name can be specified"
        "Invalid syntax of the unparser clause") )

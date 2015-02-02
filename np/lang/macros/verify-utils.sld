@@ -6,14 +6,16 @@
           define-standard-checked-verifier
 
           define-verifier
-          define-verifier/atom
+          define-verifier/symbol
           define-verifier/proper-list
           define-verifier/proper-nonempty-list
           define-verifier/proper-nonempty-list:report-dot-only)
 
   (import (scheme base)
           (sr ck)
-          (sr ck lists))
+          (sr ck kernel)
+          (sr ck lists)
+          (sr ck predicates))
 
   (begin
 
@@ -77,15 +79,19 @@
     ;;; Common verifiers
     ;;;
 
-    (define-syntax define-verifier/atom
-      (syntax-rules ::: ()
-        ((_ %verify (:not-atom-error-message))
-         (define-verifier %verify
-           (syntax-rules (quote)
-             ((_ s '(k t) 'term '())       ($ k '(:not-atom-error-message (term . t))))
-             ((_ s '(k t) 'term '(a . d))  ($ k '(:not-atom-error-message (term . t))))
-             ((_ s '(k t) 'term '#(x ...)) ($ k '(:not-atom-error-message (term . t))))
-             ((_ s '(k t) 'term  _)        ($ s '#t)) ) )) ) )
+    ;; This one is a bit special as it does not pattern-match term structure
+    (define-syntax define-verifier/symbol
+      (syntax-rules ()
+        ((_ %verify (:not-symbol-error-message))
+         (begin
+           (define-syntax %verify
+             (syntax-rules (quote)
+               ((_ s '(k t) 'term) ($ s (%verify* '(k t) 'term ($symbol? 'term)))) ) )
+
+           (define-syntax %verify*
+             (syntax-rules (quote)
+               ((_ s '(k t) 'term '#t) ($ s '#t))
+               ((_ s '(k t) 'term '#f) ($ k '(:not-symbol-error-message (term . t)))) ) ) )) ) )
 
     (define-syntax define-verifier/proper-list
       (syntax-rules ::: ()

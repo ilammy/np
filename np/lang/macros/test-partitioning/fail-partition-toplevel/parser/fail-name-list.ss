@@ -1,4 +1,4 @@
-; Name of the language parser must be a symbol
+; Name of the language parser must be an identifier
 ;   lang
 ;   (parser (1 2 3))
 ;   (1 2 3)

@@ -1,4 +1,4 @@
-; Name of the language to be extended must be a symbol
+; Name of the language to be extended must be an identifier
 ;   lang
 ;   (extends ())
 ;   ()

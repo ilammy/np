@@ -162,10 +162,10 @@
     ;;; Common verifiers
     ;;;
 
-    (define-verifier/atom %verify:terminal-name
-      ("Name of the terminal must be a symbol") )
+    (define-verifier/symbol %verify:terminal-name
+      ("Name of the terminal must be an identifier") )
 
-    (define-verifier/atom %verify:terminal-predicate-name
+    (define-verifier/symbol %verify:terminal-predicate-name
       ("Terminal predicate must be a variable in short form") )
 
     (define-verifier/proper-list %verify:terminal-definition-list

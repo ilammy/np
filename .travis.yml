@@ -14,6 +14,7 @@ before_script:
 
 script:
   - ./tools/run-success-tests np/lang/macros/test-partitioning
+  - ./tools/run-success-tests np/lang/macros/test-normalization
   - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-toplevel
   - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-terminals
   - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-nonterminals
