@@ -12,8 +12,6 @@ keep everything consistent.
 Language definition
 ===================
 
-**(Currently not tested.)**
-
 Referenced as: _language-definition_
 
 `(define-language name . toplevel-clause-list)` — the only acceptable form
@@ -22,8 +20,7 @@ Referenced as: _language-definition_
 
  1. Definitions must have exactly this form.
 
-    — Invalid syntax of the language definition: <br/>
-      <_invalid-language-definition_>
+    — Invalid syntax of the language definition
 
  2. **name** must be an identifier.
 
