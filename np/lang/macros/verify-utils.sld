@@ -3,6 +3,7 @@
   ;;; Utilities for declaring %verification macrofunctions.
   ;;;
   (export define-standard-checkers
+          define-toplevel-checkers
           define-standard-checked-verifier
 
           define-verifier
@@ -67,6 +68,24 @@
              (syntax-rules (quote)
                ((_ s 'term)       ($ s (%verify '(s ())     'term)))
                ((_ s 'lang 'term) ($ s (%verify '(s (lang)) 'term))) ) ) )) ) )
+
+    (define-syntax define-toplevel-checkers
+      (syntax-rules ()
+        ((_ %verify ($is-a? $must-be))
+         (begin
+           (define-syntax $is-a?
+             (syntax-rules (quote)
+               ((_ s 'term)
+                ($ s ($verify-result:as-boolean ($trampoline 'term)))) ) )
+
+           (define-syntax $must-be
+             (syntax-rules (quote)
+               ((_ s 'term)
+                ($ s ($verify-result:syntax-error ($trampoline 'term)))) ) )
+
+           (define-syntax $trampoline
+             (syntax-rules (quote)
+               ((_ s 'term) ($ s (%verify '(s ()) 'term))) ) ) )) ) )
 
     (define-syntax define-standard-checked-verifier
       (syntax-rules ()
