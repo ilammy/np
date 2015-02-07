@@ -1,6 +1,14 @@
 A little note on file and macro-function naming principles here.
 
 
+#### **codegen-_something_.sld**
+
+These files contain functions that generate Scheme code snippets from syntatic
+values operated by other files. They are called near the end of processing,
+to generate the actual output of the define-language form when everything has
+been already verified and normalized.
+
+
 #### **normalization-_something_.sld**
 
 These files contain functions that convert partitioned expressions into their
