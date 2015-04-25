@@ -6,6 +6,7 @@ before_install:
 
 install:
   - ./tools/install-chibi
+  - source ~/.profile
   - ./tools/checkout-syntax-rules
   - ./tools/checkout-test-essentials
 
