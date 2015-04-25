@@ -14,11 +14,8 @@ before_script:
   - ./tools/setup-test-rig
 
 script:
-  - ./tools/run-success-tests np/lang/macros/test-codegen
-  - ./tools/run-success-tests np/lang/macros/test-define-language
-  - ./tools/run-success-tests np/lang/macros/test-partitioning
-  - ./tools/run-success-tests np/lang/macros/test-normalization
-  - ./tools/run-failure-tests np/lang/macros/test-define-language/fail-define-language
-  - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-toplevel
-  - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-terminals
-  - ./tools/run-failure-tests np/lang/macros/test-partitioning/fail-partition-nonterminals
+  - ./tools/run-tests
+
+env:
+  - RUN_SUCCESS_TESTS=yes RUN_FAILURE_TESTS=no
+  - RUN_SUCCESS_TESTS=no  RUN_FAILURE_TESTS=yes
