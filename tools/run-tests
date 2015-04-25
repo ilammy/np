@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+[ -z $RUN_SUCCESS_TESTS ] && RUN_SUCCESS_TESTS="yes"
+[ -z $RUN_FAILURE_TESTS ] && RUN_FAILURE_TESTS="yes"
+
+success_tests="
+np/lang/macros/test-codegen
+np/lang/macros/test-define-language
+np/lang/macros/test-partitioning
+np/lang/macros/test-normalization
+"
+
+failure_tests="
+np/lang/macros/test-define-language/fail-define-language
+np/lang/macros/test-partitioning/fail-partition-toplevel
+np/lang/macros/test-partitioning/fail-partition-terminals
+np/lang/macros/test-partitioning/fail-partition-nonterminals
+"
+
+if [ $RUN_SUCCESS_TESTS = "yes" ]
+then
+    for test in $success_tests
+    do
+        ./tools/run-success-tests $test
+    done
+fi
+
+if [ $RUN_FAILURE_TESTS = "yes" ]
+then
+    for test in $failure_tests
+    do
+        ./tools/run-failure-tests $test
+    done
+fi

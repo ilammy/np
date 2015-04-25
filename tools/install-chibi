@@ -1,13 +1,23 @@
-#!/bin/bash
+#!/bin/sh
 set -ex
 
-CHIBI_REVISION=d9abd0f7f973076650c15a18370a53f2800b8ec1
+[ -z $CHIBI_FORK ]   && CHIBI_FORK=ashinn/chibi-scheme
+[ -z $CHIBI_BRANCH ] && CHIBI_BRANCH=master
+
+chibi_prefix=$HOME/chibi
+
+mkdir $chibi_prefix
+cat <<EOF >> $HOME/.profile
+# Chibi Scheme paths
+export PATH=$PATH:$chibi_prefix/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$chibi_prefix/lib
+EOF
 
 cd /tmp/scratch
-hg clone -r $CHIBI_REVISION https://code.google.com/p/chibi-scheme/
+git clone --depth 50 --branch $CHIBI_BRANCH -- https://github.com/$CHIBI_FORK chibi-scheme
 
 cd chibi-scheme
-make -j$(expr $(nproc) + 1)
-make test-all
+make PREFIX=$chibi_prefix -j$(expr $(nproc) + 1)
+make PREFIX=$chibi_prefix test-all
 
-sudo make install
+make PREFIX=$chibi_prefix install
