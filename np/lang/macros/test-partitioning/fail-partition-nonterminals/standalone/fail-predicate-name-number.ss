@@ -1,6 +1,6 @@
 ; Name of the nonterminal predicate must be an identifier
 ;   lang
-;   (Nonterminal #(-4) (var1 var2))
+;   (Nonterminal -4 (var1 var2))
 ;   -4
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($filter-standalone-nonterminal-definitions 'lang
-    '((Nonterminal #(-4) (var1 var2) (p p))) ) ))
+    '((Nonterminal -4 (var1 var2) (p p))) ) ))

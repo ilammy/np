@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((+ (Number #(Pred?) ((a . d)) n1 n2))) ) ))
+    '((+ (Number Pred? ((a . d)) n1 n2))) ) ))

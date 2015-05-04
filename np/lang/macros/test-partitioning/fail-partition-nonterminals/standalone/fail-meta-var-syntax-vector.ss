@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($filter-standalone-nonterminal-definitions 'lang
-    '((Number #(a) #(b) n)) ) ))
+    '((Number a #(b) n)) ) ))

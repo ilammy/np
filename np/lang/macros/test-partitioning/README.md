@@ -398,9 +398,9 @@ Standalone
 
 Referenced as: _standalone-nonterminal_
 
-`(name                   meta-var-list . production-list)` — normal form
+`(name                meta-var-list . production-list)` — normal form
 
-`(name #(predicate-name) meta-var-list . production-list)` — form with predicate binding
+`(name predicate-name meta-var-list . production-list)` — form with predicate binding
 
 ##### _Syntax violations_: #######################
 
@@ -419,15 +419,7 @@ Referenced as: _standalone-nonterminal_
     — Name of the nonterminal predicate must be an identifier: <br/>
       <_language_> <_standalone-nonterminal-without-productions_> <_invalid-predicate-name_>
 
- 4. **predicate-name** must be singular.
-
-    — Name of the nonterminal predicate cannot be empty: <br/>
-      <_language_> <_standalone-nonterminal-without-productions_> <_invalid-predicate-name-clause_>
-
-    — Only one nonterminal predicate name can be specified: <br/>
-      <_language_> <_standalone-nonterminal-without-productions_> <_invalid-predicate-name-clause_>
-
- 5. **meta-var-list** must be a proper list.
+ 4. **meta-var-list** must be a proper list.
 
     — Expected a list of meta-variables: <br/>
       <_language_> <_nonterminal-name_> <_invalid-meta-var-list_>
@@ -435,9 +427,9 @@ Referenced as: _standalone-nonterminal_
     — Unexpected dotted list in nonterminal definition: <br/>
       <_language_> <_nonterminal-name_> <_invalid-meta-var-list_> <_dotted-ending_>
 
- 6. Each **meta-var** must be _meta-variable-name_.
+ 5. Each **meta-var** must be _meta-variable-name_.
 
- 7. **production-list** must be a proper non-empty list.
+ 6. **production-list** must be a proper non-empty list.
 
     — Expected a list of productions: <br/>
       <_language_> <_nonterminal-name_> <_invalid-production-list_>
@@ -448,7 +440,7 @@ Referenced as: _standalone-nonterminal_
     — At least one production should be specified for a nonterminal: <br/>
       <_language_> <_nonterminal-name_>
 
- 8. Each **production** must be a _production-definition_.
+ 7. Each **production** must be a _production-definition_.
 
 
 Extension

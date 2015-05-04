@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((- (Nonterminal #(p) () . sudden-atom))) ) ))
+    '((- (Nonterminal p () . sudden-atom))) ) ))

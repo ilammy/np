@@ -18,7 +18,7 @@
   (define-test ("Form with predicate: predicate splicing and production unsplicing")
     (assert-equal '(Pair Pair? (pair) ((value value)))
       ($ ($quote ($normalize-standalone-nonterminal-definition
-        '(Pair #(Pair?) (pair) (value value)) ))) ) )
+        '(Pair Pair? (pair) (value value)) ))) ) )
 )
 (verify-test-case! nonterminals:standalone)
 
@@ -34,7 +34,7 @@
   (define-test ("Form with predicate: predicate splicing and production unsplicing")
     (assert-equal '(Pair Pair? (pair) ((value value)))
       ($ ($quote ($normalize-extension-nonterminal-addition
-        '(Pair #(Pair?) (pair) (value value)) ))) ) )
+        '(Pair Pair? (pair) (value value)) ))) ) )
 )
 (verify-test-case! nonterminals:extension-addition)
 
@@ -55,7 +55,7 @@
   (define-test ("Form with predicate: only name left")
     (assert-equal 'Pair
       ($ ($quote ($normalize-extension-nonterminal-removal
-        '(Pair #(Pair?) (pair) (value value)) ))) ) )
+        '(Pair Pair? (pair) (value value)) ))) ) )
 )
 (verify-test-case! nonterminals:extension-removal)
 

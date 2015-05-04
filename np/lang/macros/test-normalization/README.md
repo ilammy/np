@@ -75,9 +75,9 @@ Nonterminal definitions
 Standalone
 ----------
 
-`(name                   meta-var-list . production-list)` — regular form
+`(name                 meta-var-list . production-list)` — regular form
 
-`(name #(predicate-name) meta-var-list . production-list)` — form with predicate binding
+`(name predicate-name  meta-var-list . production-list)` — form with predicate binding
 
 `(name predicate-name? meta-var-list production-list)` — normalized form
 
@@ -87,7 +87,7 @@ Standalone
 
  2. For regular form, the default value of `predicate-name?` is `#f`.
 
- 3. For binding form, `predicate-name?` gets spliced out of the vector.
+ 3. For binding form, `predicate-name?` is transferred as-is.
 
 
 Extension
@@ -95,9 +95,9 @@ Extension
 
 ### Addition
 
-`(name                   meta-var-list . production-list)` — regular form
+`(name                 meta-var-list . production-list)` — regular form
 
-`(name #(predicate-name) meta-var-list . production-list)` — form with predicate binding
+`(name predicate-name  meta-var-list . production-list)` — form with predicate binding
 
 `(name predicate-name? meta-var-list production-list)` — normalized form
 
@@ -107,16 +107,16 @@ Extension
 
  2. For regular form, the default value of `predicate-name?` is `#f`.
 
- 3. For binding form, `predicate-name?` gets spliced out of the vector.
+ 3. For binding form, `predicate-name?` is transferred as-is.
 
 
 ### Removal
 
 `name` — identifier form (normalized form)
 
-`(name                   meta-var-list . production-list)` — regular form
+`(name                meta-var-list . production-list)` — regular form
 
-`(name #(predicate-name) meta-var-list . production-list)` — form with predicate binding
+`(name predicate-name meta-var-list . production-list)` — form with predicate binding
 
 ##### _Normalization_: #######################
 

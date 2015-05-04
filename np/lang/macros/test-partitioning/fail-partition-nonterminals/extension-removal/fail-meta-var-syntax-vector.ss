@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((- (Number #(a) #(b) n))) ) ))
+    '((- (Number a #(b) n))) ) ))

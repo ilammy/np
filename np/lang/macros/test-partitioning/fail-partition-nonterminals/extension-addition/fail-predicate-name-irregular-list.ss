@@ -1,6 +1,6 @@
 ; Name of the nonterminal predicate must be an identifier
 ;   lang
-;   (Nonterminal #((a . d)) ())
+;   (Nonterminal (a . d) ())
 ;   (a . d)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((+ (Nonterminal #((a . d)) () "technically incorrect production"))) ) ))
+    '((+ (Nonterminal (a . d) () "technically incorrect production"))) ) ))
