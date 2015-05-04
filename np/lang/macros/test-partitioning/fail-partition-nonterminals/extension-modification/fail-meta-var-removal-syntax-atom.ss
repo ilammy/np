@@ -1,8 +1,7 @@
-; Expected a list of meta-variables
+; Invalid syntax of the meta-variable modification
 ;   lang
 ;   Foo
 ;   (- . foo)
-;   foo
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

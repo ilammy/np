@@ -1,8 +1,6 @@
-; Unexpected dotted list in terminal definition
+; Invalid syntax of the terminal
 ;   lang
-;   number
-;   (a b . c)
-;   c
+;   (number number? (a b . c))
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

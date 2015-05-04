@@ -1,8 +1,6 @@
-; Unexpected dotted list in terminal definition
+; Invalid syntax of the terminal
 ;   lang
-;   num
-;   (car . cdr)
-;   cdr
+;   (num (a . d) (car . cdr))
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

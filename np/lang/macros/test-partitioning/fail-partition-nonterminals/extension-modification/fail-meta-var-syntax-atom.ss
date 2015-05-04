@@ -1,7 +1,6 @@
-; Expected a list of meta-variable modifications
+; Invalid syntax of the nonterminal modification
 ;   lang
-;   Nonterminal
-;   bar
+;   (Nonterminal bar)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

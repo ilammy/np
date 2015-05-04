@@ -1,7 +1,6 @@
-; Expected a list of terminal definitions
+; Invalid syntax of the terminal extension
 ;   lang
 ;   (+ . right-away)
-;   right-away
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

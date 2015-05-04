@@ -1,7 +1,6 @@
-; Expected a list of productions
+; Invalid syntax of the nonterminal
 ;   lang
-;   Nonterminal
-;   sudden-atom
+;   (Nonterminal p () . sudden-atom)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

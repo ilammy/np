@@ -1,8 +1,6 @@
-; Unexpected dotted list in nonterminal definition
+; Invalid syntax of the nonterminal
 ;   lang
-;   Nonterminal
-;   (foo . bar)
-;   bar
+;   (Nonterminal () foo . bar)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

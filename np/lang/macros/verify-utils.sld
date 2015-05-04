@@ -8,9 +8,7 @@
 
           define-verifier
           define-verifier/symbol
-          define-verifier/proper-list
-          define-verifier/proper-nonempty-list
-          define-verifier/proper-nonempty-list:report-dot-only)
+          define-verifier/nonempty-list)
 
   (import (scheme base)
           (sr ck)
@@ -112,33 +110,12 @@
                ((_ s '(k t) 'term '#t) ($ s '#t))
                ((_ s '(k t) 'term '#f) ($ k '(:not-symbol-error-message (term . t)))) ) ) )) ) )
 
-    (define-syntax define-verifier/proper-list
+    (define-syntax define-verifier/nonempty-list
       (syntax-rules ::: ()
-        ((_ %verify (:proper-error-message :unexpected-error-message))
-         (define-verifier %verify
-           (syntax-rules (quote)
-             ((_ s '(k t) 'term '(x ...))       ($ s '#t))
-             ((_ s '(k t) 'term '(x y ... . d)) ($ k '(:proper-error-message (d term . t))))
-             ((_ s '(k t) 'term  _)             ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
-
-    (define-syntax define-verifier/proper-nonempty-list
-      (syntax-rules ::: ()
-        ((_ %verify (:nonempty-error-message :proper-error-message :unexpected-error-message))
+        ((_ %verify (:nonempty-error-message))
          (define-verifier %verify
            (syntax-rules (quote)
              ((_ s '(k t) 'term '())            ($ k '(:nonempty-error-message t)))
-             ((_ s '(k t) 'term '(x y ...))     ($ s '#t))
-             ((_ s '(k t) 'term '(x y ... . d)) ($ k '(:proper-error-message (d term . t))))
-             ((_ s '(k t) 'term  _)             ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
-
-    (define-syntax define-verifier/proper-nonempty-list:report-dot-only
-      (syntax-rules ::: ()
-        ((_ %verify (:nonempty-error-message :proper-error-message :unexpected-error-message))
-         (define-verifier %verify
-           (syntax-rules (quote)
-             ((_ s '(k t) 'term '())            ($ k '(:nonempty-error-message t)))
-             ((_ s '(k t) 'term '(x y ...))     ($ s '#t))
-             ((_ s '(k t) 'term '(x y ... . d)) ($ k '(:proper-error-message (d . t))))
-             ((_ s '(k t) 'term  _)             ($ k '(:unexpected-error-message (term . t)))) ) )) ) )
+             ((_ s '(k t) 'term '(x y ...))     ($ s '#t)) ) )) ) )
 
 ) )

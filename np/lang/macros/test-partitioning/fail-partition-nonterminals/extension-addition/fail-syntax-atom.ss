@@ -1,7 +1,6 @@
-; Expected a list of nonterminal definitions
+; Invalid syntax of the nonterminal extension
 ;   lang
 ;   (+ . right-away)
-;   right-away
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

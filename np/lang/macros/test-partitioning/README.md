@@ -14,7 +14,7 @@ Language definition
 
 Referenced as: _language-definition_
 
-`(define-language name . toplevel-clause-list)` — the only acceptable form
+`(define-language name toplevel-clauses ...)` — the only acceptable form
 
 ##### _Syntax violations_: #######################
 
@@ -27,15 +27,7 @@ Referenced as: _language-definition_
     — Name of the language must be an identifier: <br/>
       <_invalid-language-name_>
 
- 3. **toplevel-clause-list** must be a proper list.
-
-    — Expected a list of toplevel clauses: <br/>
-      <_language_> <_invalid-toplevel-clause-list_>
-
-    — Unexpected dotted list in language definition: <br/>
-      <_language_> <_invalid-toplevel-clause-list_> <_dotted-ending_>
-
- 4. Each **toplevel-clause** must be a _toplevel-clause_.
+ 3. Each **toplevel-clause** must be a _toplevel-clause_.
 
 
 
@@ -187,7 +179,7 @@ Terminal definitions
 
 Referenced as: _terminals-clause_
 
-`(terminals . terminal-definition-list)` — the only acceptable form
+`(terminals terminal-definitions ...)` — the only acceptable form
 
 ##### _Syntax violations_: #######################
 
@@ -196,17 +188,7 @@ Referenced as: _terminals-clause_
     — Invalid syntax of the terminals clause: <br/>
       <_language_> <_invalid-terminals-clause_>
 
-    (Actually, I believe, this is never going to be reported.)
-
- 2. **terminal-definition-list** must be a proper list.
-
-    — Expected a list of terminal definitions: <br/>
-      <_language_> <_terminals-clause_> <_invalid-terminal-definition-list_>
-
-    — Unexpected dotted list in language definition: <br/>
-      <_language_> <_invalid-terminals-clause_> <_dotted-ending_>
-
- 3. Each **terminal-definition** must be a _standalone-terminal_ if
+ 2. Each **terminal-definition** must be a _standalone-terminal_ if
     _extension-clause_ is not present in the language definition;
     otherwise it must be either _terminal-addition_, _terminal-removal_,
     or _terminal-modification_.
@@ -236,9 +218,9 @@ Standalone
 
 Referenced as: _standalone-terminal_
 
-`(name predicate meta-var-list)` — full form
+`(name predicate (meta-vars ...))` — full form
 
-`(predicate-name meta-var-list)` — short form
+`(predicate-name (meta-vars ...))` — short form
 
 ##### _Syntax violations_: #######################
 
@@ -257,13 +239,7 @@ Referenced as: _standalone-terminal_
     — Terminal predicate must be a variable in short form: <br/>
       <_language_> <_standalone-terminal_> <_invalid-predicate-name_>
 
- 4. **meta-var-list** must a proper non-empty list.
-
-    — Expected a list of meta-variables: <br/>
-      <_language_> <_terminal-name_> <_invalid-meta-var-list_>
-
-    — Unexpected dotted list in terminal definition: <br/>
-      <_language_> <_terminal-name_> <_invalid-meta-var-list_> <_dotted-ending_>
+ 4. **meta-vars** must a proper non-empty list.
 
     — At least one meta-variable should be specified for a terminal: <br/>
       <_language_> <_terminal-name_>
@@ -278,7 +254,7 @@ Extension
 
 Referenced as: _terminal-addition_
 
-`(+ . added-terminal-list)` — the only acceptable form
+`(+ added-terminals ...)` — the only acceptable form
 
 ##### _Syntax violations_:
 
@@ -287,13 +263,7 @@ Referenced as: _terminal-addition_
     — Invalid syntax of the terminal extension: <br/>
       <_language_> <_invalid-terminal-addition_>
 
- 2. **added-terminal-list** must be a proper non-empty list.
-
-    — Expected a list of terminal definitions: <br/>
-      <_language_> <_invalid-terminal-addition_> <_invalid-added-terminal-list_>
-
-    — Unexpected dotted list in terminal extension: <br/>
-      <_language_> <_invalid-terminal-addition_> <_dotted-ending_>
+ 2. **added-terminals** must be a proper non-empty list.
 
     — At least one terminal should be specified for addition: <br/>
       <_language_> <_invalid-terminal-addition_>
@@ -305,7 +275,7 @@ Referenced as: _terminal-addition_
 
 Referenced as: _terminal-removal_
 
-`(- . removed-terminal-list)` — the only acceptable form
+`(- removed-terminals ...)` — the only acceptable form
 
 ##### _Syntax violations_:
 
@@ -314,13 +284,7 @@ Referenced as: _terminal-removal_
     — Invalid syntax of the terminal extension: <br/>
       <_language_> <_invalid-terminal-removal_>
 
- 2. **removed-terminal-list** must be a proper non-empty list.
-
-    — Expected a list of terminal definitions or names: <br/>
-      <_language_> <_invalid-terminal-removal_> <_invalid-removed-terminal-list_>
-
-    — Unexpected dotted list in terminal extension: <br/>
-      <_language_> <_invalid-terminal-removal_> <_dotted-ending_>
+ 2. **removed-terminals** must be a proper non-empty list.
 
     — At least one terminal should be specified for removal: <br/>
       <_language_> <_invalid-terminal-removal_>
@@ -336,7 +300,7 @@ Referenced as: _terminal-removal_
 
 Referenced as: _terminal-modification_
 
-`(! . modified-terminal-list)` — the only acceptable form
+`(! modified-terminals ...)` — the only acceptable form
 
 ##### _Syntax violations_: #######################
 
@@ -345,13 +309,7 @@ Referenced as: _terminal-modification_
     — Invalid syntax of the terminal extension: <br/>
       <_language_> <_invalid-terminal-modification_>
 
- 2. **modified-terminal-list** must be a proper non-empty list.
-
-    — Expected a list of terminal modifications: <br/>
-      <_language_> <_invalid-terminal-modification_> <_invalid-modified-terminal-list_>
-
-    — Unexpected dotted list in terminal extension: <br/>
-      <_language_> <_invalid-terminal-modification_> <_dotted-ending_>
+ 2. **modified-terminals** must be a proper non-empty list.
 
     — At least one terminal should be specified for modification: <br/>
       <_language_> <_invalid-terminal-modification_>
@@ -361,7 +319,7 @@ Referenced as: _terminal-modification_
 
 Referenced as: _modified-terminal_
 
-`(name meta-var-modification-list)` — the only acceptable form
+`(name (meta-var-modifications ...))` — the only acceptable form
 
 ##### _Syntax violations_: #######################
 
@@ -375,13 +333,7 @@ Referenced as: _modified-terminal_
     — Name of the terminal must be an identifier: <br/>
       <_language_> <_modified-terminal_> <_name_>
 
- 3. **meta-var-modification-list** must be a proper non-empty list.
-
-    — Expected a list of meta-variable modifications: <br/>
-      <_language_> <_terminal-name_> <_invalid-meta-var-modification-list_>
-
-    — Unexpected dotted list in terminal modification: <br/>
-      <_language_> <_terminal-name_> <_invalid-meta-var-modification-list_> <_dotted-ending_>
+ 3. **meta-var-modifications** must be a proper non-empty list.
 
     — Terminal modification should modify meta-variables: <br/>
       <_language_> <_terminal-name_>
@@ -398,9 +350,9 @@ Standalone
 
 Referenced as: _standalone-nonterminal_
 
-`(name                meta-var-list . production-list)` — normal form
+`(name                (meta-vars ...) productions ...)` — normal form
 
-`(name predicate-name meta-var-list . production-list)` — form with predicate binding
+`(name predicate-name (meta-vars ...) productions ...)` — form with predicate binding
 
 ##### _Syntax violations_: #######################
 
@@ -419,28 +371,14 @@ Referenced as: _standalone-nonterminal_
     — Name of the nonterminal predicate must be an identifier: <br/>
       <_language_> <_standalone-nonterminal-without-productions_> <_invalid-predicate-name_>
 
- 4. **meta-var-list** must be a proper list.
+ 4. Each **meta-var** must be _meta-variable-name_.
 
-    — Expected a list of meta-variables: <br/>
-      <_language_> <_nonterminal-name_> <_invalid-meta-var-list_>
-
-    — Unexpected dotted list in nonterminal definition: <br/>
-      <_language_> <_nonterminal-name_> <_invalid-meta-var-list_> <_dotted-ending_>
-
- 5. Each **meta-var** must be _meta-variable-name_.
-
- 6. **production-list** must be a proper non-empty list.
-
-    — Expected a list of productions: <br/>
-      <_language_> <_nonterminal-name_> <_invalid-production-list_>
-
-    — Unexpected dotted list in nonterminal definition: <br/>
-      <_language_> <_nonterminal-name_> <_invalid-production-list_> <_dotted-ending_>
+ 5. **productions** must be a proper non-empty list.
 
     — At least one production should be specified for a nonterminal: <br/>
       <_language_> <_nonterminal-name_>
 
- 7. Each **production** must be a _production-definition_.
+ 6. Each **production** must be a _production-definition_.
 
 
 Extension
@@ -450,7 +388,7 @@ Extension
 
 Referenced as: _nonterminal-addition_
 
-`(+ . added-nonterminal-list)` — the only acceptable form
+`(+ added-nonterminals ...)` — the only acceptable form
 
 ##### _Syntax violations_: #######################
 
@@ -459,13 +397,7 @@ Referenced as: _nonterminal-addition_
     — Invalid syntax of the nonterminal extension: <br/>
       <_language_> <_invalid-nonterminal-addition_>
 
- 2. **added-nonterminal-list** must be a proper non-empty list.
-
-    — Expected a list of nonterminal definitions: <br/>
-      <_language_> <_invalid-nonterminal-addition_> <_invalid-added-nonterminal-list_>
-
-    — Unexpected dotted list in nonterminal extension: <br/>
-      <_language_> <_invalid-nonterminal-addition_> <_dotted-ending_>
+ 2. **added-nonterminals** must be a proper non-empty list.
 
     — At least one nonterminal should be specified for addition: <br/>
       <_language_> <_invalid-nonterminal-addition_>
@@ -477,7 +409,7 @@ Referenced as: _nonterminal-addition_
 
 Referenced as: _nonterminal-removal_
 
-`(- . removed-nonterminal-list)` — the only acceptable form
+`(- removed-nonterminals ...)` — the only acceptable form
 
 ##### _Syntax violations_: #######################
 
@@ -486,13 +418,7 @@ Referenced as: _nonterminal-removal_
     — Invalid syntax of the nonterminal extension: <br/>
       <_language_> <_invalid-nonterminal-removal_>
 
- 2. **removed-nonterminal-list** must be a proper non-empty list.
-
-    — Expected a list of nonterminal definitions or names: <br/>
-      <_language_> <_invalid-nonterminal-removal_> <_invalid-removed-nonterminal-list_>
-
-    — Unexpected dotted list in nonterminal extension: <br/>
-      <_language_> <_invalid-nonterminal-removal_> <_dotted-ending_>
+ 2. **removed-nonterminals** must be a proper non-empty list.
 
     — At least one nonterminal should be specified for removal: <br/>
       <_language_> <_invalid-nonterminal-removal_>
@@ -509,7 +435,7 @@ Referenced as: _nonterminal-removal_
 
 Referenced as: _nonterminal-modification_
 
-`(! . modified-nonterminal-list)` — the only acceptable form
+`(! modified-nonterminals ...)` — the only acceptable form
 
 ##### _Syntax violations_: #######################
 
@@ -518,13 +444,7 @@ Referenced as: _nonterminal-modification_
     — Invalid syntax of the nonterminal extension: <br/>
       <_language_> <_invalid-nonterminal-modification_>
 
- 2. **modified-nonterminal-list** must be a proper non-empty list.
-
-    — Expected a list of nonterminal modifications: <br/>
-      <_language_> <_invalid-nonterminal-modification_> <_invalid-modified-nonterminal-list_>
-
-    — Unexpected dotted list in nonterminal extension: <br/>
-      <_language_> <_invalid-nonterminal-modification_> <_dotted-ending_>
+ 2. **modified-nonterminals** must be a proper non-empty list.
 
     — At least one nonterminal should be specified for modification: <br/>
       <_language_> <_invalid-nonterminal-modification_>
@@ -534,7 +454,7 @@ Referenced as: _nonterminal-modification_
 
 Referenced as: _modified-nonterminal_
 
-`(name meta-var-modification-list . production-modification-list)` — the only acceptable form
+`(name (meta-var-modifications ...) production-modifications ...)` — the only acceptable form
 
 ##### _Syntax violations_: #######################
 
@@ -548,27 +468,11 @@ Referenced as: _modified-nonterminal_
     — Name of the nonterminal must be an identifier: <br/>
       <_language_> <_modified-nonterminal_> <_name_>
 
- 3. **meta-var-modification-list** must be a proper list.
-
-    — Expected a list of meta-variable modifications: <br/>
-      <_language_> <_nonterminal-name_> <_invalid-meta-var-modification-list_>
-
-    — Unexpected dotted list in nonterminal modification: <br/>
-      <_language_> <_nonterminal-name_> <_invalid-meta-var-modification-list_> <_dotted-ending_>
-
  4. Each **meta-var-modification** must be a _meta-variable-modification_.
 
- 5. **production-modification-list** must be a proper list.
+ 5. Each **production-modification** must be a _production-modification_.
 
-    — Expected a list of production modifications: <br/>
-      <_language_> <_terminal-name_> <_invalid-production-modification-list_>
-
-    — Unexpected dotted list in nonterminal modification: <br/>
-      <_language_> <_terminal-name_> <_invalid-production-modification-list_> <_dotted-ending_>
-
- 6. Each **production-modification** must be a _production-modification_.
-
- 7. **meta-var-modification-list** and **production-modification** cannot be
+ 6. **meta-var-modifications** and **production-modifications** cannot be
     simultaneously empty.
 
     — Nonterminal modification should modify either meta-variables or productions: <br/>
@@ -599,9 +503,9 @@ Extension
 
 Referenced as: _meta-variable-modification_
 
-`(+ . meta-var-name-list)` — addition form
+`(+ meta-var-names ...)` — addition form
 
-`(- . meta-var-name-list)` — removal form
+`(- meta-var-names ...)` — removal form
 
 ##### _Syntax violations_: #######################
 
@@ -610,13 +514,7 @@ Referenced as: _meta-variable-modification_
     — Invalid syntax of the meta-variable modification: <br/>
       <_language_> <_terminal-or-nonterminal-name_> <_invalid-meta-variable-modification_>
 
- 2. **meta-var-name-list** must be a proper non-empty list.
-
-    — Expected a list of meta-variables: <br/>
-      <_language_> <_terminal-or-nonterminal-name_> <_meta-variable-modification_> <_invalid-meta-var-name-list_>
-
-    — Unexpected dotted list in meta-variable modification: <br/>
-      <_language_> <_terminal-or-nonterminal-name_> <_invalid-meta-variable-modification_> <_dotted-ending_>
+ 2. **meta-var-names** must be a proper non-empty list.
 
     — At least one meta-variable should be specified for addition: <br/>
       <_language_> <_terminal-or-nonterminal-name_> <_invalid-addition-form_>
@@ -654,9 +552,9 @@ Extension
 
 Referenced as: _production-modification_
 
-`(+ . production-list)` — addition form
+`(+ productions ...)` — addition form
 
-`(- . production-list)` — removal form
+`(- productions ...)` — removal form
 
 ##### _Syntax violations_: #######################
 
@@ -665,13 +563,7 @@ Referenced as: _production-modification_
     — Invalid syntax of the production modification: <br/>
       <_language_> <_nonterminal-name_> <_invalid-production-modification_>
 
- 2. **production-list** must be a proper non-empty list.
-
-    — Expected a list of productions: <br/>
-      <_language_> <_nonterminal-name_> <_invalid-production-list_>
-
-    — Unexpected dotted list in production modification: <br/>
-      <_language_> <_nonterminal-name_> <_invalid-production-list_> <_dotted-ending_>
+ 2. **productions** must be a proper non-empty list.
 
     — At least one production should be specified for addition: <br/>
       <_language_> <_nonterminal-name_> <_invalid-addition-form_>

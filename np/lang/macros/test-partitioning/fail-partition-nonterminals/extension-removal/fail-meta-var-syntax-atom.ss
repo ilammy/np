@@ -1,7 +1,6 @@
-; Expected a list of meta-variables
+; Invalid syntax of the nonterminal
 ;   lang
-;   Number
-;   SURPRISE!
+;   (Number SURPRISE!)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

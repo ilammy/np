@@ -23,7 +23,7 @@
           $must-be:terminals-clause
 
           $can-be:nonterminals-clause?
- 
+
           $expected-a:toplevel-clause
 
           $squash-terminals-clauses
@@ -107,16 +107,7 @@
 
     (define-standard-checked-verifier ($is-a:terminals-clause? $must-be:terminals-clause)
       (syntax-rules (quote terminals)
-        ((_ s '(k t) 'term '(terminals . (x ...))) ($ s '#t))
-
-        ((_ s '(k t) 'term '(terminals . #(x ...)))
-         ($ k '("Expected a list of terminal definitions" (#(x ...) term . t))))
-
-        ((_ s '(k t) 'term '(terminals . (x y ... . d)))
-         ($ k '("Unexpected dotted list in language definition" (d term . t))))
-
-        ((_ s '(k t) 'term '(terminals . d))
-         ($ k '("Expected a list of terminal definitions" (d term . t))))
+        ((_ s '(k t) 'term '(terminals x ...)) ($ s '#t))
 
         ((_ s '(k t) 'term _)
          ($ k '("Invalid syntax of the terminals clause" (term . t)))) ) )

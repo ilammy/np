@@ -1,7 +1,6 @@
-; Expected a list of meta-variables
+; Invalid syntax of the terminal
 ;   lang
-;   number?
-;   foo
+;   (number? foo)
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

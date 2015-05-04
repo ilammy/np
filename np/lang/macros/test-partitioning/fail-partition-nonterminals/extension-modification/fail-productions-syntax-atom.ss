@@ -1,7 +1,6 @@
-; Expected a list of production modifications
+; Invalid syntax of the nonterminal modification
 ;   lang
-;   Pair
-;   foo
+;   (Pair ((+ x)) . foo)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

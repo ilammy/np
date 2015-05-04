@@ -47,36 +47,32 @@
 
     (define-syntax $can-be:production-addition?
       (syntax-rules (quote +)
-        ((_ s '(+ . production-list)) ($ s '#t))
-        ((_ s  _)                     ($ s '#f)) ) )
+        ((_ s '(+ productions ...)) ($ s '#t))
+        ((_ s  _)                   ($ s '#f)) ) )
 
     (define-syntax $can-be:production-removal?
       (syntax-rules (quote -)
-        ((_ s '(- . production-list)) ($ s '#t))
-        ((_ s  _)                     ($ s '#f)) ) )
+        ((_ s '(- productions ...)) ($ s '#t))
+        ((_ s  _)                   ($ s '#f)) ) )
 
     (define-verifier %verify:production-modification
       (syntax-rules (quote + -)
-        ((_ s '(k t) 'term '(+ . production-list))
-         ($ s ($and '(%verify:production-addition-list '(k (term . t)) 'production-list)
-                    '($every? '(%verify:standalone-production '(k t)) 'production-list) )))
+        ((_ s '(k t) 'term '(+ productions ...))
+         ($ s ($and '(%verify:production-addition-list '(k (term . t)) '(productions ...))
+                    '($every? '(%verify:standalone-production '(k t)) '(productions ...)) )))
 
-        ((_ s '(k t) 'term '(- . production-list))
-         ($ s ($and '(%verify:production-removal-list '(k (term . t)) 'production-list)
-                    '($every? '(%verify:standalone-production '(k t)) 'production-list) )))
+        ((_ s '(k t) 'term '(- productions ...))
+         ($ s ($and '(%verify:production-removal-list '(k (term . t)) '(productions ...))
+                    '($every? '(%verify:standalone-production '(k t)) '(productions ...)) )))
 
         ((_ s '(k t) 'term _)
          ($ k '("Invalid syntax of the production modification" (term . t)))) ) )
 
-    (define-verifier/proper-nonempty-list:report-dot-only %verify:production-addition-list
-      ("At least one production should be specified for addition"
-       "Unexpected dotted list in production modification"
-       "Expected a list of productions") )
+    (define-verifier/nonempty-list %verify:production-addition-list
+      ("At least one production should be specified for addition") )
 
-    (define-verifier/proper-nonempty-list:report-dot-only %verify:production-removal-list
-      ("At least one production should be specified for removal"
-       "Unexpected dotted list in production modification"
-       "Expected a list of productions") )
+    (define-verifier/nonempty-list %verify:production-removal-list
+      ("At least one production should be specified for removal") )
 
     ;;;
     ;;; Squashers

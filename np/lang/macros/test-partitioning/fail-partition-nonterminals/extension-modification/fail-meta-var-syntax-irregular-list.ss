@@ -1,8 +1,6 @@
-; Unexpected dotted list in nonterminal modification
+; Invalid syntax of the nonterminal modification
 ;   lang
-;   Nonterminal
-;   ((- x) . foo)
-;   foo
+;   (Nonterminal ((- x) . foo))
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

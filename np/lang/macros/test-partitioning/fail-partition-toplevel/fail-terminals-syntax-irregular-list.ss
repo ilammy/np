@@ -1,7 +1,6 @@
-; Unexpected dotted list in language definition
+; Invalid syntax of the terminals clause
 ;   lang
 ;   (terminals (num number? (n)) . some-atom)
-;   some-atom
 (import (scheme base)
         (np lang macros partitioning-toplevel)
         (sr ck)

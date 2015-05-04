@@ -1,7 +1,6 @@
-; Expected a list of productions
+; Invalid syntax of the nonterminal
 ;   lang
-;   Nonterminal
-;   #()
+;   (Nonterminal (nt) . #())
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
