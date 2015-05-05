@@ -125,14 +125,20 @@ Extension
 
 ### Modification
 
-`(name ((meta-var-additions ...) (meta-var-removals ...)) ((production-additions ...) (production-removals ...)))` — regular form
+`(name                 ((meta-var-additions ...) (meta-var-removals ...)) ((production-additions ...) (production-removals ...)))` — regular form
 
-`(name (meta-var-additions ...) (meta-var-removals ...) (production-additions ...) (production-removals ...))` — normalized form
+`(name predicate-name  ((meta-var-additions ...) (meta-var-removals ...)) ((production-additions ...) (production-removals ...)))` — for with predicate (re)binding
+
+`(name predicate-name? (meta-var-additions ...) (meta-var-removals ...) (production-additions ...) (production-removals ...))` — normalized form
 
 ##### _Normalization_: #######################
 
  1. Input form is converted into normalized form by splicing the lists of
     meta-variable and production modifications into the form body.
+
+ 2. For regular form, the default value of `predicate-name?` is `#f`.
+
+ 3. For binding form, `predicate-name?` is transferred as-is.
 
 
 Other clauses

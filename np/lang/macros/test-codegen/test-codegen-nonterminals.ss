@@ -174,22 +174,22 @@
       (assert-list-of 0 mods) ) )
 
   (define-test ("Smoke test")
-    (for mods '((Number () () () ()))
+    (for mods '((Number #f () () () ()))
       (assert-list-of 1 mods)
       (assert-mod (first mods) 'Number '() '() '() '()) ) )
 
   (define-test ("Does not change meta-variable order")
-    (for mods '((Number (a b) (c d e) () ()))
+    (for mods '((Number #f (a b) (c d e) () ()))
       (assert-list-of 1 mods)
       (assert-mod (first mods) 'Number '(a b) '() '(c d e) '()) ) )
 
   (define-test ("Does not change production order")
-    (for mods '((Number () () (a b) (c d e)))
+    (for mods '((Number #f () () (a b) (c d e)))
       (assert-list-of 1 mods)
       (assert-mod (first mods) 'Number '() '(a b) '() '(c d e)) ) )
 
   (define-test ("Does not change nonterminal order")
-    (for mods '((Number (a b c) (d) (e f) (g h i)) (Pair (j) () () (k)))
+    (for mods '((Number #f (a b c) (d) (e f) (g h i)) (Pair #f (j) () () (k)))
       (assert-list-of 2 mods)
       (assert-mod (first mods) 'Number '(a b c) '(e f) '(d) '(g h i))
       (assert-mod (second mods) 'Pair '(j) '() '() '(k)) ) )
@@ -257,17 +257,21 @@
 
   ; This should be syntactically valid
   (define-test ("Effectively empty list")
-    (for '((Number #f (Num) (n)) (Pair #f (Cons) ((a d))))
+    (for '((Number #f (Num) (n)) (Pair #f (Cons) ((a d)))
+           (Triple #f (Tri) () () ((t t t))) (Void #f () () () ()))
       #t ) )
 
   (define-test ("Example definitions")
-    (for '((Number Number? (Num) (n)) (Pair Pair? (Cons) ((a d))))
+    (for '((Number Number? (Num) (n)) (Pair Pair? (Cons) ((a d)))
+           (Triple Tri? (Tri) () () ((t t t))) (Void Void? () () () ()))
       (assert-defined Number?)
-      (assert-defined Pair?) ) )
+      (assert-defined Pair?)
+      (assert-defined Tri?)
+      (assert-defined Void?) ) )
 
   ; These are allowed, but they are the user's problem
   (define-test ("Duplicate definitions are allowed")
-    (for '((Number Number? (Num) (n)) (Pair Number? (Cons) ((a d))))
+    (for '((Number Number? (Num) (n)) (Pair Number? (Cons) ((a d))) (Void Number? () () () ()))
       (assert-defined Number?) ) )
 )
 (verify-test-case! nonterminals:predicate-definitions:extension)

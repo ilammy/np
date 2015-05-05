@@ -1,7 +1,7 @@
-; Invalid syntax of the production modification
+; Name of the nonterminal predicate must be an identifier
 ;   lang
-;   Foo
-;   (+ p . x)
+;   Number
+;   42
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((! (Foo Foo? () (+ p . x)))) ) ))
+    '((! (Number 42))) ) ))

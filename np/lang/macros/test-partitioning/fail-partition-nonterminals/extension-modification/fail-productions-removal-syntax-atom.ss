@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((! (Foo () (- . atom)))) ) ))
+    '((! (Foo Foo? () (- . atom)))) ) ))

@@ -158,6 +158,18 @@
                     '(%verify:meta-vars-or-productions-are-modified '(k (name . t))
                        '(meta-var-modifications ...) '(production-modifications ...) ) )))
 
+        ((_ s '(k t) 'term '(name predicate-name (meta-var-modifications ...) production-modifications ...))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate-name (meta-var-modifications ...)) . t)) 'name)
+                    '(%verify:nonterminal-predicate-name '(k (name . t)) 'predicate-name)
+                    '($every? '(%verify:meta-var-modification '(k (name . t))) '(meta-var-modifications ...))
+                    '($every? '(%verify:production-modification '(k (name . t))) '(production-modifications ...))
+                    '(%verify:meta-vars-or-productions-are-modified '(k (name . t))
+                       '(meta-var-modifications ...) '(production-modifications ...) ) )))
+
+        ((_ s '(k t) 'term '(name predicate-name))
+         ($ s ($and '(%verify:nonterminal-name '(k ((name predicate-name) . t)) 'name)
+                    '(%verify:nonterminal-predicate-name '(k (name . t)) 'predicate-name) )))
+
         ((_ s '(k t) 'term _)
          ($ k '("Invalid syntax of the nonterminal modification" (term . t)))) ) )
 
@@ -183,23 +195,45 @@
 
     (define-syntax $get-nonterminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s 'lang '(name meta-var-modification-list . production-modification-list))
-         ($ s 'meta-var-modification-list)) ))
+        ((_ s 'lang '(name (meta-var-modifications ...) production-modifications ...))
+         ($ s '(meta-var-modifications ...)))
+
+        ((_ s 'lang '(name predicate-name (meta-var-modifications ...) production-modifications ...))
+         ($ s '(meta-var-modifications ...)))
+
+        ((_ s 'lang '(name predicate-name)) ($ s '())) ) )
 
     (define-syntax $set-nonterminal-modification-meta-vars
       (syntax-rules (quote)
-        ((_ s 'lang '(name meta-var-modification-list . production-modification-list) 'meta-var-modification-list*)
-         ($ s '(name meta-var-modification-list* . production-modification-list))) ) )
+        ((_ s 'lang '(name (meta-var-modifications ...) production-modifications ...) '(meta-var-modifications* ...))
+         ($ s '(name (meta-var-modifications* ...) production-modifications ...)))
+
+        ((_ s 'lang '(name predicate-name (meta-var-modifications ...) production-modifications ...) '(meta-var-modifications* ...))
+         ($ s '(name predicate-name (meta-var-modifications* ...) production-modifications ...)))
+
+        ((_ s 'lang '(name predicate-name) '(meta-var-modifications* ...))
+         ($ s '(name predicate-name (meta-var-modifications* ...)))) ) )
 
     (define-syntax $get-nonterminal-modification-productions
       (syntax-rules (quote)
-        ((_ s 'lang '(name meta-var-modification-list . production-modification-list))
-         ($ s 'production-modification-list)) ))
+        ((_ s 'lang '(name (meta-var-modifications ...) production-modifications ...))
+         ($ s '(production-modifications ...)))
+
+        ((_ s 'lang '(name predicate-name (meta-var-modifications ...) production-modifications ...))
+         ($ s '(production-modifications ...)))
+
+        ((_ s 'lang '(name predicate-name)) ($ s '())) ) )
 
     (define-syntax $set-nonterminal-modification-productions
       (syntax-rules (quote)
-        ((_ s 'lang '(name meta-var-modification-list . production-modification-list) 'production-modification-list*)
-         ($ s '(name meta-var-modification-list production-modification-list*))) ) )
+        ((_ s 'lang '(name (meta-var-modifications ...) production-modifications ...) '(production-modifications* ...))
+         ($ s '(name (meta-var-modifications ...) (production-modifications* ...))))
+
+        ((_ s 'lang '(name predicate-name (meta-var-modifications ...) production-modifications ...) '(production-modifications* ...))
+         ($ s '(name predicate-name (meta-var-modifications ...) (production-modifications* ...))))
+
+        ((_ s 'lang '(name predicate-name) '(production-modifications* ...))
+         ($ s '(name predicate-name () (production-modifications* ...)))) ) )
 
     ;;;
     ;;; Common verifiers

@@ -153,19 +153,26 @@
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
         '((! (Bar () (- m) (+ (n n)) (- ())))) ))) ) )
 
-  (define-test ("can handle all options at the same time")
-    (assert-equal '(() () ((Mega ((mega) (form)) ((prod) ((list ...))))))
+  (define-test ("recognizes predicate rebinding form")
+    (assert-equal '(() () ((Zog Zog? (() ()) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
-        '((! (Mega ((+ mega) (- form)) (+ prod) (- (list ...))))) ))) ) )
+        '((! (Zog Zog?))) ))) ) )
+
+  (define-test ("can handle all options at the same time")
+    (assert-equal '(() () ((Mega Borg? ((mega) (form)) ((prod) ((list ...))))))
+      ($ ($quote ($partition-extension-nonterminal-definitions 'lang
+        '((! (Mega Borg? ((+ mega) (- form)) (+ prod) (- (list ...))))) ))) ) )
 
   (define-test ("recognizes modification forms with multiple definitions")
     (assert-equal '(() () ((Foo (() ()) (() (x)))
                            (Bar ((b) ()) (() ()))
-                           (Baz (() ()) (((z z z)) ()))))
+                           (Baz (() ()) (((z z z)) ()))
+                           (Zog Zog? (() ()) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
         '((! (Foo () (- x))
              (Bar ((+ b))))
-          (! (Baz () (+ (z z z))))) ))) ) )
+          (! (Baz () (+ (z z z))))
+          (! (Zog Zog?))) ))) ) )
 )
 (verify-test-case! nonterminals:extension-modification)
 

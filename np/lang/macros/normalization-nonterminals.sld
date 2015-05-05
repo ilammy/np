@@ -34,9 +34,9 @@
 
     (define-syntax $normalize-extension-nonterminal-modification
       (syntax-rules (quote)
-        ((_ s '(name (meta-var-additions meta-var-removals)
-                     (production-additions production-removals) ))
-         ($ s '(name meta-var-additions meta-var-removals
-                     production-additions production-removals ))) ) )
+        ((_ s '(name predicate-name (meta-var-additions meta-var-removals) (production-additions production-removals)))
+         ($ s '(name predicate-name  meta-var-additions meta-var-removals   production-additions production-removals)))
+        ((_ s '(name                (meta-var-additions meta-var-removals) (production-additions production-removals)))
+         ($ s '(name #f              meta-var-additions meta-var-removals   production-additions production-removals))) ) )
 
 ) )

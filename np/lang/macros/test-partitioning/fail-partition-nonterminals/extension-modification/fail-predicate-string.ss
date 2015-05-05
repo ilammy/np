@@ -1,6 +1,7 @@
-; Invalid syntax of the nonterminal modification
+; Name of the nonterminal predicate must be an identifier
 ;   lang
-;   (Nonterminal #((+ x y z)))
+;   Number
+;   "gazillion"
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
@@ -8,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((! (Nonterminal #((+ x y z))))) ) ))
+    '((! (Number "gazillion"))) ) ))

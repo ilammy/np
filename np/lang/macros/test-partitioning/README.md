@@ -454,11 +454,15 @@ Referenced as: _nonterminal-modification_
 
 Referenced as: _modified-nonterminal_
 
-`(name (meta-var-modifications ...) production-modifications ...)` — the only acceptable form
+`(name (meta-var-modifications ...) production-modifications ...)` — normal form
+
+`(name predicate-name (meta-var-modifications ...) production-modifications ...)` — normal form with predicate rebind
+
+`(name predicate-name)` — pure predicate rebind form
 
 ##### _Syntax violations_: #######################
 
- 1. Clauses must have exactly this form.
+ 1. Clauses must have exactly one of these forms.
 
     — Invalid syntax of the nonterminal modification: <br/>
       <_language_> <_invalid-modified-nonterminal_>
@@ -467,6 +471,11 @@ Referenced as: _modified-nonterminal_
 
     — Name of the nonterminal must be an identifier: <br/>
       <_language_> <_modified-nonterminal_> <_name_>
+
+ 3. **predicate-name** must be an identifier.
+
+    — Name of the nonterminal predicate must be an identifier: <br/>
+      <_language_> <_modified-nonterminal_> <_invalid-predicate-name_>
 
  4. Each **meta-var-modification** must be a _meta-variable-modification_.
 

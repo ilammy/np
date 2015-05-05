@@ -51,7 +51,7 @@
       (terminals
         (+ (number? (n))) )
 
-      (! (Empty ((+ g)))) )
+      (! (Empty Empty? ((+ g)))) )
 
     (assert-defined-language Foo)
     (assert-defined-language Bar) )
