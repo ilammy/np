@@ -1,7 +1,6 @@
-; Unexpected dotted list in terminal extension
+; Invalid syntax of the terminal extension
 ;   lang
 ;   (- some . terminals)
-;   terminals
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

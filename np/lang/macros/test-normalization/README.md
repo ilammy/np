@@ -13,9 +13,9 @@ Terminal definitions
 Standalone
 ----------
 
-`(name predicate meta-var-list)` — full form (normalized form)
+`(name predicate (meta-vars ...))` — full form (normalized form)
 
-`(predicate-name meta-var-list)` — short form
+`(predicate-name (meta-vars ...))` — short form
 
 ##### _Normalization_: #######################
 
@@ -29,9 +29,9 @@ Extension
 
 ### Addition
 
-`(name predicate meta-var-list)` — full form (normalized form)
+`(name predicate (meta-vars ...))` — full form (normalized form)
 
-`(predicate-name meta-var-list)` — short form
+`(predicate-name (meta-vars ...))` — short form
 
 ##### _Normalization_: #######################
 
@@ -44,9 +44,9 @@ Extension
 
 `name` — identifier form (normalized form)
 
-`(name predicate meta-var-list)` — full form
+`(name predicate (meta-vars ...))` — full form
 
-`(predicate-name meta-var-list)` — short form
+`(predicate-name (meta-vars ...))` — short form
 
 ##### _Normalization_: #######################
 
@@ -58,9 +58,9 @@ Extension
 
 ### Modification
 
-`(name (meta-var-additions meta-var-removals))` — regular form
+`(name ((meta-var-additions ...) (meta-var-removals ...)))` — regular form
 
-`(name meta-var-additions meta-var-removals)` — normalized form
+`(name (meta-var-additions ...) (meta-var-removals ...))` — normalized form
 
 ##### _Normalization_: #######################
 
@@ -75,11 +75,11 @@ Nonterminal definitions
 Standalone
 ----------
 
-`(name                   meta-var-list . production-list)` — regular form
+`(name                 (meta-vars ...) productions ...)` — regular form
 
-`(name #(predicate-name) meta-var-list . production-list)` — form with predicate binding
+`(name predicate-name  (meta-vars ...) productions ...)` — form with predicate binding
 
-`(name predicate-name? meta-var-list production-list)` — normalized form
+`(name predicate-name? (meta-vars ...) (productions ...))` — normalized form
 
 ##### _Normalization_: #######################
 
@@ -87,7 +87,7 @@ Standalone
 
  2. For regular form, the default value of `predicate-name?` is `#f`.
 
- 3. For binding form, `predicate-name?` gets spliced out of the vector.
+ 3. For binding form, `predicate-name?` is transferred as-is.
 
 
 Extension
@@ -95,11 +95,11 @@ Extension
 
 ### Addition
 
-`(name                   meta-var-list . production-list)` — regular form
+`(name                 (meta-vars ...) productions ...)` — regular form
 
-`(name #(predicate-name) meta-var-list . production-list)` — form with predicate binding
+`(name predicate-name  (meta-vars ...) productions ...)` — form with predicate binding
 
-`(name predicate-name? meta-var-list production-list)` — normalized form
+`(name predicate-name? (meta-vars ...) (productions ...))` — normalized form
 
 ##### _Normalization_: #######################
 
@@ -107,16 +107,16 @@ Extension
 
  2. For regular form, the default value of `predicate-name?` is `#f`.
 
- 3. For binding form, `predicate-name?` gets spliced out of the vector.
+ 3. For binding form, `predicate-name?` is transferred as-is.
 
 
 ### Removal
 
 `name` — identifier form (normalized form)
 
-`(name                   meta-var-list . production-list)` — regular form
+`(name                (meta-vars ...) productions ...)` — regular form
 
-`(name #(predicate-name) meta-var-list . production-list)` — form with predicate binding
+`(name predicate-name (meta-vars ...) productions ...)` — form with predicate binding
 
 ##### _Normalization_: #######################
 
@@ -125,14 +125,20 @@ Extension
 
 ### Modification
 
-`(name (meta-var-additions meta-var-removals) (production-additions production-removals))` — regular form
+`(name                 ((meta-var-additions ...) (meta-var-removals ...)) ((production-additions ...) (production-removals ...)))` — regular form
 
-`(name meta-var-additions meta-var-removals production-additions production-removals)` — normalized form
+`(name predicate-name  ((meta-var-additions ...) (meta-var-removals ...)) ((production-additions ...) (production-removals ...)))` — for with predicate (re)binding
+
+`(name predicate-name? (meta-var-additions ...) (meta-var-removals ...) (production-additions ...) (production-removals ...))` — normalized form
 
 ##### _Normalization_: #######################
 
  1. Input form is converted into normalized form by splicing the lists of
     meta-variable and production modifications into the form body.
+
+ 2. For regular form, the default value of `predicate-name?` is `#f`.
+
+ 3. For binding form, `predicate-name?` is transferred as-is.
 
 
 Other clauses

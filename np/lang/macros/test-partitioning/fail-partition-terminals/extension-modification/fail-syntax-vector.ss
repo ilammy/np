@@ -1,7 +1,6 @@
-; Expected a list of terminal modifications
+; Invalid syntax of the terminal extension
 ;   lang
 ;   (! . #(number? ((+ n))))
-;   #(number? ((+ n)))
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

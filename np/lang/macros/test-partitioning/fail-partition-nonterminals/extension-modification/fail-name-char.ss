@@ -1,6 +1,6 @@
 ; Name of the nonterminal must be an identifier
 ;   lang
-;   (#\f ((+ vars)))
+;   (#\f False? ((+ vars)))
 ;   #\f
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((! (#\f ((+ vars)) (+ prod)))) ) ))
+    '((! (#\f False? ((+ vars)) (+ prod)))) ) ))

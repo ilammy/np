@@ -50,7 +50,7 @@
 
     (define-syntax $make-nonterminal-modification
       (syntax-rules (quote)
-        ((_ s '(name added-meta-variables removed-meta-variables
+        ((_ s '(name predicate-name added-meta-variables removed-meta-variables
                 added-production-descriptions removed-production-descriptions ))
          ($ s '(make-nonterminal-modification
            'name 'added-meta-variables 'added-production-descriptions
@@ -73,6 +73,10 @@
         ((_ s 'lang '(name     #f    meta-variables production-descriptions))
          ($ s '#t))
         ((_ s 'lang '(name predicate meta-variables production-descriptions))
+         ($ s '(define predicate (language-nonterminal-predicate lang 'name))))
+        ((_ s 'lang '(name     #f    added-meta-vars removed-meta-vars added-productions removed-productions))
+         ($ s '#t))
+        ((_ s 'lang '(name predicate added-meta-vars removed-meta-vars added-productions removed-productions))
          ($ s '(define predicate (language-nonterminal-predicate lang 'name)))) ) )
 
 ) )

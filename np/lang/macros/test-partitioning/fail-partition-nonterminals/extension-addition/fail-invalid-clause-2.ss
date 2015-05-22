@@ -1,6 +1,6 @@
 ; Invalid syntax of the nonterminal
 ;   lang
-;   (Number #(pred))
+;   (Number pred)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
@@ -8,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((+ (Number #(pred)))) ) ))
+    '((+ (Number pred))) ) ))

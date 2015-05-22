@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((! (Number ((+ (+ x)))))) ) ))
+    '((! (Number Number? ((+ (+ x)))))) ) ))

@@ -1,7 +1,6 @@
-; Unexpected dotted list in nonterminal extension
+; Invalid syntax of the nonterminal extension
 ;   lang
 ;   (- some . nonterminals)
-;   nonterminals
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

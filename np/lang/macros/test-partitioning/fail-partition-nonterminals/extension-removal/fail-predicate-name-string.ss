@@ -1,6 +1,6 @@
 ; Name of the nonterminal predicate must be an identifier
 ;   lang
-;   (Nonterminal #("There") (var1 var2))
+;   (Nonterminal "There" (var1 var2))
 ;   "There"
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((- (Nonterminal #("There") (var1 var2) (p p)))) ) ))
+    '((- (Nonterminal "There" (var1 var2) (p p)))) ) ))

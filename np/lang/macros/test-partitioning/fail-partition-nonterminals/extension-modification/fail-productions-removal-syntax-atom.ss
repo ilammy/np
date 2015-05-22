@@ -1,8 +1,7 @@
-; Expected a list of productions
+; Invalid syntax of the production modification
 ;   lang
 ;   Foo
 ;   (- . atom)
-;   atom
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
@@ -10,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((! (Foo () (- . atom)))) ) ))
+    '((! (Foo Foo? () (- . atom)))) ) ))

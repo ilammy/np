@@ -1,7 +1,6 @@
-; Expected a list of terminal definitions
+; Invalid syntax of the terminals clause
 ;   lang
 ;   (terminals . #(some vector))
-;   #(some vector)
 (import (scheme base)
         (np lang macros partitioning-toplevel)
         (sr ck)

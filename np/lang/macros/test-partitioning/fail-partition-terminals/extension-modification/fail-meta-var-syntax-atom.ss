@@ -1,7 +1,6 @@
-; Expected a list of meta-variable modifications
+; Invalid syntax of the terminal modification
 ;   lang
-;   foo
-;   bar
+;   (foo bar)
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

@@ -1,7 +1,7 @@
-; Name of the nonterminal predicate cannot be empty
+; Name of the nonterminal predicate must be an identifier
 ;   lang
-;   (Nonterminal #() ())
-;   #()
+;   Number
+;   42
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((+ (Nonterminal #() () prod))) ) ))
+    '((! (Number 42))) ) ))

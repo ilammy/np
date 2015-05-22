@@ -1,7 +1,6 @@
-; Expected a list of nonterminal modifications
+; Invalid syntax of the nonterminal extension
 ;   lang
 ;   (! . #(Number () (+ p)))
-;   #(Number () (+ p))
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

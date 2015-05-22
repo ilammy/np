@@ -1,8 +1,7 @@
-; Expected a list of productions
+; Invalid syntax of the production modification
 ;   lang
 ;   Foo
 ;   (- . #())
-;   #()
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

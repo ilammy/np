@@ -1,7 +1,7 @@
-; Only one nonterminal predicate name can be specified
+; Name of the nonterminal predicate must be an identifier
 ;   lang
-;   (Nonterminal #(a b c) ())
-;   #(a b c)
+;   Number
+;   #\N
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((- (Nonterminal #(a b c) ()))) ) ))
+    '((! (Number #\N))) ) ))

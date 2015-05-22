@@ -1,7 +1,6 @@
-; Expected a list of meta-variables
+; Invalid syntax of the nonterminal
 ;   lang
-;   Number
-;   #(b)
+;   (Number a #(b) n)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
@@ -9,4 +8,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((- (Number #(a) #(b) n))) ) ))
+    '((- (Number a #(b) n))) ) ))

@@ -1,8 +1,7 @@
-; Unexpected dotted list in production modification
+; Invalid syntax of the production modification
 ;   lang
 ;   Foo
 ;   (+ p . x)
-;   x
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)
@@ -10,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((! (Foo () (+ p . x)))) ) ))
+    '((! (Foo Foo? () (+ p . x)))) ) ))

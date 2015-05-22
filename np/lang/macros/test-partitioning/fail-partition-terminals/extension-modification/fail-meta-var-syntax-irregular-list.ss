@@ -1,8 +1,6 @@
-; Unexpected dotted list in terminal modification
+; Invalid syntax of the terminal modification
 ;   lang
-;   num
-;   ((- x) . foo)
-;   foo
+;   (num ((- x) . foo))
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

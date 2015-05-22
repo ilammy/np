@@ -9,4 +9,4 @@
 
 ($ ($quote
   ($partition-extension-nonterminal-definitions 'lang
-    '((! (Pair ((+ x)) ()))) ) ))
+    '((! (Pair Pair? ((+ x)) ()))) ) ))

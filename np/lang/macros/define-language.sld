@@ -31,11 +31,10 @@
 
     (define-syntax $define-language
       (syntax-rules (quote)
-        ((_ s '(language . clauses))
+        ((_ s '(language clauses ...))
          ($ s ($and '($must-be:language-name 'language)
-                    '($must-be:toplevel-clauses-list 'language 'clauses)
                     '($define-language:partitioned 'language
-                       ($partition-toplevel-clauses 'language 'clauses) ) )))
+                       ($partition-toplevel-clauses 'language '(clauses ...)) ) )))
         ((_ s _)
          (syntax-error "Invalid syntax of the language definition")) ) )
 
@@ -172,17 +171,10 @@
     ;;; Verifiers
     ;;;
 
-    (define-standard-checkers %verify:toplevel-clauses-list
-      ($is-a:toplevel-clauses-list? $must-be:toplevel-clauses-list) )
-
     (define-toplevel-checkers %verify:language-name
       ($is-a:language-name? $must-be:language-name) )
 
     (define-verifier/symbol %verify:language-name
       ("Name of the language must be an identifier") )
-
-    (define-verifier/proper-list %verify:toplevel-clauses-list
-      ("Unexpected dotted list in language definition"
-       "Expected a list of toplevel clauses") )
 
 ) )

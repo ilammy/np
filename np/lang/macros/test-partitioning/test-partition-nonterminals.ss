@@ -20,14 +20,14 @@
         '((Atom (atom) number symbol string boolean)) ))) ) )
 
   (define-test ("accepts form with predicate")
-    (assert-equal '((Pair #(Pair?) (pair) (value value)))
+    (assert-equal '((Pair Pair? (pair) (value value)))
       ($ ($quote ($filter-standalone-nonterminal-definitions 'lang
-        '((Pair #(Pair?) (pair) (value value))) ))) ) )
+        '((Pair Pair? (pair) (value value))) ))) ) )
 
   (define-test ("accepts nonterminals without meta-variables")
-    (assert-equal '((Pair #(Pair?) () (value value)))
+    (assert-equal '((Pair Pair? () (value value)))
       ($ ($quote ($filter-standalone-nonterminal-definitions 'lang
-        '((Pair #(Pair?) () (value value))) ))) ) )
+        '((Pair Pair? () (value value))) ))) ) )
 
   (define-test ("accepts peculiar extension-like forms")
     (assert-equal '((Addition () (+ some list)) (Removal () (- (some (other list)))))
@@ -93,14 +93,14 @@
 (define-test-case (nonterminals:extension-removal "Partitioning of extension removal nonterminal forms")
 
   (define-test ("recognizes full removal forms")
-    (assert-equal '(() ((Pair #(Pair?) () (value value))) ())
+    (assert-equal '(() ((Pair Pair? () (value value))) ())
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
-        '((- (Pair #(Pair?) () (value value)))) ))) ) )
+        '((- (Pair Pair? () (value value)))) ))) ) )
 
   (define-test ("recognizes full removal forms with multiple definitions")
-    (assert-equal '(() ((Pair #(Pair?) () (value value))) ())
+    (assert-equal '(() ((Pair Pair? () (value value))) ())
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
-        '((- (Pair #(Pair?) () (value value)))) ))) ) )
+        '((- (Pair Pair? () (value value)))) ))) ) )
 
   (define-test ("recognizes full removal forms without productions")
     (assert-equal '(() ((Atom ())) ())
@@ -113,9 +113,9 @@
         '((- Some Removed) (- Nonterminals)) ))) ) )
 
   (define-test ("recognizes mixed removal forms")
-    (assert-equal '(() (Some (Atom ()) (Pair #(Pair?) () (value value))) ())
+    (assert-equal '(() (Some (Atom ()) (Pair Pair? () (value value))) ())
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
-        '((- Some (Atom ()) (Pair #(Pair?) () (value value)))) ))) ) )
+        '((- Some (Atom ()) (Pair Pair? () (value value)))) ))) ) )
 )
 (verify-test-case! nonterminals:extension-removal)
 
@@ -153,19 +153,26 @@
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
         '((! (Bar () (- m) (+ (n n)) (- ())))) ))) ) )
 
-  (define-test ("can handle all options at the same time")
-    (assert-equal '(() () ((Mega ((mega) (form)) ((prod) ((list ...))))))
+  (define-test ("recognizes predicate rebinding form")
+    (assert-equal '(() () ((Zog Zog? (() ()) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
-        '((! (Mega ((+ mega) (- form)) (+ prod) (- (list ...))))) ))) ) )
+        '((! (Zog Zog?))) ))) ) )
+
+  (define-test ("can handle all options at the same time")
+    (assert-equal '(() () ((Mega Borg? ((mega) (form)) ((prod) ((list ...))))))
+      ($ ($quote ($partition-extension-nonterminal-definitions 'lang
+        '((! (Mega Borg? ((+ mega) (- form)) (+ prod) (- (list ...))))) ))) ) )
 
   (define-test ("recognizes modification forms with multiple definitions")
     (assert-equal '(() () ((Foo (() ()) (() (x)))
                            (Bar ((b) ()) (() ()))
-                           (Baz (() ()) (((z z z)) ()))))
+                           (Baz (() ()) (((z z z)) ()))
+                           (Zog Zog? (() ()) (() ()))))
       ($ ($quote ($partition-extension-nonterminal-definitions 'lang
         '((! (Foo () (- x))
              (Bar ((+ b))))
-          (! (Baz () (+ (z z z))))) ))) ) )
+          (! (Baz () (+ (z z z))))
+          (! (Zog Zog?))) ))) ) )
 )
 (verify-test-case! nonterminals:extension-modification)
 

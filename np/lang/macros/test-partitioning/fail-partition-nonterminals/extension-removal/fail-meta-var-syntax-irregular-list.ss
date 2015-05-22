@@ -1,8 +1,6 @@
-; Unexpected dotted list in nonterminal definition
+; Invalid syntax of the nonterminal
 ;   lang
-;   Number
-;   (a . d)
-;   d
+;   (Number (a . d) n)
 (import (scheme base)
         (np lang macros partitioning-nonterminals)
         (sr ck)

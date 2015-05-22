@@ -1,8 +1,7 @@
-; Unexpected dotted list in meta-variable modification
+; Invalid syntax of the meta-variable modification
 ;   lang
 ;   num
 ;   (+ car . cdr)
-;   cdr
 (import (scheme base)
         (np lang macros partitioning-terminals)
         (sr ck)

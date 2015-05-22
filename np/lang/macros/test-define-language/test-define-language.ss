@@ -31,7 +31,7 @@
         (number number? (n i j k))
         (boolean boolean? (b)) )
 
-      (Pair #(Pair?) (Pair)
+      (Pair Pair? (Pair)
         (n b) (n n) (b n) (b b) ) )
 
     (assert-defined-language Foo)
@@ -51,7 +51,7 @@
       (terminals
         (+ (number? (n))) )
 
-      (! (Empty ((+ g)))) )
+      (! (Empty Empty? ((+ g)))) )
 
     (assert-defined-language Foo)
     (assert-defined-language Bar) )
