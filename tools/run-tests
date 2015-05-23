@@ -5,7 +5,7 @@ count() { echo $#; }
 
 output_with_indent() { echo "$1" | sed "s/^/    /"; }
 
-test_dirs=$(find . -type d -name 'test-*')
+test_dirs=$(find . -type d -name 'test')
 cd /tmp/build
 
 test_total=0
