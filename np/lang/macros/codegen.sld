@@ -1,8 +1,17 @@
-(define-library (np lang macros codegen-nonterminals)
+(define-library (np lang macros codegen)
   ;;;
-  ;;; Codegen for normalized nonterminal definition clauses
+  ;;; Codegen for normalized clauses
   ;;;
-  (export $generate-standalone-nonterminal-definitions
+  (export $generate-toplevel-predicate-definition
+          $generate-toplevel-parser-definition
+          $generate-toplevel-unparser-definition
+
+          $generate-standalone-terminal-definitions
+          $generate-extension-terminal-additions
+          $generate-extension-terminal-removals
+          $generate-extension-terminal-modifications
+
+          $generate-standalone-nonterminal-definitions
           $generate-standalone-nonterminal-predicate-definitions
           $generate-extension-nonterminal-additions
           $generate-extension-nonterminal-removals
@@ -18,6 +27,78 @@
           (sr ck maps))
 
   (begin
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;; Toplevel clauses
+    ;;;
+
+    (define-syntax $generate-toplevel-predicate-definition
+      (syntax-rules (quote)
+        ((_ s 'lang '#f)
+         ($ s '#t))
+        ((_ s 'lang '(binding))
+         ($ s '(define binding (language-predicate lang)))) ) )
+
+    (define-syntax $generate-toplevel-parser-definition
+      (syntax-rules (quote)
+        ((_ s 'lang '#f)
+         ($ s '#t))
+        ((_ s 'lang '(binding))
+         ($ s '(define binding (language-parser lang)))) ) )
+
+    (define-syntax $generate-toplevel-unparser-definition
+      (syntax-rules (quote)
+        ((_ s 'lang '#f)
+         ($ s '#t))
+        ((_ s 'lang '(binding))
+         ($ s '(define binding (language-unparser lang)))) ) )
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;; Terminal definitions
+    ;;;
+
+    (define-syntax $generate-standalone-terminal-definitions
+      (syntax-rules (quote)
+        ((_ s 'definitions)
+         ($ s ($cons 'list
+           ($map '$make-terminal-definition 'definitions) ))) ) )
+
+    (define-syntax $generate-extension-terminal-additions
+      (syntax-rules (quote)
+        ((_ s 'definitions)
+         ($ s ($cons 'list
+           ($map '$make-terminal-definition 'definitions) ))) ) )
+
+    (define-syntax $make-terminal-definition
+      (syntax-rules (quote)
+        ((_ s '(name predicate meta-variables))
+         ($ s '(make-terminal-definition 'name predicate 'meta-variables))) ) )
+
+    (define-syntax $generate-extension-terminal-removals
+      (syntax-rules (quote)
+        ((_ s 'terminal-names)
+         ($ s ($cons 'list ($map '$quote 'terminal-names)))) ) )
+
+    (define-syntax $generate-extension-terminal-modifications
+      (syntax-rules (quote)
+        ((_ s 'modifications)
+         ($ s ($cons 'list
+           ($map '$make-terminal-modification 'modifications) ))) ) )
+
+    (define-syntax $make-terminal-modification
+      (syntax-rules (quote)
+        ((_ s '(name added-meta-variables removed-meta-variables))
+         ($ s '(make-terminal-modification
+           'name 'added-meta-variables 'removed-meta-variables ))) ) )
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;
+    ;;; Nonterminal definitions
+    ;;;
 
     (define-syntax $generate-standalone-nonterminal-definitions
       (syntax-rules (quote)

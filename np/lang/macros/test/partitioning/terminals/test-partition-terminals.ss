@@ -1,5 +1,5 @@
 (import (scheme base)
-        (np lang macros partitioning-terminals)
+        (np lang macros partitioning)
         (sr ck)
         (sr ck kernel)
         (te base)

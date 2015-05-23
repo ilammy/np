@@ -1,5 +1,5 @@
 (import (scheme base)
-        (np lang macros codegen-toplevel)
+        (np lang macros codegen)
         (np lang descriptions types)
         (sr ck)
         (sr ck kernel)

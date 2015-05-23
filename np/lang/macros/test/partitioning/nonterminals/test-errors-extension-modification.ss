@@ -1,5 +1,5 @@
 (import (scheme base)
-        (np lang macros partitioning-nonterminals)
+        (np lang macros partitioning)
         (np lang macros test-utils)
         (sr ck)
         (sr ck kernel)

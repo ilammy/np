@@ -1,5 +1,5 @@
 (import (scheme base)
-        (np lang macros normalization-terminals)
+        (np lang macros normalization)
         (sr ck)
         (sr ck kernel)
         (te base)

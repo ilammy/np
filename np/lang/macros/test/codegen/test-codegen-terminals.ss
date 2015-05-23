@@ -1,6 +1,6 @@
 (import (scheme base)
         (only (srfi 1) every first second)
-        (np lang macros codegen-terminals)
+        (np lang macros codegen)
         (np lang descriptions types)
         (sr ck)
         (sr ck kernel)
