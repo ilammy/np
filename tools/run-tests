@@ -1,35 +1,47 @@
 #!/bin/sh
 set -e
 
-[ -z $RUN_SUCCESS_TESTS ] && RUN_SUCCESS_TESTS="yes"
-[ -z $RUN_FAILURE_TESTS ] && RUN_FAILURE_TESTS="yes"
+count() { echo $#; }
 
-success_tests="
-np/lang/macros/test-codegen
-np/lang/macros/test-define-language
-np/lang/macros/test-partitioning
-np/lang/macros/test-normalization
-"
+output_with_indent() { echo "$1" | sed "s/^/    /"; }
 
-failure_tests="
-np/lang/macros/test-define-language/fail-define-language
-np/lang/macros/test-partitioning/fail-partition-toplevel
-np/lang/macros/test-partitioning/fail-partition-terminals
-np/lang/macros/test-partitioning/fail-partition-nonterminals
-"
+test_dirs=$(find . -type d -name 'test-*')
+cd /tmp/build
 
-if [ $RUN_SUCCESS_TESTS = "yes" ]
-then
-    for test in $success_tests
+test_total=0
+test_passed=0
+
+for test_dir in $test_dirs
+do
+    echo
+    echo "Running tests in '$test_dir'"
+
+    test_files=$(find -L "$test_dir" -type f -name 'test-*.ss' -printf '%P\n')
+    test_subtotal=$(count $test_files)
+    test_subpassed=0
+
+    for test in $test_files
     do
-        ./tools/run-success-tests $test
+        if output=$(chibi-scheme "$test_dir/$test" 2>&1)
+        then
+            echo "- $test"
+            test_subpassed=$(expr $test_subpassed + 1)
+        else
+            echo "X $test"
+            output_with_indent "$output"
+        fi
     done
-fi
 
-if [ $RUN_FAILURE_TESTS = "yes" ]
-then
-    for test in $failure_tests
-    do
-        ./tools/run-failure-tests $test
-    done
-fi
+    echo
+    echo "Done"
+    echo "[ $test_subpassed / $test_subtotal ]"
+
+    test_total=$(expr $test_total + $test_subtotal)
+    test_passed=$(expr $test_passed + $test_subpassed)
+done
+
+echo
+echo "All done"
+echo "[ $test_passed / $test_total ]"
+
+[ "$test_passed" = "$test_total" ]
