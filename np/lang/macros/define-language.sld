@@ -10,14 +10,9 @@
           (sr ck maps)
           (sr ck predicates)
           (np lang descriptions language)
-          (np lang macros partitioning-toplevel)
-          (np lang macros partitioning-terminals)
-          (np lang macros partitioning-nonterminals)
-          (np lang macros normalization-terminals)
-          (np lang macros normalization-nonterminals)
-          (np lang macros codegen-toplevel)
-          (np lang macros codegen-terminals)
-          (np lang macros codegen-nonterminals)
+          (np lang macros partitioning)
+          (np lang macros normalization)
+          (np lang macros codegen)
           (np lang macros verify-utils))
 
   (begin

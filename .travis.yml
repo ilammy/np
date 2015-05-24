@@ -15,7 +15,3 @@ before_script:
 
 script:
   - ./tools/run-tests
-
-env:
-  - RUN_SUCCESS_TESTS=yes RUN_FAILURE_TESTS=no
-  - RUN_SUCCESS_TESTS=no  RUN_FAILURE_TESTS=yes
