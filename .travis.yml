@@ -1,5 +1,9 @@
 language: c
 
+branches:
+  except:
+    - /^wip\/.*$/
+
 before_install:
   - mkdir -p /tmp/build
   - mkdir -p /tmp/scratch
