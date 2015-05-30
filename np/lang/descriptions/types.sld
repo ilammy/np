@@ -5,6 +5,7 @@
   (export terminal-definition terminal-definition?
           make-terminal-definition
           check-terminal-definition
+          with-terminal-definition
           terminal-name
           terminal-predicate
           terminal-meta-variables
@@ -12,6 +13,7 @@
           terminal-modification terminal-modification?
           make-terminal-modification
           check-terminal-modification
+          with-terminal-modification
           modified-terminal-name
           modified-terminal-added-meta-variables
           modified-terminal-removed-meta-variables
@@ -19,6 +21,7 @@
           nonterminal-definition nonterminal-definition?
           make-nonterminal-definition
           check-nonterminal-definition
+          with-nonterminal-definition
           nonterminal-name
           nonterminal-meta-variables
           nonterminal-production-definitions
@@ -26,6 +29,7 @@
           nonterminal-modification nonterminal-modification?
           make-nonterminal-modification
           check-nonterminal-modification
+          with-nonterminal-modification
           modified-nonterminal-name
           modified-nonterminal-added-meta-variables
           modified-nonterminal-removed-meta-variables
@@ -52,6 +56,14 @@
       (predicate      terminal-predicate)
       (meta-variables terminal-meta-variables) )
 
+    (define-syntax with-terminal-definition
+      (syntax-rules ()
+        ((_ terminal (name predicate meta-variables) expr ...)
+         (let ((name           (terminal-name           terminal))
+               (predicate      (terminal-predicate      terminal))
+               (meta-variables (terminal-meta-variables terminal)))
+           expr ...)) ) )
+
     (define-record-type terminal-modification
       (make-terminal-modification name added-meta-variables removed-meta-variables)
       terminal-modification?
@@ -59,12 +71,28 @@
       (added-meta-variables   modified-terminal-added-meta-variables)
       (removed-meta-variables modified-terminal-removed-meta-variables) )
 
+    (define-syntax with-terminal-modification
+      (syntax-rules ()
+        ((_ terminal (name added-meta-variables removed-meta-variables) expr ...)
+         (let ((name                   (modified-terminal-name                   terminal))
+               (added-meta-variables   (modified-terminal-added-meta-variables   terminal))
+               (removed-meta-variables (modified-terminal-removed-meta-variables terminal)))
+           expr ...)) ) )
+
     (define-record-type nonterminal-definition
       (make-nonterminal-definition name meta-variables production-definitions)
       nonterminal-definition?
       (name                   nonterminal-name)
       (meta-variables         nonterminal-meta-variables)
       (production-definitions nonterminal-production-definitions) )
+
+    (define-syntax with-nonterminal-definition
+      (syntax-rules ()
+        ((_ nonterminal (name meta-variables production-definitions) expr ...)
+         (let ((name                   (nonterminal-name                   nonterminal))
+               (meta-variables         (nonterminal-meta-variables         nonterminal))
+               (production-definitions (nonterminal-production-definitions nonterminal)))
+           expr ...)) ) )
 
     (define-record-type nonterminal-modification
       (make-nonterminal-modification name
@@ -76,6 +104,16 @@
       (removed-meta-variables         modified-nonterminal-removed-meta-variables)
       (added-production-definitions   modified-nonterminal-added-production-definitions)
       (removed-production-definitions modified-nonterminal-removed-production-definitions) )
+
+    (define-syntax with-nonterminal-modification
+      (syntax-rules ()
+        ((_ nonterminal (name added-meta-variables removed-meta-variables added-production-definitions removed-production-definitions) expr ...)
+         (let ((name                           (modified-nonterminal-name                           nonterminal))
+               (added-meta-variables           (modified-nonterminal-added-meta-variables           nonterminal))
+               (removed-meta-variables         (modified-nonterminal-removed-meta-variables         nonterminal))
+               (added-production-definitions   (modified-nonterminal-added-production-definitions   nonterminal))
+               (removed-production-definitions (modified-nonterminal-removed-production-definitions nonterminal)))
+           expr ...)) ) )
 
     ;;;
     ;;; Error report object
