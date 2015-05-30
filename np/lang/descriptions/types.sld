@@ -42,7 +42,7 @@
           lang-error-causes)
 
   (import (scheme base)
-          (only (srfi 1) filter))
+          (only (srfi 1) every filter remove))
 
   (begin
     ;;;
@@ -133,21 +133,33 @@
     ;;; Type check helpers
     ;;;
 
-    (define-syntax collect-errors
-      (syntax-rules ()
-        ((_ object clauses ...)
-         (let ((errors '()))
-           (collect* errors object clauses ...)
-           (reverse errors) )) ) )
+    (define-syntax check
+      (syntax-rules (else)
+        ((check object type-predicate?
+           (with-destructuring-bind (fields ...) clauses ...)
+           (else type-kind
+             (constructor default-fields ...) ) )
+         (if (type-predicate? object)
+             (with-destructuring-bind object (fields ...)
+               (check-clause* object clauses) ...
+               (constructor fields ...) )
+             (begin
+               (raise-continuable (lang-error type-kind object))
+               (constructor default-fields ...) ) ) ) ) )
 
-    (define-syntax collect*
+    (define-syntax check-clause*
       (syntax-rules ()
-        ((_ errors object ((predicate expr) kind clauses ...) ...)
-         (begin
-           (let ((value expr))
-             (if (predicate value)
-                 (collect* errors object clauses ...)
-                 (set! errors (cons (lang-error kind object value) errors)) ) ) ...)) ) )
+        ((_ object ((predicate? field) kind default))
+         (unless (predicate? kind)
+           (raise-continuable (lang-error kind object field))
+           (set! field default) ))
+        ((_ object ((predicate? field) kind default error-object))
+         (unless (predicate? kind)
+           (raise-continuable (lang-error kind object error-object))
+           (set! field default) )) ) )
+
+    (define (name? x)
+      (symbol? x) )
 
     (define (meta-variable? x)
       (symbol? x) )
@@ -159,62 +171,115 @@
                (production? (car x))
                (production? (cdr x)) ) ) )
 
-    (define (invalid-meta-variables list)
-      (filter (lambda (x) (not (meta-variable? x))) list) )
+    (define (meta-vars? list)
+      (every meta-variable? list) )
+
+    (define (valid-meta-vars list)
+      (filter meta-variable? list) )
+
+    (define (invalid-meta-vars list)
+      (remove meta-variable? list) )
+
+    (define (productions? list)
+      (every production? list) )
+
+    (define (valid-productions list)
+      (filter production? list) )
 
     (define (invalid-productions list)
-      (filter (lambda (x) (not (production? x))) list) )
+      (remove production? list) )
+
+    (define (proper-part list)
+      (let loop ((list list) (res '()))
+        (if (pair? list)
+            (loop (cdr list)
+                  (cons (car list) res) )
+            (reverse res) ) ) )
 
     ;;;
     ;;; Type checks
     ;;;
 
-    (define (check-terminal-definition x)
-      (collect-errors x
-        ((terminal-definition? x)                        'type:terminal-definition
-          ((symbol? (terminal-name x))                   'type:terminal-name)
-          ((procedure? (terminal-predicate x))           'type:terminal-predicate)
-          ((list? (terminal-meta-variables x))           'type:terminal-meta-var-list
-            ((null? (invalid-meta-variables (terminal-meta-variables x)))
-                                                         'type:terminal-meta-var ) ) ) ) )
+    (define invalid-name '<invalid>)
+    (define invalid-predicate (lambda (x) #f))
 
-    (define (check-terminal-modification x)
-      (collect-errors x
-        ((terminal-modification? x)                              'type:terminal-modification
-          ((symbol? (modified-terminal-name x))                  'type:terminal-name)
-          ((list? (modified-terminal-added-meta-variables x))    'type:terminal-added-meta-var-list
-            ((null? (invalid-meta-variables (modified-terminal-added-meta-variables x)))
-                                                                 'type:terminal-added-meta-var ) )
-          ((list? (modified-terminal-removed-meta-variables x))  'type:terminal-removed-meta-var-list
-            ((null? (invalid-meta-variables (modified-terminal-removed-meta-variables x)))
-                                                                 'type:terminal-removed-meta-var ) ) ) ) )
+    (define (check-terminal-definition object)
+      (check object terminal-definition?
+        (with-terminal-definition (name predicate meta-vars)
+          ((name? name)           'type:terminal-name
+                                   invalid-name )
+          ((procedure? predicate) 'type:terminal-predicate
+                                   invalid-predicate )
+          ((list? meta-vars)      'type:terminal-meta-var-list
+                                   (proper-part meta-vars) )
+          ((meta-vars? meta-vars) 'type:terminal-meta-var
+                                   (valid-meta-vars meta-vars)
+                                   (invalid-meta-vars meta-vars) ) )
+        (else 'type:terminal-definition
+          (make-terminal-definition invalid-name invalid-predicate '()) ) ) )
 
-    (define (check-nonterminal-definition x)
-      (collect-errors x
-        ((nonterminal-definition? x)                                'type:nonterminal-definition
-          ((symbol? (nonterminal-name x))                           'type:nonterminal-name)
-          ((list? (nonterminal-meta-variables x))                   'type:nonterminal-meta-var-list
-            ((null? (invalid-meta-variables (nonterminal-meta-variables x)))
-                                                                    'type:nonterminal-meta-var ) )
-          ((list? (nonterminal-production-definitions x))           'type:nonterminal-production-list
-            ((null? (invalid-productions (nonterminal-production-definitions x)))
-                                                                    'type:nonterminal-production ) ) ) ) )
+    (define (check-terminal-modification object)
+      (check object terminal-modification?
+        (with-terminal-modification (name meta-vars+ meta-vars-)
+          ((name? name)            'type:terminal-name
+                                    invalid-name )
+          ((list? meta-vars+)      'type:terminal-added-meta-var-list
+                                    (proper-part meta-vars+) )
+          ((meta-vars? meta-vars+) 'type:terminal-added-meta-var
+                                    (valid-meta-vars meta-vars+)
+                                    (invalid-meta-vars meta-vars+) )
+          ((list? meta-vars-)      'type:terminal-removed-meta-var-list
+                                    (proper-part meta-vars-) )
+          ((meta-vars? meta-vars-) 'type:terminal-removed-meta-var
+                                    (valid-meta-vars meta-vars-)
+                                    (invalid-meta-vars meta-vars-) ) )
+        (else 'type:terminal-modification
+          (make-terminal-modification invalid-name '() '()) ) ) )
 
-    (define (check-nonterminal-modification x)
-      (collect-errors x
-        ((nonterminal-modification? x)                                      'type:nonterminal-modification
-          ((symbol? (modified-nonterminal-name x))                          'type:nonterminal-name)
-          ((list? (modified-nonterminal-added-meta-variables x))            'type:nonterminal-added-meta-var-list
-            ((null? (invalid-meta-variables (modified-nonterminal-added-meta-variables x)))
-                                                                            'type:nonterminal-added-meta-var) )
-          ((list? (modified-nonterminal-removed-meta-variables x))          'type:nonterminal-removed-meta-var-list
-            ((null? (invalid-meta-variables (modified-nonterminal-removed-meta-variables x)))
-                                                                            'type:nonterminal-removed-meta-var) )
-          ((list? (modified-nonterminal-added-production-definitions x))    'type:nonterminal-added-production-list
-            ((null? (invalid-productions (modified-nonterminal-added-production-definitions x)))
-                                                                            'type:nonterminal-added-production) )
-          ((list? (modified-nonterminal-removed-production-definitions x))  'type:nonterminal-removed-production-list
-            ((null? (invalid-productions (modified-nonterminal-removed-production-definitions x)))
-                                                                            'type:nonterminal-removed-production) ) ) ) )
+    (define (check-nonterminal-definition object)
+      (check object nonterminal-definition?
+        (with-nonterminal-definition (name meta-vars productions)
+          ((name? name)               'type:nonterminal-name
+                                       invalid-name )
+          ((list? meta-vars)          'type:nonterminal-meta-var-list
+                                       (proper-part meta-vars) )
+          ((meta-vars? meta-vars)     'type:nonterminal-meta-var
+                                       (valid-meta-vars meta-vars)
+                                       (invalid-meta-vars meta-vars) )
+          ((list? productions)        'type:nonterminal-production-list
+                                       (proper-part productions) )
+          ((productions? productions) 'type:nonterminal-production
+                                       (valid-productions productions)
+                                       (invalid-productions productions) ) )
+        (else 'type:nonterminal-definition
+          (make-nonterminal-definition invalid-name '() '()) ) ) )
+
+    (define (check-nonterminal-modification object)
+      (check object nonterminal-modification?
+        (with-nonterminal-modification (name meta-vars+ meta-vars- productions+ productions-)
+          ((name? name)                'type:nonterminal-name
+                                        invalid-name )
+          ((list? meta-vars+)          'type:nonterminal-added-meta-var-list
+                                        (proper-part meta-vars+) )
+          ((meta-vars? meta-vars+)     'type:nonterminal-added-meta-var
+                                        (valid-meta-vars meta-vars+)
+                                        (invalid-meta-vars meta-vars+) )
+          ((list? meta-vars-)          'type:nonterminal-removed-meta-var-list
+                                        (proper-part meta-vars-) )
+          ((meta-vars? meta-vars-)     'type:nonterminal-removed-meta-var
+                                        (valid-meta-vars meta-vars-)
+                                        (invalid-meta-vars meta-vars-) )
+          ((list? productions+)        'type:nonterminal-added-production-list
+                                        (proper-part productions+) )
+          ((productions? productions+) 'type:nonterminal-added-production
+                                        (valid-productions productions+)
+                                        (invalid-productions productions+) )
+          ((list? productions-)        'type:nonterminal-removed-production-list
+                                        (proper-part productions-) )
+          ((productions? productions-) 'type:nonterminal-removed-production
+                                        (valid-productions productions-)
+                                        (invalid-productions productions-) ) )
+        (else 'type:nonterminal-modification
+          (make-nonterminal-modification invalid-name '() '() '() '()) ) ) )
 
 ) )
