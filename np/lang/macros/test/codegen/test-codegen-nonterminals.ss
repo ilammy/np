@@ -23,10 +23,10 @@
     (assert-= n (length list))
     (assert-true (every nonterminal-definition? list)) )
 
-  (define (assert-def def name meta-variables production-descriptions)
-    (assert-eq    name                    (nonterminal-name def))
-    (assert-equal meta-variables          (nonterminal-meta-variables def))
-    (assert-equal production-descriptions (nonterminal-production-descriptions def)) )
+  (define (assert-def def name meta-variables production-definitions)
+    (assert-eq    name                   (nonterminal-name def))
+    (assert-equal meta-variables         (nonterminal-meta-variables def))
+    (assert-equal production-definitions (nonterminal-production-definitions def)) )
 
   (define-test ("Empty list")
     (for defs '()
@@ -75,10 +75,10 @@
     (assert-= n (length list))
     (assert-true (every nonterminal-definition? list)) )
 
-  (define (assert-def def name meta-variables production-descriptions)
-    (assert-eq    name                    (nonterminal-name def))
-    (assert-equal meta-variables          (nonterminal-meta-variables def))
-    (assert-equal production-descriptions (nonterminal-production-descriptions def)) )
+  (define (assert-def def name meta-variables production-definitions)
+    (assert-eq    name                   (nonterminal-name def))
+    (assert-equal meta-variables         (nonterminal-meta-variables def))
+    (assert-equal production-definitions (nonterminal-production-definitions def)) )
 
   (define-test ("Empty list")
     (for defs '()
@@ -162,12 +162,12 @@
     (assert-= n (length list))
     (assert-true (every nonterminal-modification? list)) )
 
-  (define (assert-mod modified name added-meta-vars added-production-descriptions removed-meta-vars removed-production-descriptions)
-    (assert-eq    name                            (modified-nonterminal-name modified))
-    (assert-equal added-meta-vars                 (modified-nonterminal-added-meta-variables modified))
-    (assert-equal added-production-descriptions   (modified-nonterminal-added-production-descriptions modified))
-    (assert-equal removed-meta-vars               (modified-nonterminal-removed-meta-variables modified))
-    (assert-equal removed-production-descriptions (modified-nonterminal-removed-production-descriptions modified)) )
+  (define (assert-mod modified name added-meta-vars added-production-definitions removed-meta-vars removed-production-definitions)
+    (assert-eq    name                           (modified-nonterminal-name modified))
+    (assert-equal added-meta-vars                (modified-nonterminal-added-meta-variables modified))
+    (assert-equal added-production-definitions   (modified-nonterminal-added-production-definitions modified))
+    (assert-equal removed-meta-vars              (modified-nonterminal-removed-meta-variables modified))
+    (assert-equal removed-production-definitions (modified-nonterminal-removed-production-definitions modified)) )
 
   (define-test ("Empty list")
     (for mods '()
