@@ -15,14 +15,14 @@
           nonterminal-definition nonterminal-definition? make-nonterminal-definition
           nonterminal-name
           nonterminal-meta-variables
-          nonterminal-production-descriptions
+          nonterminal-production-definitions
 
           nonterminal-modification nonterminal-modification? make-nonterminal-modification
           modified-nonterminal-name
           modified-nonterminal-added-meta-variables
-          modified-nonterminal-added-production-descriptions
+          modified-nonterminal-added-production-definitions
           modified-nonterminal-removed-meta-variables
-          modified-nonterminal-removed-production-descriptions)
+          modified-nonterminal-removed-production-definitions)
 
   (import (scheme base))
 
@@ -46,21 +46,21 @@
       (removed-meta-variables modified-terminal-removed-meta-variables) )
 
     (define-record-type nonterminal-definition
-      (make-nonterminal-definition name meta-variables production-descriptions)
+      (make-nonterminal-definition name meta-variables production-definitions)
       nonterminal-definition?
-      (name                    nonterminal-name)
-      (meta-variables          nonterminal-meta-variables)
-      (production-descriptions nonterminal-production-descriptions) )
+      (name                   nonterminal-name)
+      (meta-variables         nonterminal-meta-variables)
+      (production-definitions nonterminal-production-definitions) )
 
     (define-record-type nonterminal-modification
       (make-nonterminal-modification name
-        added-meta-variables added-production-descriptions
-        removed-meta-variables removed-production-descriptions )
+        added-meta-variables added-production-definitions
+        removed-meta-variables removed-production-definitions )
       nonterminal-modification?
-      (name                            modified-nonterminal-name)
-      (added-meta-variables            modified-nonterminal-added-meta-variables)
-      (added-production-descriptions   modified-nonterminal-added-production-descriptions)
-      (removed-meta-variables          modified-nonterminal-removed-meta-variables)
-      (removed-production-descriptions modified-nonterminal-removed-production-descriptions) )
+      (name                           modified-nonterminal-name)
+      (added-meta-variables           modified-nonterminal-added-meta-variables)
+      (added-production-definitions   modified-nonterminal-added-production-definitions)
+      (removed-meta-variables         modified-nonterminal-removed-meta-variables)
+      (removed-production-definitions modified-nonterminal-removed-production-definitions) )
 
 ) )
