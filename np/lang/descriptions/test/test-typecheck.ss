@@ -225,10 +225,10 @@
      (make-nonterminal-modification name added-meta-vars removed-meta-vars added-productions removed-productions) ) )
 
   (define-test ("Normal nonterminal modification")
-    (assert-null (make-checked-modification 'Number '(Num) '(n (r i)) '(Number) '((C r i)))) )
+    (assert-null (make-checked-modification 'Number '(Num) '(Number) '(n (r i)) '((C r i)))) )
 
   (define-test ("Empty meta-variables")
-    (assert-null (make-checked-modification 'Number '() '(n (r i)) '() '((C r i)))) )
+    (assert-null (make-checked-modification 'Number '() '() '(n (r i)) '((C r i)))) )
 
   (define-test ("Empty productions")
     (assert-null (make-checked-modification 'Number '() '() '() '())) )
@@ -255,7 +255,7 @@
 
   (define-test ("Nonterminal meta-variable list (removal)" meta-vars)
     #(invalid-meta-variable-lists)
-    (let ((errors (make-checked-modification 'Number '() '() meta-vars '())))
+    (let ((errors (make-checked-modification 'Number '() meta-vars '() '())))
       (assert-= 1 (length errors))
       (assert-lang-error 'type:nonterminal-removed-meta-var-list (car errors)) ) )
 
@@ -267,13 +267,13 @@
 
   (define-test ("Nonterminal meta-variables (removal)" meta-vars)
     #(invalid-meta-variables)
-    (let ((errors (make-checked-modification 'Number '() '() meta-vars '())))
+    (let ((errors (make-checked-modification 'Number '() meta-vars '() '())))
       (assert-= 1 (length errors))
       (assert-lang-error 'type:nonterminal-removed-meta-var (car errors)) ) )
 
   (define-test ("Nonterminal production list (addition)" productions)
     #(invalid-production-lists)
-    (let ((errors (make-checked-modification 'Number '() productions '() '())))
+    (let ((errors (make-checked-modification 'Number '() '() productions '())))
       (assert-= 1 (length errors))
       (assert-lang-error 'type:nonterminal-added-production-list (car errors)) ) )
 
@@ -285,7 +285,7 @@
 
   (define-test ("Nonterminal productions (addition)" productions)
     #(invalid-productions)
-    (let ((errors (make-checked-modification 'Number '() productions '() '())))
+    (let ((errors (make-checked-modification 'Number '() '() productions '())))
       (assert-= 1 (length errors))
       (assert-lang-error 'type:nonterminal-added-production (car errors)) ) )
 
@@ -297,7 +297,7 @@
 
   (define-test ("Nonterminal productions nested (addition)" productions)
     #(invalid-productions-nested)
-    (let ((errors (make-checked-modification 'Number '() productions '() '())))
+    (let ((errors (make-checked-modification 'Number '() '() productions '())))
       (assert-= 1 (length errors))
       (assert-lang-error 'type:nonterminal-added-production (car errors)) ) )
 

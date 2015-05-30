@@ -28,8 +28,8 @@
           check-nonterminal-modification
           modified-nonterminal-name
           modified-nonterminal-added-meta-variables
-          modified-nonterminal-added-production-definitions
           modified-nonterminal-removed-meta-variables
+          modified-nonterminal-added-production-definitions
           modified-nonterminal-removed-production-definitions
 
           lang-error lang-error?
@@ -68,13 +68,13 @@
 
     (define-record-type nonterminal-modification
       (make-nonterminal-modification name
-        added-meta-variables added-production-definitions
-        removed-meta-variables removed-production-definitions )
+        added-meta-variables removed-meta-variables
+        added-production-definitions removed-production-definitions )
       nonterminal-modification?
       (name                           modified-nonterminal-name)
       (added-meta-variables           modified-nonterminal-added-meta-variables)
-      (added-production-definitions   modified-nonterminal-added-production-definitions)
       (removed-meta-variables         modified-nonterminal-removed-meta-variables)
+      (added-production-definitions   modified-nonterminal-added-production-definitions)
       (removed-production-definitions modified-nonterminal-removed-production-definitions) )
 
     ;;;
