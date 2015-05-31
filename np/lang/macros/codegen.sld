@@ -134,8 +134,8 @@
         ((_ s '(name predicate-name added-meta-variables removed-meta-variables
                 added-production-descriptions removed-production-descriptions ))
          ($ s '(make-nonterminal-modification
-           'name 'added-meta-variables 'added-production-descriptions
-           'removed-meta-variables 'removed-production-descriptions ))) ) )
+           'name 'added-meta-variables 'removed-meta-variables
+           'added-production-descriptions 'removed-production-descriptions ))) ) )
 
     (define-syntax $generate-standalone-nonterminal-predicate-definitions
       (syntax-rules (quote)
