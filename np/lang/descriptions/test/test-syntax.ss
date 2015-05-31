@@ -1,6 +1,7 @@
 (import (scheme base)
         (only (srfi 1) every)
         (np lang descriptions types)
+        (np lang descriptions syntax)
         (np lang descriptions test-utils)
         (te base)
         (te conditions assertions)
@@ -40,7 +41,7 @@
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(define-test-case (typecheck:terminals "Type checking of terminals")
+(define-test-case (syntax:terminals "Syntax checking of terminals")
 
   (define (make-checked-definition name predicate meta-vars)
     (check-terminal-definition
@@ -118,11 +119,11 @@
       (assert-lang-error 'type:terminal-meta-var  (list-ref errors 2))
       (assert-terminal-definition term) ) )
 )
-(verify-test-case! typecheck:terminals)
+(verify-test-case! syntax:terminals)
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(define-test-case (typecheck:terminal-mods "Type checking of terminal modifications")
+(define-test-case (syntax:terminal-mods "Syntax checking of terminal modifications")
 
   (define (make-checked-modification name added-meta-vars removed-meta-vars)
     (check-terminal-modification
@@ -211,11 +212,11 @@
       (assert-lang-error 'type:terminal-removed-meta-var (list-ref errors 2))
       (assert-terminal-modification term) ) )
 )
-(verify-test-case! typecheck:terminal-mods)
+(verify-test-case! syntax:terminal-mods)
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(define-test-case (typecheck:nonterminals "Type checking of nonterminals")
+(define-test-case (syntax:nonterminals "Syntax checking of nonterminals")
 
   (define (make-checked-definition name meta-vars productions)
     (check-nonterminal-definition
@@ -308,11 +309,11 @@
       (assert-lang-error 'type:nonterminal-production (list-ref errors 2))
       (assert-nonterminal-definition nterm) ) )
 )
-(verify-test-case! typecheck:nonterminals)
+(verify-test-case! syntax:nonterminals)
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(define-test-case (typecheck:nonterminal-mods "Type checking of nonterminal modifications")
+(define-test-case (syntax:nonterminal-mods "Syntax checking of nonterminal modifications")
 
   (define (make-checked-modification name added-meta-vars removed-meta-vars added-productions removed-productions)
     (check-nonterminal-modification
@@ -455,4 +456,4 @@
       (assert-lang-error 'type:nonterminal-removed-production (list-ref errors 4))
       (assert-nonterminal-modification nterm) ) )
 )
-(verify-test-case! typecheck:nonterminal-mods)
+(verify-test-case! syntax:nonterminal-mods)
