@@ -60,21 +60,21 @@
         ($partition-toplevel-clauses 'lang '((terminals) (terminals))) )) ) )
 
   (define-test ("squashes 'terminals' contents")
-    (assert-equal '(#f #f #f #f ((num number? (n)) (sym symbol? (s)) (null? (x))) ())
+    (assert-equal '(#f #f #f #f ((num number? (n)) (sym symbol? (s)) (null null? (x))) ())
       ($ ($quote
         ($partition-toplevel-clauses 'lang '((terminals (num number? (n))
                                                         (sym symbol? (s)))
                                              (terminals)
-                                             (terminals (null? (x))))) )) ) )
+                                             (terminals (null null? (x))))) )) ) )
 
   (define-test ("recognizes extension 'terminals' clause")
     (assert-equal '(#f #f #f #f ((+ (num number? (n))
-                                    (null? (x)) )
+                                    (null null? (x)) )
                                  (void void? ((+ vv)))
                                  (- some other terms)) ())
       ($ ($quote
         ($partition-toplevel-clauses 'lang '((terminals (+ (num number? (n))
-                                                           (null? (x)) )
+                                                           (null null? (x)) )
                                                         (void void? ((+ vv)))
                                                         (- some other terms) ))) )) ) )
 )
@@ -116,13 +116,13 @@
 
   (define-test ("clause order is (mostly) irrelevant")
     (assert-equal '((another-lang) (lang?) (parse-lang) #f
-                    ((null? (x))) ((Pair Pair? (p) (x x))
+                    ((null null? (x))) ((Pair Pair? (p) (x x))
                                    (- Some Non Terminals)
                                    (+ (Num-Pair (np) (n n)))))
       ($ ($quote
         ($partition-toplevel-clauses 'lang
           '((terminals)               (Pair Pair? (p) (x x))
-            (parser parse-lang)       (terminals (null? (x)))
+            (parser parse-lang)       (terminals (null null? (x)))
             (predicate lang?)         (- Some Non Terminals)
             (+ (Num-Pair (np) (n n))) (extends another-lang)) ) )) ) )
 

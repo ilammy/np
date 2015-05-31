@@ -19,31 +19,26 @@
       ($ ($quote ($filter-standalone-terminal-definitions 'lang
         '((number number? (n))) ))) ) )
 
-  (define-test ("accepts short form")
-    (assert-equal '((number? (n nn)))
-      ($ ($quote ($filter-standalone-terminal-definitions 'lang
-        '((number? (n nn))) ))) ) )
-
   (define-test ("accepts expressions in full form")
     (assert-equal '((odd-number (lambda (x) (and (number? x) (odd? x))) (o-n)))
       ($ ($quote ($filter-standalone-terminal-definitions 'lang
         '((odd-number (lambda (x) (and (number? x) (odd? x))) (o-n))) ))) ) )
 
   (define-test ("leaves clauses in order")
-    (assert-equal '((terminal1 (v11 v12 v13))
-                    (terminal2 (v21 v22 v23))
-                    (terminal3 (v31 v32 v33)))
+    (assert-equal '((terminal1 pred1 (v11 v12 v13))
+                    (terminal2 pred2 (v21 v22 v23))
+                    (terminal3 pred3 (v31 v32 v33)))
       ($ ($quote ($filter-standalone-terminal-definitions 'lang
-        '((terminal1 (v11 v12 v13))
-          (terminal2 (v21 v22 v23))
-          (terminal3 (v31 v32 v33))) ))) ) )
+        '((terminal1 pred1 (v11 v12 v13))
+          (terminal2 pred2 (v21 v22 v23))
+          (terminal3 pred3 (v31 v32 v33))) ))) ) )
 
   (define-test ("accepts peculiar extension-like forms")
     (assert-equal '((+ (Look like (extension forms))
-                    (while in fact)) (- (they are not)))
+                    (while in fact)) (- (they are) (not)))
       ($ ($quote ($filter-standalone-terminal-definitions 'lang
         '((+ (Look like (extension forms)) (while in fact))
-          (- (they are not))) ))) ) )
+          (- (they are) (not))) ))) ) )
 )
 (verify-test-case! terminals:standalone)
 
@@ -52,16 +47,16 @@
 (define-test-case (terminals:extension-addition "Partitioning of extension addition terminal forms")
 
   (define-test ("recognizes addition forms")
-    (assert-equal '(((number? (n)) (symbol symbol? (s))) () ())
+    (assert-equal '(((number number? (n)) (symbol symbol? (s))) () ())
       ($ ($quote ($partition-extension-terminal-definitions 'lang
-        '((+ (number? (n)))
+        '((+ (number number? (n)))
           (+ (symbol symbol? (s)))) ))) ) )
 
   (define-test ("recognizes addition forms with multiple definitions")
-    (assert-equal '(((number? (n)) (symbol? (s))) () ())
+    (assert-equal '(((number number? (n)) (symbol symbol? (s))) () ())
       ($ ($quote ($partition-extension-terminal-definitions 'lang
-        '((+ (number? (n))
-             (symbol? (s)) )) ))) ) )
+        '((+ (number number? (n))
+             (symbol symbol? (s)) )) ))) ) )
 )
 (verify-test-case! terminals:extension-addition)
 
@@ -75,10 +70,10 @@
         '((- (void (lambda (x) (odd? x)) (v)))) ))) ) )
 
   (define-test ("recognizes full removal forms with multiple definitions")
-    (assert-equal '(() ((void (lambda (x) (odd? x)) (v)) (term? (t tt))) ())
+    (assert-equal '(() ((void (lambda (x) (odd? x)) (v)) (term term? (t tt))) ())
       ($ ($quote ($partition-extension-terminal-definitions 'lang
         '((- (void (lambda (x) (odd? x)) (v))
-             (term? (t tt)))) ))) ) )
+             (term term? (t tt)))) ))) ) )
 
   (define-test ("recognizes short removal forms")
     (assert-equal '(() (some removed terminals) ())
@@ -86,9 +81,9 @@
         '((- some removed) (- terminals)) ))) ) )
 
   (define-test ("recognizes mixed removal forms")
-    (assert-equal '(() (some removed (terminal? (t))) ())
+    (assert-equal '(() (some removed (terminal terminal? (t))) ())
       ($ ($quote ($partition-extension-terminal-definitions 'lang
-        '((- some removed (terminal? (t)))) ))) ) )
+        '((- some removed (terminal terminal? (t)))) ))) ) )
 )
 (verify-test-case! terminals:extension-removal)
 
@@ -129,12 +124,12 @@
       ($ ($quote ($partition-extension-terminal-definitions 'lang '()))) ) )
 
   (define-test ("can handle all forms altogether")
-    (assert-equal '(((tar var? (x)) (x (x)))
-                    (some removed (terminal? (t)))
+    (assert-equal '(((tar var? (x)) (x x (x)))
+                    (some removed (term terminal? (t)))
                     ((zog (() (var)))))
       ($ ($quote ($partition-extension-terminal-definitions 'lang
-        '((- some removed) (+ (tar var? (x))) (- (terminal? (t)))
-          (! (zog ((- var)))) (+ (x (x)))) ))) ) )
+        '((- some removed) (+ (tar var? (x))) (- (term terminal? (t)))
+          (! (zog ((- var)))) (+ (x x (x)))) ))) ) )
 
   (define-test ("has not restrictions on terminal naming")
     (assert-equal '(((+ + (+))) ((- - (-))) ((! ((+) (-)))))

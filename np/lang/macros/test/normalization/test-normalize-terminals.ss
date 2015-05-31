@@ -10,15 +10,10 @@
 
 (define-test-case (terminals:standalone "Normalization of standalone terminal forms")
 
-  (define-test ("Full form is not transformed")
+  (define-test ("Form is not transformed")
     (assert-equal '(number number? (n))
       ($ ($quote ($normalize-standalone-terminal-definition
         '(number number? (n)) ))) ) )
-
-  (define-test ("Short form: predicate name duplication")
-    (assert-equal '(number? number? (n nn))
-      ($ ($quote ($normalize-standalone-terminal-definition
-        '(number? (n nn)) ))) ) )
 )
 (verify-test-case! terminals:standalone)
 
@@ -26,15 +21,10 @@
 
 (define-test-case (terminals:extension-addition "Normalization of extension addition terminal forms")
 
-  (define-test ("Full form is not transformed")
+  (define-test ("Form is not transformed")
     (assert-equal '(number number? (n))
       ($ ($quote ($normalize-extension-terminal-addition
         '(number number? (n)) ))) ) )
-
-  (define-test ("Short form: predicate name duplication")
-    (assert-equal '(number? number? (n nn))
-      ($ ($quote ($normalize-extension-terminal-addition
-        '(number? (n nn)) ))) ) )
 )
 (verify-test-case! terminals:extension-addition)
 
@@ -51,11 +41,6 @@
     (assert-equal 'example
       ($ ($quote ($normalize-extension-terminal-removal
         '(example (lambda (x) (odd? x)) (ee)) ))) ) )
-
-  (define-test ("Short form: only name left")
-    (assert-equal 'number?
-      ($ ($quote ($normalize-extension-terminal-removal
-        '(number? (n nn)) ))) ) )
 )
 (verify-test-case! terminals:extension-removal)
 
