@@ -1,4 +1,4 @@
-(define-library (np lang descriptions test-utils)
+(define-library (np lang descriptions test utils)
   ;;;
   ;;; Utilities for description processing testing.
   ;;;

@@ -3,7 +3,7 @@
         (np lang descriptions errors)
         (np lang descriptions types)
         (np lang descriptions syntax)
-        (np lang descriptions test-utils)
+        (np lang descriptions test utils)
         (te base)
         (te conditions assertions)
         (te conditions define-assertion)

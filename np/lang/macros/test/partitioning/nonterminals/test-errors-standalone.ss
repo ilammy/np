@@ -1,6 +1,6 @@
 (import (scheme base)
         (np lang macros partitioning)
-        (np lang macros test-utils)
+        (np lang macros test utils)
         (sr ck)
         (sr ck kernel)
         (te base)
