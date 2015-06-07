@@ -216,6 +216,19 @@
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
+(define-test-case (syntax:terminal-rems "Syntax checking of terminal removals")
+
+  (define-test ("Terminal type" object)
+    #(invalid-names)
+    (collect-errors ((term errors) (check-terminal-removal object))
+      (assert-= 1 (length errors))
+      (assert-lang-error 'type:terminal-removal (car errors))
+      (assert-true (name? term)) ) )
+)
+(verify-test-case! syntax:terminal-rems)
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
 (define-test-case (syntax:nonterminals "Syntax checking of nonterminals")
 
   (define (make-checked-definition name meta-vars productions)
@@ -457,3 +470,16 @@
       (assert-nonterminal-modification nterm) ) )
 )
 (verify-test-case! syntax:nonterminal-mods)
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+(define-test-case (syntax:nonterminal-rems "Syntax checking of nonterminal removals")
+
+  (define-test ("Terminal type" object)
+    #(invalid-names)
+    (collect-errors ((term errors) (check-nonterminal-removal object))
+      (assert-= 1 (length errors))
+      (assert-lang-error 'type:nonterminal-removal (car errors))
+      (assert-true (name? term)) ) )
+)
+(verify-test-case! syntax:nonterminal-rems)
