@@ -4,8 +4,10 @@
   ;;;
   (export check-terminal-definition
           check-terminal-modification
+          check-terminal-removal
           check-nonterminal-definition
-          check-nonterminal-modification)
+          check-nonterminal-modification
+          check-nonterminal-removal)
 
   (import (scheme base)
           (only (srfi 1) every filter remove)
@@ -119,6 +121,13 @@
         (else 'type:terminal-modification
           (make-terminal-modification invalid-name '() '()) ) ) )
 
+    (define (check-terminal-removal object)
+      (if (name? object)
+          object
+          (begin
+            (raise-continuable (lang-error 'type:terminal-removal object))
+            invalid-name ) ) )
+
     (define (check-nonterminal-definition object)
       (check object nonterminal-definition?
         (with-nonterminal-definition (name meta-vars productions)
@@ -164,5 +173,12 @@
                                         (invalid-productions productions-) ) )
         (else 'type:nonterminal-modification
           (make-nonterminal-modification invalid-name '() '() '() '()) ) ) )
+
+    (define (check-nonterminal-removal object)
+      (if (name? object)
+          object
+          (begin
+            (raise-continuable (lang-error 'type:nonterminal-removal object))
+            invalid-name ) ) )
 
 ) )
