@@ -2,28 +2,28 @@
   ;;;
   ;;; Types used in processing of language definitions and descriptions
   ;;;
-  (export terminal-definition terminal-definition?
+  (export terminal-definition?
           make-terminal-definition
           with-terminal-definition
           terminal-name
           terminal-predicate
           terminal-meta-variables
 
-          terminal-modification terminal-modification?
+          terminal-modification?
           make-terminal-modification
           with-terminal-modification
           modified-terminal-name
           modified-terminal-added-meta-variables
           modified-terminal-removed-meta-variables
 
-          nonterminal-definition nonterminal-definition?
+          nonterminal-definition?
           make-nonterminal-definition
           with-nonterminal-definition
           nonterminal-name
           nonterminal-meta-variables
           nonterminal-production-definitions
 
-          nonterminal-modification nonterminal-modification?
+          nonterminal-modification?
           make-nonterminal-modification
           with-nonterminal-modification
           modified-nonterminal-name
