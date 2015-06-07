@@ -19,8 +19,8 @@
           $generate-extension-nonterminal-predicate-definitions)
 
   (import (scheme base)
+          (np lang descriptions definitions)
           (np lang descriptions language)
-          (np lang descriptions types)
           (sr ck)
           (sr ck kernel)
           (sr ck lists)

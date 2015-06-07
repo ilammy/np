@@ -5,8 +5,8 @@
   (export assert-lang-error)
 
   (import (scheme base)
+          (np lang descriptions definitions)
           (np lang descriptions errors)
-          (np lang descriptions types)
           (te conditions define-assertion))
 
   (begin

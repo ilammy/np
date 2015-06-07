@@ -11,8 +11,8 @@
 
   (import (scheme base)
           (only (srfi 1) every filter remove)
-          (np lang descriptions errors)
-          (np lang descriptions types))
+          (np lang descriptions definitions)
+          (np lang descriptions errors))
 
   (begin
     ;;;

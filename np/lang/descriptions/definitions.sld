@@ -1,6 +1,6 @@
-(define-library (np lang descriptions types)
+(define-library (np lang descriptions definitions)
   ;;;
-  ;;; Types used in processing of language definitions and descriptions
+  ;;; Types and utilities used in processing of language definitions
   ;;;
   (export terminal-definition?
           make-terminal-definition

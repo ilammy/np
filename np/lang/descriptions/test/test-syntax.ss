@@ -1,7 +1,7 @@
 (import (scheme base)
         (only (srfi 1) every)
+        (np lang descriptions definitions)
         (np lang descriptions errors)
-        (np lang descriptions types)
         (np lang descriptions syntax)
         (np lang descriptions test utils)
         (te base)
