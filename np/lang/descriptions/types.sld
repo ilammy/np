@@ -30,12 +30,7 @@
           modified-nonterminal-added-meta-variables
           modified-nonterminal-removed-meta-variables
           modified-nonterminal-added-production-definitions
-          modified-nonterminal-removed-production-definitions
-
-          lang-error lang-error?
-          lang-error-kind
-          lang-error-object
-          lang-error-causes)
+          modified-nonterminal-removed-production-definitions)
 
   (import (scheme base))
 
@@ -109,19 +104,5 @@
                (added-production-definitions   (modified-nonterminal-added-production-definitions   nonterminal))
                (removed-production-definitions (modified-nonterminal-removed-production-definitions nonterminal)))
            expr ...)) ) )
-
-    ;;;
-    ;;; Error report object
-    ;;;
-
-    (define-record-type %lang-error
-      (make-lang-error kind object causes)
-      lang-error?
-      (kind   lang-error-kind)
-      (object lang-error-object)
-      (causes lang-error-causes) )
-
-    (define (lang-error kind object . causes)
-      (make-lang-error kind object causes) )
 
 ) )
