@@ -1,5 +1,6 @@
 (import (scheme base)
         (np lang descriptions unification)
+        (np lang descriptions definitions)
         (te base)
         (te conditions assertions)
         (te utils verify-test-case))
@@ -37,3 +38,55 @@
     (assert-eq after (trim-meta-var-name before)) )
 )
 (verify-test-case! unification:meta-var-names)
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+(define-test-case (unification:productions "Production comparison")
+
+  (define mapping (make-meta-var-mapping
+   (list (make-terminal-definition 'number number? '(n m))
+         (make-terminal-definition 'string string? '(s str)) )
+   (list (make-nonterminal-definition 'Number '(Num Number) '())
+         (make-nonterminal-definition 'NamedNumber '(Name NamedNumber) '()) ) ))
+
+  (define-test ("Normal case")
+    (assert-true
+     (productions-equal? mapping '(Num n s) '(Num n s)) ) )
+
+  (define-test ("Empty lists are equal")
+    (assert-true
+     (productions-equal? mapping '() '()) ) )
+
+  (define-test ("Can use any of meta-vars")
+    (assert-true
+     (productions-equal? mapping '(Num n s) '(Number m str)) ) )
+
+  (define-test ("Suffixes do not matter for meta-vars")
+    (assert-true
+     (productions-equal? mapping '(Num* n+ s9) '(Number000 m? str???*)) ) )
+
+  (define-test ("Can handle literals")
+    (assert-true
+     (productions-equal? mapping '(/ Num Num) '(/ Number Number)) ) )
+
+  (define-test ("Can handle maybe")
+    (assert-true
+     (productions-equal? mapping '(+ (maybe Num) Num) '(+ (maybe Number) Number)) ) )
+
+  (define-test ("Can handle repetitions")
+    (assert-true
+     (productions-equal? mapping '(n ... s !..) '(m ... str !..)) ) )
+
+  (define-test ("Suffixes do matter for literals")
+    (assert-false
+     (productions-equal? mapping '(e n n s) '(e* n* n* s*)) ) )
+
+  (define-test ("Literals do not match meta-vars")
+    (assert-false
+     (productions-equal? mapping 'n 'N) ) )
+
+  (define-test ("Different entities do not match")
+    (assert-false
+     (productions-equal? mapping 'Num 'n) ) )
+)
+(verify-test-case! unification:productions)
