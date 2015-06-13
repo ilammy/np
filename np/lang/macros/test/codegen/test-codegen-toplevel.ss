@@ -1,6 +1,6 @@
 (import (scheme base)
         (np lang macros codegen)
-        (np lang descriptions types)
+        (np lang descriptions definitions)
         (sr ck)
         (sr ck kernel)
         (te base)

@@ -1,4 +1,4 @@
-(define-library (np lang macros test-utils)
+(define-library (np lang macros test utils)
   ;;;
   ;;; Utilities for macroexpansion testing.
   ;;;

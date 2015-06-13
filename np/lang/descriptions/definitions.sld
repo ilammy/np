@@ -1,41 +1,36 @@
-(define-library (np lang descriptions types)
+(define-library (np lang descriptions definitions)
   ;;;
-  ;;; Types used in processing of language definitions and descriptions
+  ;;; Types and utilities used in processing of language definitions
   ;;;
-  (export terminal-definition terminal-definition?
+  (export terminal-definition?
           make-terminal-definition
           with-terminal-definition
           terminal-name
           terminal-predicate
           terminal-meta-variables
 
-          terminal-modification terminal-modification?
+          terminal-modification?
           make-terminal-modification
           with-terminal-modification
           modified-terminal-name
           modified-terminal-added-meta-variables
           modified-terminal-removed-meta-variables
 
-          nonterminal-definition nonterminal-definition?
+          nonterminal-definition?
           make-nonterminal-definition
           with-nonterminal-definition
           nonterminal-name
           nonterminal-meta-variables
           nonterminal-production-definitions
 
-          nonterminal-modification nonterminal-modification?
+          nonterminal-modification?
           make-nonterminal-modification
           with-nonterminal-modification
           modified-nonterminal-name
           modified-nonterminal-added-meta-variables
           modified-nonterminal-removed-meta-variables
           modified-nonterminal-added-production-definitions
-          modified-nonterminal-removed-production-definitions
-
-          lang-error lang-error?
-          lang-error-kind
-          lang-error-object
-          lang-error-causes)
+          modified-nonterminal-removed-production-definitions)
 
   (import (scheme base))
 
@@ -109,19 +104,5 @@
                (added-production-definitions   (modified-nonterminal-added-production-definitions   nonterminal))
                (removed-production-definitions (modified-nonterminal-removed-production-definitions nonterminal)))
            expr ...)) ) )
-
-    ;;;
-    ;;; Error report object
-    ;;;
-
-    (define-record-type %lang-error
-      (make-lang-error kind object causes)
-      lang-error?
-      (kind   lang-error-kind)
-      (object lang-error-object)
-      (causes lang-error-causes) )
-
-    (define (lang-error kind object . causes)
-      (make-lang-error kind object causes) )
 
 ) )

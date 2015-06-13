@@ -1,11 +1,12 @@
-(define-library (np lang descriptions test-utils)
+(define-library (np lang descriptions test utils)
   ;;;
   ;;; Utilities for description processing testing.
   ;;;
   (export assert-lang-error)
 
   (import (scheme base)
-          (np lang descriptions types)
+          (np lang descriptions definitions)
+          (np lang descriptions errors)
           (te conditions define-assertion))
 
   (begin

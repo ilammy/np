@@ -1,7 +1,7 @@
 (import (scheme base)
         (np lang macros define-language)
         (np lang descriptions language)
-        (np lang macros test-utils)
+        (np lang macros test utils)
         (sr ck)
         (sr ck kernel)
         (te base)
