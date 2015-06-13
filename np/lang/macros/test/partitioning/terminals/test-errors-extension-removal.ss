@@ -48,52 +48,52 @@
 (define-test-case (terminals:extension-removal:meta-var-names "Partitioning of extension terminal removal forms: meta variable names")
 
   (define-test ("boolean")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num #f)
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num #f)
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (Num number? (#f)))) ) )) ) )
+          '((- (num number? (#f)))) ) )) ) )
 
   (define-test ("char")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num #\q)
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num #\q)
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (Num number? (#\q)))) ) )) ) )
+          '((- (num number? (#\q)))) ) )) ) )
 
   (define-test ("empty list")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang number? ())
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num ())
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (number? (())))) ) )) ) )
+          '((- (num number? (())))) ) )) ) )
 
   (define-test ("irregular list")
     (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num (car . cdr))
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (num (a . d) ((car . cdr))))) ) )) ) )
+          '((- (num number? ((car . cdr))))) ) )) ) )
 
   (define-test ("list")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang number? (+ x))
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num (+ x))
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (number? ((+ x))))) ) )) ) )
+          '((- (num number? ((+ x))))) ) )) ) )
 
   (define-test ("number")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num -42)
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num -42)
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (Num number? (-42)))) ) )) ) )
+          '((- (num number? (-42)))) ) )) ) )
 
   (define-test ("string")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num "have")
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num "have")
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (Num number? ("have")))) ) )) ) )
+          '((- (num number? ("have")))) ) )) ) )
 
   (define-test ("vector")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num #(x))
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num #(x))
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (Num number? (#(x))))) ) )) ) )
+          '((- (num number? (#(x))))) ) )) ) )
 )
 (verify-test-case! terminals:extension-removal:meta-var-names)
 
@@ -102,28 +102,28 @@
 (define-test-case (terminals:extension-removal:meta-var-syntax "Partitioning of extension terminal removal forms: meta variable syntax")
 
   (define-test ("atom")
-    (assert-syntax-error ("Invalid syntax of the terminal" lang (number? foo))
+    (assert-syntax-error ("Invalid syntax of the terminal" lang (num number? foo))
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (number? foo))) ) )) ) )
+          '((- (num number? foo))) ) )) ) )
 
   (define-test ("empty list")
-    (assert-syntax-error ("At least one meta-variable should be specified for a terminal" lang number?)
+    (assert-syntax-error ("At least one meta-variable should be specified for a terminal" lang num)
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (number? ()))) ) )) ) )
+          '((- (num number? ()))) ) )) ) )
 
   (define-test ("irregular list")
-    (assert-syntax-error ("Invalid syntax of the terminal" lang (num (a . d) (car . cdr)))
+    (assert-syntax-error ("Invalid syntax of the terminal" lang (num number? (car . cdr)))
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (num (a . d) (car . cdr)))) ) )) ) )
+          '((- (num number? (car . cdr)))) ) )) ) )
 
   (define-test ("vector")
-    (assert-syntax-error ("Invalid syntax of the terminal" lang (number? #(1 2 3)))
+    (assert-syntax-error ("Invalid syntax of the terminal" lang (num number? #(1 2 3)))
       ($ ($quote
         ($partition-extension-terminal-definitions 'lang
-          '((- (number? #(1 2 3)))) ) )) ) )
+          '((- (num number? #(1 2 3)))) ) )) ) )
 )
 (verify-test-case! terminals:extension-removal:meta-var-syntax)
 
@@ -180,36 +180,6 @@
           '((- (#() predicate? (some vars)))) ) )) ) )
 )
 (verify-test-case! terminals:extension-removal:name)
-
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
-
-(define-test-case (terminals:extension-removal:predicate "Partitioning of extension terminal removal forms: short form predicate syntax")
-
-  (define-test ("empty list")
-    (assert-syntax-error ("Terminal predicate must be a variable in short form" lang (() (some vars)) ())
-      ($ ($quote
-        ($partition-extension-terminal-definitions 'lang
-          '((- (() (some vars)))) ) )) ) )
-
-  (define-test ("irregular list")
-    (assert-syntax-error ("Terminal predicate must be a variable in short form" lang ((a . d) (some vars)) (a . d))
-      ($ ($quote
-        ($partition-extension-terminal-definitions 'lang
-          '((- ((a . d) (some vars)))) ) )) ) )
-
-  (define-test ("list")
-    (assert-syntax-error ("Terminal predicate must be a variable in short form" lang ((lambda (x) (odd? x)) (some vars)) (lambda (x) (odd? x)))
-      ($ ($quote
-        ($partition-extension-terminal-definitions 'lang
-          '((- ((lambda (x) (odd? x)) (some vars)))) ) )) ) )
-
-  (define-test ("vector")
-    (assert-syntax-error ("Terminal predicate must be a variable in short form" lang (#(1 2 3) (some vars)) #(1 2 3))
-      ($ ($quote
-        ($partition-extension-terminal-definitions 'lang
-          '((- (#(1 2 3) (some vars)))) ) )) ) )
-)
-(verify-test-case! terminals:extension-removal:predicate)
 
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 

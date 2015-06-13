@@ -44,7 +44,6 @@
     (define-syntax $can-be:standalone-terminal?
       (syntax-rules (quote)
         ((_ s '(name predicate (meta-vars ...))) ($ s '#t))
-        ((_ s '(predicate-name (meta-vars ...))) ($ s '#t))
         ((_ s  _)                                ($ s '#f)) ) )
 
     (define-standard-checkers %verify:standalone-terminal
@@ -56,11 +55,6 @@
          ($ s ($and '(%verify:terminal-name '(k (term . t)) 'name)
                     '(%verify:terminal-meta-var-list '(k (name . t)) '(meta-vars ...))
                     '($every? '(%verify:meta-var-name '(k (name . t))) '(meta-vars ...)) )))
-
-        ((_ s '(k t) 'term '(predicate-name (meta-vars ...)))
-         ($ s ($and '(%verify:terminal-predicate-name '(k (term . t)) 'predicate-name)
-                    '(%verify:terminal-meta-var-list '(k (predicate-name . t)) '(meta-vars ...))
-                    '($every? '(%verify:meta-var-name '(k (predicate-name . t))) '(meta-vars ...)) )))
 
         ((_ s '(k t) 'term _)
          ($ k '("Invalid syntax of the terminal" (term . t)))) ) )
@@ -164,9 +158,6 @@
 
     (define-verifier/symbol %verify:terminal-name
       ("Name of the terminal must be an identifier") )
-
-    (define-verifier/symbol %verify:terminal-predicate-name
-      ("Terminal predicate must be a variable in short form") )
 
     (define-verifier/nonempty-list %verify:terminal-meta-var-list
       ("At least one meta-variable should be specified for a terminal") )

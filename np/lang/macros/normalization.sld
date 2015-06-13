@@ -25,21 +25,16 @@
     (define-syntax $normalize-standalone-terminal-definition
       (syntax-rules (quote)
         ((_ s '(name predicate meta-var-list))
-         ($ s '(name predicate meta-var-list)))
-        ((_ s '(predicate-name meta-var-list))
-         ($ s '(predicate-name predicate-name meta-var-list))) ) )
+         ($ s '(name predicate meta-var-list))) ) )
 
     (define-syntax $normalize-extension-terminal-addition
       (syntax-rules (quote)
         ((_ s '(name predicate meta-var-list))
-         ($ s '(name predicate meta-var-list)))
-        ((_ s '(predicate-name meta-var-list))
-         ($ s '(predicate-name predicate-name meta-var-list))) ) )
+         ($ s '(name predicate meta-var-list))) ) )
 
     (define-syntax $normalize-extension-terminal-removal
       (syntax-rules (quote)
         ((_ s '(name predicate meta-var-list)) ($ s 'name))
-        ((_ s '(predicate-name meta-var-list)) ($ s 'predicate-name))
         ((_ s 'name)                           ($ s 'name)) ) )
 
     (define-syntax $normalize-extension-terminal-modification

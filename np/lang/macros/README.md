@@ -382,13 +382,11 @@ _**Syntax violations**_:
 
 Referenced as: _standalone-terminal_
 
-`(name predicate (meta-vars ...))` — full form
-
-`(predicate-name (meta-vars ...))` — short form
+`(name predicate (meta-vars ...))` — the only acceptable form
 
 _**Syntax violations**_:
 
- 1. Clauses must have exactly one of these forms.
+ 1. Clauses must have exactly this form.
 
     — Invalid syntax of the terminal: <br/>
       <_language_> <_invalid-standalone-terminal_>
@@ -398,17 +396,12 @@ _**Syntax violations**_:
     — Name of the terminal must be an identifier: <br/>
       <_language_> <_standalone-terminal_> <_invalid-name_>
 
- 3. **predicate-name** must be an identifier.
-
-    — Terminal predicate must be a variable in short form: <br/>
-      <_language_> <_standalone-terminal_> <_invalid-predicate-name_>
-
- 4. **meta-vars** must a proper non-empty list.
+ 3. **meta-vars** must a proper non-empty list.
 
     — At least one meta-variable should be specified for a terminal: <br/>
       <_language_> <_terminal-name_>
 
- 5. Each **meta-var** must be a _meta-variable-name_.
+ 4. Each **meta-var** must be a _meta-variable-name_.
 
 
 #### Extension #######################################################
@@ -786,13 +779,9 @@ Here the rules of normalization are described in human-readable form.
 
 `(name predicate (meta-vars ...))` — full form (normalized form)
 
-`(predicate-name (meta-vars ...))` — short form
-
 _**Normalization**_:
 
- 1. Short form is converted into normalized form by assuming the
-    `predicate-name` to be both the name of the terminal and a reference
-    to its predicate.
+None.
 
 
 #### Extension #######################################################
@@ -801,13 +790,9 @@ _**Normalization**_:
 
 `(name predicate (meta-vars ...))` — full form (normalized form)
 
-`(predicate-name (meta-vars ...))` — short form
-
 _**Normalization**_:
 
- 1. Short form is converted into normalized form by assuming the
-    `predicate-name` to be both the name of the terminal and a reference
-    to its predicate.
+None.
 
 
 ##### Removal ##############################################
@@ -816,14 +801,9 @@ _**Normalization**_:
 
 `(name predicate (meta-vars ...))` — full form
 
-`(predicate-name (meta-vars ...))` — short form
-
 _**Normalization**_:
 
  1. Full form is converted into normalized form by leaving only the `name`.
-
- 2. Short form is converted into normalized form by leaving only the
-    `predicate-name` which is assumed to be the name of the terminal.
 
 
 ##### Modification #########################################

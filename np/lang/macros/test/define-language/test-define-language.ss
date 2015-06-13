@@ -49,7 +49,7 @@
       (extends Foo)
 
       (terminals
-        (+ (number? (n))) )
+        (+ (number number? (n))) )
 
       (! (Empty Empty? ((+ g)))) )
 

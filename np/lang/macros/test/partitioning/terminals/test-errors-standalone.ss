@@ -54,52 +54,52 @@
 (define-test-case (terminals:standalone:meta-var-names "Partitioning of standalone terminal forms: meta-variable names")
 
   (define-test ("boolean")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num #t)
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num #t)
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((Num number? (#t))) ) )) ) )
+          '((num number? (#t))) ) )) ) )
 
   (define-test ("char")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num #\x1234)
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num #\x1234)
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((Num number? (#\x1234))) ) )) ) )
+          '((num number? (#\x1234))) ) )) ) )
 
   (define-test ("empty list")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang number? ())
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num ())
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((number? (()))) ) )) ) )
+          '((num number? (()))) ) )) ) )
 
   (define-test ("irregular list")
     (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num (car . cdr))
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((num (car . cdr) ((car . cdr)))) ) )) ) )
+          '((num number? ((car . cdr)))) ) )) ) )
 
   (define-test ("list")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang number (+ x))
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num (+ x))
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((number number? ((+ x)))) ) )) ) )
+          '((num number? ((+ x)))) ) )) ) )
 
   (define-test ("number")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num -6)
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num -6)
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((Num number? (-6))) ) )) ) )
+          '((num number? (-6))) ) )) ) )
 
   (define-test ("string")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num "then")
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num "then")
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((Num number? ("then"))) ) )) ) )
+          '((num number? ("then"))) ) )) ) )
 
   (define-test ("vector")
-    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang Num #(x))
+    (assert-syntax-error ("Name of the meta-variable must be an identifier" lang num #(x))
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((Num number? (#(x)))) ) )) ) )
+          '((num number? (#(x)))) ) )) ) )
 )
 (verify-test-case! terminals:standalone:meta-var-names)
 
@@ -108,16 +108,16 @@
 (define-test-case (terminals:standalone:meta-var-syntax "Partitioning of standalone terminal forms: meta-variable syntax")
 
   (define-test ("atom")
-    (assert-syntax-error ("Invalid syntax of the terminal" lang (number? foo))
+    (assert-syntax-error ("Invalid syntax of the terminal" lang (number number? foo))
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((number? foo)) ) )) ) )
+          '((number number? foo)) ) )) ) )
 
   (define-test ("empty")
-    (assert-syntax-error ("At least one meta-variable should be specified for a terminal" lang number?)
+    (assert-syntax-error ("At least one meta-variable should be specified for a terminal" lang number)
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((number? ())) ) )) ) )
+          '((number number? ())) ) )) ) )
 
   (define-test ("irregular list")
     (assert-syntax-error ("Invalid syntax of the terminal" lang (number number? (a b . c)))
@@ -126,10 +126,10 @@
           '((number number? (a b . c))) ) )) ) )
 
   (define-test ("vector")
-    (assert-syntax-error ("Invalid syntax of the terminal" lang (number? #(1 2 3)))
+    (assert-syntax-error ("Invalid syntax of the terminal" lang (number number? #(1 2 3)))
       ($ ($quote
         ($filter-standalone-terminal-definitions 'lang
-          '((number? #(1 2 3))) ) )) ) )
+          '((number number? #(1 2 3))) ) )) ) )
 )
 (verify-test-case! terminals:standalone:meta-var-syntax)
 
@@ -186,33 +186,3 @@
           '((#() predicate? (some vars))) ) )) ) )
 )
 (verify-test-case! terminals:standalone:name)
-
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
-
-(define-test-case (terminals:standalone:predicate "Partitioning of standalone terminal forms: short form predicate syntax")
-
-  (define-test ("empty list")
-    (assert-syntax-error ("Terminal predicate must be a variable in short form" lang (() (some vars)) ())
-      ($ ($quote
-        ($filter-standalone-terminal-definitions 'lang
-          '((() (some vars))) ) )) ) )
-
-  (define-test ("irregular list")
-    (assert-syntax-error ("Terminal predicate must be a variable in short form" lang ((a . d) (some vars)) (a . d))
-      ($ ($quote
-        ($filter-standalone-terminal-definitions 'lang
-          '(((a . d) (some vars))) ) )) ) )
-
-  (define-test ("list")
-    (assert-syntax-error ("Terminal predicate must be a variable in short form" lang ((lambda (x) (odd? x)) (some vars)) (lambda (x) (odd? x)))
-      ($ ($quote
-        ($filter-standalone-terminal-definitions 'lang
-          '(((lambda (x) (odd? x)) (some vars))) ) )) ) )
-
-  (define-test ("vector")
-    (assert-syntax-error ("Terminal predicate must be a variable in short form" lang (#(1 2 3) (some vars)) #(1 2 3))
-      ($ ($quote
-        ($filter-standalone-terminal-definitions 'lang
-          '((#(1 2 3) (some vars))) ) )) ) )
-)
-(verify-test-case! terminals:standalone:predicate)
