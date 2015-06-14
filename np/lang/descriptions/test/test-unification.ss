@@ -43,50 +43,76 @@
 
 (define-test-case (unification:productions "Production comparison")
 
-  (define mapping (make-meta-var-mapping
-   (list (make-terminal-definition 'number number? '(n m))
-         (make-terminal-definition 'string string? '(s str)) )
-   (list (make-nonterminal-definition 'Number '(Num Number) '())
-         (make-nonterminal-definition 'NamedNumber '(Name NamedNumber) '()) ) ))
+  (define productions-equal?
+   (equality-for-mapping
+    (make-meta-var-mapping
+     (list (make-terminal-definition 'number number? '(n m))
+           (make-terminal-definition 'string string? '(s str)) )
+     (list (make-nonterminal-definition 'Number '(Num Number) '())
+           (make-nonterminal-definition 'NamedNumber '(Name NamedNumber) '()) ) ) ) )
 
   (define-test ("Normal case")
     (assert-true
-     (productions-equal? mapping '(Num n s) '(Num n s)) ) )
+     (productions-equal? '(Num n s) '(Num n s)) ) )
 
   (define-test ("Empty lists are equal")
     (assert-true
-     (productions-equal? mapping '() '()) ) )
+     (productions-equal? '() '()) ) )
 
   (define-test ("Can use any of meta-vars")
     (assert-true
-     (productions-equal? mapping '(Num n s) '(Number m str)) ) )
+     (productions-equal? '(Num n s) '(Number m str)) ) )
 
   (define-test ("Suffixes do not matter for meta-vars")
     (assert-true
-     (productions-equal? mapping '(Num* n+ s9) '(Number000 m? str???*)) ) )
+     (productions-equal? '(Num* n+ s9) '(Number000 m? str???*)) ) )
 
   (define-test ("Can handle literals")
     (assert-true
-     (productions-equal? mapping '(/ Num Num) '(/ Number Number)) ) )
+     (productions-equal? '(/ Num Num) '(/ Number Number)) ) )
 
   (define-test ("Can handle maybe")
     (assert-true
-     (productions-equal? mapping '(+ (maybe Num) Num) '(+ (maybe Number) Number)) ) )
+     (productions-equal? '(+ (maybe Num) Num) '(+ (maybe Number) Number)) ) )
 
   (define-test ("Can handle repetitions")
     (assert-true
-     (productions-equal? mapping '(n ... s !..) '(m ... str !..)) ) )
+     (productions-equal? '(n ... s !..) '(m ... str !..)) ) )
 
   (define-test ("Suffixes do matter for literals")
     (assert-false
-     (productions-equal? mapping '(e n n s) '(e* n* n* s*)) ) )
+     (productions-equal? '(e n n s) '(e* n* n* s*)) ) )
 
   (define-test ("Literals do not match meta-vars")
     (assert-false
-     (productions-equal? mapping 'n 'N) ) )
+     (productions-equal? 'n 'N) ) )
 
   (define-test ("Different entities do not match")
     (assert-false
-     (productions-equal? mapping 'Num 'n) ) )
+     (productions-equal? 'Num 'n) ) )
 )
 (verify-test-case! unification:productions)
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+(define-test-case (unification:mapping "Meta-var mapping utilities")
+
+  (define mapping
+   (make-meta-var-mapping
+    (list (make-terminal-definition 'number number? '(a b))
+          (make-terminal-definition 'string string? '(c)) )
+    (list (make-nonterminal-definition 'Number '(D) '())
+          (make-nonterminal-definition 'NamedNumber '(E F) '()) ) ) )
+
+  (define-test ("Meta-var exists" var)
+    #((map list '(a b c D E F)))
+    (assert-true (meta-var-mapped? mapping var) ) )
+
+  (define-test ("Meta-var does not exist" var)
+    #((map list '(foo BAR baz zomg |42|)))
+    (assert-false (meta-var-mapped? mapping var) ) )
+
+  (define-test ("Trims suffixes")
+    (assert-true (meta-var-mapped? mapping 'a1234567890***??+^) ) )
+)
+(verify-test-case! unification:mapping)

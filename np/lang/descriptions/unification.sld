@@ -4,7 +4,8 @@
   ;;;
   (export trim-meta-var-name
           make-meta-var-mapping
-          productions-equal?)
+          equality-for-mapping
+          meta-var-mapped?)
 
   (import (scheme base)
           (srfi 69) ; hash tables
@@ -62,14 +63,16 @@
           nonterminals )
         hash ) )
 
-    (define (productions-equal? mapping p1 p2)
-      (cond ((and (null? p1) (null? p2)) #t)
-            ((and (symbol? p1) (symbol? p2))
-             (symbols-equal? mapping p1 p2) )
-            ((and (pair? p1) (pair? p2))
-             (and (productions-equal? mapping (car p1) (car p2))
-                  (productions-equal? mapping (cdr p1) (cdr p2)) ) )
-            (else #f) ) )
+    (define (equality-for-mapping mapping)
+      (define (productions-equal? p1 p2)
+        (cond ((and (null? p1) (null? p2)) #t)
+              ((and (symbol? p1) (symbol? p2))
+               (symbols-equal? mapping p1 p2) )
+              ((and (pair? p1) (pair? p2))
+               (and (productions-equal? (car p1) (car p2))
+                    (productions-equal? (cdr p1) (cdr p2)) ) )
+              (else #f) ) )
+      productions-equal? )
 
     (define (symbols-equal? mapping s1 s2)
       (if (eq? s1 s2) ; If symbols are equal
@@ -80,4 +83,8 @@
                 (eq? e1 e2) ; they must refer to the same entity.
                 #f ) ) ) )  ; Otherwise, one of them is literal and the other
                             ; one is a meta-variable or some different literal
+
+    (define (meta-var-mapped? mapping x)
+      (hash-table-exists? mapping (trim-meta-var-name x)) )
+
 ) )

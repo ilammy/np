@@ -117,8 +117,7 @@
         eq? #f
         'ext:nonterm:modify-duplicate
         'ext:nonterm:modify-missing )
-      (let* ((mapping (make-meta-var-mapping terminals nonterminals))
-             (productions-equal? (lambda (a b) (productions-equal? mapping a b))))
+      (let ((productions-equal? (equality-for-mapping (make-meta-var-mapping terminals nonterminals))))
         (map
           (lambda (nonterminal)
             (define (with-name name)
