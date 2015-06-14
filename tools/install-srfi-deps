@@ -1,0 +1,28 @@
+#!/bin/sh
+set -ex
+
+[ -z $SRFI_60_FORK ]    && SRFI_60_FORK=ilammy/srfi-60
+[ -z $SRFI_60_BRANCH ]  && SRFI_60_BRANCH=v1.0.0
+
+[ -z $SRFI_113_FORK ]   && SRFI_113_FORK=ilammy/srfi-113
+[ -z $SRFI_113_BRANCH ] && SRFI_113_BRANCH=v1.0.0
+
+[ -z $SRFI_114_FORK ]   && SRFI_114_FORK=ilammy/srfi-114
+[ -z $SRFI_114_BRANCH ] && SRFI_114_BRANCH=v1.0.0
+
+cd /tmp/scratch
+git clone --depth 50 --branch $SRFI_60_BRANCH  -- https://github.com/$SRFI_60_FORK  srfi-60
+git clone --depth 50 --branch $SRFI_113_BRANCH -- https://github.com/$SRFI_113_FORK srfi-113
+git clone --depth 50 --branch $SRFI_114_BRANCH -- https://github.com/$SRFI_114_FORK srfi-114
+
+cd /tmp/scratch/srfi-60
+./tools/make-snowball
+snow-chibi --ignore-sig --ignore-digest install srfi-60.tgz
+
+cd /tmp/scratch/srfi-114
+./tools/make-snowball
+snow-chibi --ignore-sig --ignore-digest install srfi-114.tgz
+
+cd /tmp/scratch/srfi-113
+./tools/make-snowball
+snow-chibi --ignore-sig --ignore-digest install srfi-113.tgz

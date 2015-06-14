@@ -13,6 +13,7 @@ install:
   - source ~/.profile
   - ./tools/checkout-syntax-rules
   - ./tools/checkout-test-essentials
+  - ./tools/install-srfi-deps
 
 before_script:
   - ./tools/setup-test-rig
